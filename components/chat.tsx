@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/client";
+import { connectRealtime, createClient } from "@/lib/supabase/client";
 import { Avatar } from "@/components/avatar";
 import { Icon } from "@/components/icons";
 import { ReportButton } from "@/components/report-button";
@@ -49,22 +49,28 @@ export function Chat({
         .eq("profile_id", meId)
         .then(() => {});
     markRead();
-    const channel = supabase
-      .channel(`chat:${conversationId}`)
-      .on(
-        "postgres_changes",
-        { event: "INSERT", schema: "public", table: "messages", filter: `conversation_id=eq.${conversationId}` },
-        (payload) => {
-          const m = payload.new as ChatMessage;
-          if (m.status === "visible" || m.sender_id === meId) {
-            add(m);
-            markRead();
-          }
-        },
-      )
-      .subscribe();
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+    let stopped = false;
+    connectRealtime().then(() => {
+      if (stopped) return;
+      channel = supabase
+        .channel(`chat:${conversationId}`)
+        .on(
+          "postgres_changes",
+          { event: "INSERT", schema: "public", table: "messages", filter: `conversation_id=eq.${conversationId}` },
+          (payload) => {
+            const m = payload.new as ChatMessage;
+            if (m.status === "visible" || m.sender_id === meId) {
+              add(m);
+              markRead();
+            }
+          },
+        )
+        .subscribe();
+    });
     return () => {
-      supabase.removeChannel(channel);
+      stopped = true;
+      if (channel) supabase.removeChannel(channel);
     };
   }, [conversationId, meId]);
 

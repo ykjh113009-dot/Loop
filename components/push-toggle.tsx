@@ -10,25 +10,26 @@ function base64ToBytes(base64: string) {
   return Uint8Array.from(atob(padded), (c) => c.charCodeAt(0));
 }
 
+type PushState = "loading" | "unsupported" | "off" | "on" | "blocked";
+
+async function detect(): Promise<PushState> {
+  if (!KEY || !("serviceWorker" in navigator) || !("PushManager" in window)) return "unsupported";
+  if (Notification.permission === "denied") return "blocked";
+  try {
+    const reg = await navigator.serviceWorker.register("/sw.js");
+    return (await reg.pushManager.getSubscription()) ? "on" : "off";
+  } catch {
+    return "unsupported";
+  }
+}
+
 // Lets a student turn on alerts on their phone (needs the site added to the
 // home screen on iPhones).
 export function PushToggle() {
-  const [state, setState] = useState<"loading" | "unsupported" | "off" | "on" | "blocked">("loading");
+  const [state, setState] = useState<PushState>("loading");
 
   useEffect(() => {
-    if (!KEY || !("serviceWorker" in navigator) || !("PushManager" in window)) {
-      setState("unsupported");
-      return;
-    }
-    if (Notification.permission === "denied") {
-      setState("blocked");
-      return;
-    }
-    navigator.serviceWorker
-      .register("/sw.js")
-      .then((reg) => reg.pushManager.getSubscription())
-      .then((sub) => setState(sub ? "on" : "off"))
-      .catch(() => setState("unsupported"));
+    detect().then(setState);
   }, []);
 
   async function turnOn() {

@@ -11,3 +11,12 @@ export function createClient() {
   );
   return client;
 }
+
+// Live updates must carry the student's sign-in, otherwise the security
+// rules (correctly) send nothing. Call this before subscribing to a channel.
+export async function connectRealtime() {
+  const supabase = createClient();
+  const { data } = await supabase.auth.getSession();
+  if (data.session) await supabase.realtime.setAuth(data.session.access_token);
+  return supabase;
+}

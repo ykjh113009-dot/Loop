@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
+import { connectRealtime, createClient } from "@/lib/supabase/client";
 import { Icon, type IconName } from "@/components/icons";
 
 export type Badges = { notifications: number; messages: number; moderation: number };
@@ -32,16 +32,22 @@ export function BottomNav({ userId, initial }: { userId: string | null; initial:
   useEffect(() => {
     if (!userId) return;
     const supabase = createClient();
-    const channel = supabase
-      .channel(`badges:${userId}`)
-      .on(
-        "postgres_changes",
-        { event: "INSERT", schema: "public", table: "notifications", filter: `recipient_id=eq.${userId}` },
-        () => setBadges((b) => ({ ...b, notifications: b.notifications + 1 })),
-      )
-      .subscribe();
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+    let stopped = false;
+    connectRealtime().then(() => {
+      if (stopped) return;
+      channel = supabase
+        .channel(`badges:${userId}`)
+        .on(
+          "postgres_changes",
+          { event: "INSERT", schema: "public", table: "notifications", filter: `recipient_id=eq.${userId}` },
+          () => setBadges((b) => ({ ...b, notifications: b.notifications + 1 })),
+        )
+        .subscribe();
+    });
     return () => {
-      supabase.removeChannel(channel);
+      stopped = true;
+      if (channel) supabase.removeChannel(channel);
     };
   }, [userId]);
 

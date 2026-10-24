@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
+import { connectRealtime, createClient } from "@/lib/supabase/client";
 
 // "I'm going" button with a going-count that updates live for everyone.
 export function RsvpButton({
@@ -36,16 +36,22 @@ export function RsvpButton({
 
   useEffect(() => {
     const supabase = createClient();
-    const channel = supabase
-      .channel(`rsvps:${eventId}`)
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "event_rsvps", filter: `event_id=eq.${eventId}` }, recount)
-      // Deletes can't be filtered on the server, so check which event it was.
-      .on("postgres_changes", { event: "DELETE", schema: "public", table: "event_rsvps" }, (payload) => {
-        if ((payload.old as { event_id?: string }).event_id === eventId) recount();
-      })
-      .subscribe();
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+    let stopped = false;
+    connectRealtime().then(() => {
+      if (stopped) return;
+      channel = supabase
+        .channel(`rsvps:${eventId}`)
+        .on("postgres_changes", { event: "INSERT", schema: "public", table: "event_rsvps", filter: `event_id=eq.${eventId}` }, recount)
+        // Deletes can't be filtered on the server, so check which event it was.
+        .on("postgres_changes", { event: "DELETE", schema: "public", table: "event_rsvps" }, (payload) => {
+          if ((payload.old as { event_id?: string }).event_id === eventId) recount();
+        })
+        .subscribe();
+    });
     return () => {
-      supabase.removeChannel(channel);
+      stopped = true;
+      if (channel) supabase.removeChannel(channel);
     };
   }, [eventId, recount]);
 

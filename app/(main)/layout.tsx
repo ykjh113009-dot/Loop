@@ -71,7 +71,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         <SuspendedBanner />
       </Suspense>
       <main className="px-4 py-4">{children}</main>
-      <Suspense fallback={<BottomNav userId={null} initial={NO_BADGES} />}>
+      <Suspense fallback={<div className="fixed inset-x-0 bottom-0 h-16 border-t border-black/5 bg-white/95" />}>
         <Nav />
       </Suspense>
     </div>
