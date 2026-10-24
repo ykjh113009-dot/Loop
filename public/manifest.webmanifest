@@ -1,0 +1,10 @@
+{
+  "name": "Pbs Go",
+  "short_name": "Pbs Go",
+  "description": "Your school's private space for clubs, events and friends.",
+  "start_url": "/home",
+  "display": "standalone",
+  "background_color": "#f5f6f4",
+  "theme_color": "#047857",
+  "icons": [{ "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
+}

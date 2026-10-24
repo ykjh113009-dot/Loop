@@ -1,0 +1,68 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-50: #ecfdf5;
+  --color-brand-100: #d1fae5;
+  --color-brand-200: #a7f3d0;
+  --color-brand-500: #10b981;
+  --color-brand-600: #059669;
+  --color-brand-700: #047857;
+  --color-brand-800: #065f46;
+  --color-brand-900: #064e3b;
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", "Noto Sans Arabic", Tahoma, sans-serif;
+}
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  background: #f5f6f4;
+  color: #1c1f1d;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Reusable building blocks, used like normal Tailwind classes. */
+@utility card {
+    @apply rounded-2xl border border-black/5 bg-white shadow-sm;
+}
+
+@utility input {
+    @apply w-full rounded-xl border border-black/15 bg-white px-3 py-2.5 text-base outline-none placeholder:text-black/35 focus:border-brand-600 focus:ring-2 focus:ring-brand-600/20;
+}
+
+@utility label {
+    @apply mb-1 block text-sm font-medium text-black/70;
+}
+
+@utility btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50;
+}
+
+@utility btn-primary {
+    @apply btn bg-brand-700 text-white hover:bg-brand-800;
+}
+
+@utility btn-secondary {
+    @apply btn border border-black/10 bg-white text-black/80 hover:bg-black/5;
+}
+
+@utility btn-danger {
+    @apply btn bg-red-600 text-white hover:bg-red-700;
+}
+
+@utility btn-ghost {
+    @apply btn text-black/70 hover:bg-black/5;
+}
+
+@utility chip {
+    @apply inline-flex items-center gap-1 rounded-full bg-black/5 px-2.5 py-1 text-xs font-medium text-black/70;
+}
+
+@utility page-title {
+    @apply text-xl font-bold tracking-tight;
+}
+
+@utility section-title {
+    @apply mb-2 text-sm font-semibold uppercase tracking-wide text-black/50;
+}
