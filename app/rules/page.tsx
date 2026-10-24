@@ -22,11 +22,21 @@ export default function RulesPage() {
         <li>Don&apos;t share phone numbers, addresses, passwords or photos of other people without asking them.</li>
         <li>Don&apos;t screenshot private chats to embarrass anyone.</li>
       </ul>
+      <h2>Buying, selling and swapping</h2>
+      <ul>
+        <li>Meet only at school, during the school day. No online payments.</li>
+        <li>Only sell things that are yours and allowed at school. No food, medicine, phones that aren&apos;t yours, or anything dangerous.</li>
+      </ul>
+      <h2>Points, challenges and volunteering</h2>
+      <ul>
+        <li>Be honest about challenges and volunteering hours — moderators check them, and false entries are removed.</li>
+        <li>Points add up for your grade. Nobody else can see your own points.</li>
+      </ul>
       <h2>Speak up</h2>
       <ul>
         <li>Every post, message, profile, club and event has a <strong>Report</strong> button. Reports are private — the person you report is not told who reported them.</li>
         <li>If someone bothers you in private messages, you can <strong>block</strong> them from their profile.</li>
-        <li>If you or a friend is not OK, tell a teacher or counselor you trust, or use the report reason &quot;Someone may need help&quot; — an admin will see it straight away.</li>
+        <li>If you or a friend is not OK, tell a teacher or counselor you trust, use the report reason &quot;Someone may need help&quot;, or tap <strong>Talk to the counselor</strong> on the More page. Only you and the counselor can read those messages.</li>
       </ul>
       <h2>What happens if rules are broken</h2>
       <p>Moderators can remove content and suspend accounts for 1, 7 or 30 days. School admins can remove accounts. Every action is recorded.</p>

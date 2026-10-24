@@ -35,7 +35,16 @@ export async function updateProfile(_: ActionResult, formData: FormData): Promis
   const supabase = await createClient();
   const { error } = await supabase
     .from("profiles")
-    .update({ avatar, bio: String(formData.get("bio") ?? "").trim().slice(0, 200) })
+    .update({
+      avatar,
+      bio: String(formData.get("bio") ?? "").trim().slice(0, 200),
+      ...(me.isAlumni
+        ? {
+            university: String(formData.get("university") ?? "").trim().slice(0, 80),
+            major: String(formData.get("major") ?? "").trim().slice(0, 80),
+          }
+        : {}),
+    })
     .eq("id", me.id);
   if (error) return { error: friendlyError(error) };
 

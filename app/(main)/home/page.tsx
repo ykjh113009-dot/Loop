@@ -29,6 +29,11 @@ async function Home() {
     supabase.from("event_rsvps").select("event_id").eq("profile_id", me.id),
   ]);
 
+  const nowIso = new Date().toISOString();
+  const [{ data: challenge }, { count: openPolls }] = await Promise.all([
+    supabase.from("challenges").select("id, title, emoji, points").lte("starts_at", nowIso).gt("ends_at", nowIso).order("starts_at", { ascending: false }).limit(1).maybeSingle(),
+    supabase.from("polls").select("id", { count: "exact", head: true }).gt("closes_at", nowIso),
+  ]);
   const clubIds = (memberships ?? []).map((m) => m.club_id);
   const goingTo = new Set((myRsvps ?? []).map((r) => r.event_id));
   const posts = await loadPosts(supabase, clubIds, 20);
@@ -50,6 +55,30 @@ async function Home() {
           ))}
         </section>
       )}
+
+      <section className="grid grid-cols-2 gap-2">
+        {challenge && me.isStudent ? (
+          <Link href="/challenges" className="card p-3 hover:bg-black/[0.02]">
+            <p className="text-xs font-semibold text-brand-700">This week&apos;s challenge</p>
+            <p className="mt-1 text-sm leading-tight font-semibold">{challenge.emoji} {challenge.title}</p>
+            <p className="mt-0.5 text-xs text-black/50">+{challenge.points} points for your grade</p>
+          </Link>
+        ) : (
+          <Link href="/tawjihi" className="card p-3 hover:bg-black/[0.02]">
+            <p className="text-xs font-semibold text-brand-700">Tawjihi corner</p>
+            <p className="mt-1 text-sm leading-tight font-semibold">🎓 Ask alumni mentors</p>
+          </Link>
+        )}
+        <Link href="/polls" className="card p-3 hover:bg-black/[0.02]">
+          <p className="text-xs font-semibold text-brand-700">Polls</p>
+          <p className="mt-1 text-sm leading-tight font-semibold">📊 {openPolls ? `${openPolls} open ${openPolls === 1 ? "poll" : "polls"}` : "No open polls"}</p>
+          <p className="mt-0.5 text-xs text-black/50">Have your say</p>
+        </Link>
+        <Link href="/more" className="card col-span-2 flex items-center justify-between p-3 text-sm hover:bg-black/[0.02]">
+          <span>📚 Tutors · 🛍️ Market · 💚 Volunteering · 🗳️ Council · 💡 Ideas</span>
+          <span className="text-brand-700">More →</span>
+        </Link>
+      </section>
 
       <section>
         <div className="flex items-baseline justify-between">

@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { connectRealtime, createClient } from "@/lib/supabase/client";
 import { Icon, type IconName } from "@/components/icons";
 
-export type Badges = { notifications: number; messages: number; moderation: number };
+export type Badges = { notifications: number; messages: number; moderation: number; counselor?: number };
 
 const TABS: { href: string; label: string; icon: IconName; badge?: keyof Badges }[] = [
   { href: "/home", label: "Home", icon: "home" },
@@ -52,11 +52,11 @@ export function BottomNav({ userId, initial }: { userId: string | null; initial:
   }, [userId]);
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-black/5 bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur">
+    <nav className="fixed inset-x-0 bottom-0 z-20 print:hidden border-t border-black/5 bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur">
       <ul className="mx-auto flex max-w-2xl">
         {TABS.map((tab) => {
           const active = pathname === tab.href || pathname.startsWith(tab.href + "/");
-          const count = tab.badge ? badges[tab.badge] : 0;
+          const count = (tab.badge ? badges[tab.badge] : 0) ?? 0;
           return (
             <li key={tab.href} className="flex-1">
               <Link

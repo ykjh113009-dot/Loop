@@ -310,6 +310,255 @@ insert into public.moderation_log (school_id, actor_id, action, target_type, tar
 select school_id, reviewed_by, 'approve_club', 'club', id, name, reviewed_at
 from public.clubs where status = 'approved';
 
+-- =============================================================================
+-- PHASE 2 demo data
+-- =============================================================================
+
+-- A school counselor (adult staff) and two alumni mentors.
+select pg_temp.demo_user('00000000-0000-0000-0000-0000000000b1', 'demo.counselor@pioneers.edu.ps', 'Hiba Saadeh');
+select pg_temp.demo_user('00000000-0000-0000-0000-0000000000b2', 'demo.khalil@pioneers.edu.ps', 'Khalil Mansour');
+select pg_temp.demo_user('00000000-0000-0000-0000-0000000000b3', 'demo.dina@pioneers.edu.ps', 'Dina Awad');
+update public.profiles set role = 'counselor', grade = null, avatar = 'a10', onboarded_at = now() - interval '25 days',
+  bio = 'School counselor. My door (and inbox) is always open.'
+  where id = '00000000-0000-0000-0000-0000000000b1';
+update public.profiles set alumni_year = 2024, grade = null, avatar = 'a08', onboarded_at = now() - interval '20 days',
+  university = 'Birzeit University', major = 'Computer Engineering',
+  bio = 'Tawjihi scientific stream 2024. Happy to help with math and physics!'
+  where id = '00000000-0000-0000-0000-0000000000b2';
+update public.profiles set alumni_year = 2023, grade = null, avatar = 'a04', onboarded_at = now() - interval '20 days',
+  university = 'An-Najah National University', major = 'Medicine',
+  bio = 'Ask me about biology, chemistry and how to plan your study time.'
+  where id = '00000000-0000-0000-0000-0000000000b3';
+
+-- ---------------------------------------------------------------------------
+-- Tutors, tutoring and study buddies
+-- ---------------------------------------------------------------------------
+insert into public.tutor_profiles (profile_id, school_id, subjects, about, availability) values
+  ('00000000-0000-0000-0000-0000000000a3', '00000000-0000-0000-0000-00000000a001', '{Math,Physics}',
+   'I explain step by step and I''m patient. Got 98 in math last term.', 'Mon & Wed after school, library'),
+  ('00000000-0000-0000-0000-0000000000a1', '00000000-0000-0000-0000-00000000a001', '{English,Arabic}',
+   'Essay writing, grammar and speaking practice.', 'Break time, any day'),
+  ('00000000-0000-0000-0000-0000000000a2', '00000000-0000-0000-0000-00000000a001', '{Technology,Math}',
+   'Python, Scratch and basic algebra.', 'Tuesdays after football'),
+  ('00000000-0000-0000-0000-000000001003', '00000000-0000-0000-0000-00000000a001', '{Chemistry,Biology}',
+   'I make flashcards for everything — happy to share them.', 'Thursday break'),
+  ('00000000-0000-0000-0000-000000001007', '00000000-0000-0000-0000-00000000a001', '{History,Geography}',
+   'Maps, dates and tricks to remember them.', 'Sunday after school'),
+  ('00000000-0000-0000-0000-00000000100b', '00000000-0000-0000-0000-00000000a001', '{Islamic Education,Arabic}',
+   'Tajweed and Arabic grammar.', 'Mon break');
+
+insert into public.tutoring_requests (school_id, learner_id, tutor_id, subject, message, status, created_at, responded_at, completed_at) values
+  ('00000000-0000-0000-0000-00000000a001', '00000000-0000-0000-0000-0000000000a5', '00000000-0000-0000-0000-0000000000a3',
+   'Math', 'Can you help me with fractions and percentages? I have a quiz next week.', 'accepted', now() - interval '2 days', now() - interval '1 day', null),
+  ('00000000-0000-0000-0000-00000000a001', '00000000-0000-0000-0000-0000000000a5', '00000000-0000-0000-0000-0000000000a1',
+   'English', 'I need help with my English essay about my hometown.', 'completed', now() - interval '9 days', now() - interval '8 days', now() - interval '6 days'),
+  ('00000000-0000-0000-0000-00000000a001', '00000000-0000-0000-0000-000000001004', '00000000-0000-0000-0000-0000000000a3',
+   'Physics', 'Newton''s laws are confusing me 😅', 'pending', now() - interval '3 hours', null, null);
+select public.award_points('00000000-0000-0000-0000-0000000000a1', 15, 'tutoring', id, completed_at)
+from public.tutoring_requests where status = 'completed';
+
+insert into public.study_buddy_posts (school_id, author_id, subject, note, created_at) values
+  ('00000000-0000-0000-0000-00000000a001', '00000000-0000-0000-0000-000000001003', 'Physics',
+   'Tawjihi physics — looking for 2 people to solve past exams together, Tuesdays after school.', now() - interval '1 day'),
+  ('00000000-0000-0000-0000-00000000a001', '00000000-0000-0000-0000-0000000000a5', 'English',
+   'Anyone in grade 9 want to practise English speaking at break? 🙂', now() - interval '5 hours'),
+  ('00000000-0000-0000-0000-00000000a001', '00000000-0000-0000-0000-000000001006', 'Math',
+   'Preparing for the math olympiad. Who''s in?', now() - interval '3 days');
+
+-- ---------------------------------------------------------------------------
+-- Marketplace
+-- ---------------------------------------------------------------------------
+insert into public.listings (id, school_id, seller_id, title, description, category, kind, price, condition, created_at) values
+  ('00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-00000000a001', '00000000-0000-0000-0000-000000001003',
+   'Grade 12 physics book + solved exams', 'Clean copy, a few notes in pencil. Includes 5 years of solved Tawjihi exams.', 'books', 'sell', 25, 'good', now() - interval '2 days'),
+  ('00000000-0000-0000-0000-00000000f002', '00000000-0000-0000-0000-00000000a001', '00000000-0000-0000-0000-0000000000a4',
+   'Football boots, size 42', 'Worn one season. Great grip on the school field.', 'sports', 'sell', 60, 'used', now() - interval '1 day'),
+  ('00000000-0000-0000-0000-00000000f003', '00000000-0000-0000-0000-00000000a001', '00000000-0000-0000-0000-000000001008',
+   'Scientific calculator (Casio fx-991)', 'Works perfectly, new batteries.', 'electronics', 'sell', 40, 'like_new', now() - interval '4 days'),
+  ('00000000-0000-0000-0000-00000000f004', '00000000-0000-0000-0000-00000000a001', '00000000-0000-0000-0000-00000000100c',
+   'School uniform shirts (2), size M', 'Too small for me now. Free to anyone who needs them.', 'uniform', 'free', null, 'good', now() - interval '6 hours'),
+  ('00000000-0000-0000-0000-00000000f005', '00000000-0000-0000-0000-00000000a001', '00000000-0000-0000-0000-000000001003',
+   'Swap: watercolour set for sketchbooks', 'I have a 24-colour watercolour set and would love some sketchbooks.', 'art', 'swap', null, 'like_new', now() - interval '3 days'),
+  ('00000000-0000-0000-0000-00000000f006', '00000000-0000-0000-0000-00000000a001', '00000000-0000-0000-0000-000000001012',
+   'Oud for beginners', 'Small oud, good for learning. Case included.', 'music', 'sell', 300, 'good', now() - interval '8 days'),
+  ('00000000-0000-0000-0000-00000000f007', '00000000-0000-0000-0000-00000000a001', '00000000-0000-0000-0000-000000001016',
+   'Arabic novels bundle', 'Five novels including "Returning to Haifa".', 'books', 'sell', 30, 'good', now() - interval '10 days');
+update public.listings set status = 'reserved' where id = '00000000-0000-0000-0000-00000000f003';
+update public.listings set status = 'sold' where id = '00000000-0000-0000-0000-00000000f007';
+
+-- ---------------------------------------------------------------------------
+-- Weekly challenges (this week's and last week's)
+-- ---------------------------------------------------------------------------
+insert into public.challenges (id, school_id, title, description, emoji, points, starts_at, ends_at, created_by, created_at) values
+  ('00000000-0000-0000-0000-000000000c01', '00000000-0000-0000-0000-00000000a001', 'Read for 20 minutes a day',
+   'Any book, any language. Tell us what you read and one thing you liked about it.', '📚', 20,
+   public.week_start(), public.week_start() + interval '7 days', '00000000-0000-0000-0000-0000000000a2', now() - interval '1 hour'),
+  ('00000000-0000-0000-0000-000000000c02', '00000000-0000-0000-0000-00000000a001', 'Plastic-free lunch',
+   'Bring your lunch without any plastic for 3 days. Share a photo of your lunch box!', '🌱', 15,
+   public.week_start(), public.week_start() + interval '7 days', '00000000-0000-0000-0000-0000000000a1', now() - interval '1 hour'),
+  ('00000000-0000-0000-0000-000000000c03', '00000000-0000-0000-0000-00000000a001', 'Thank a school worker',
+   'Write a thank-you card for a cleaner, guard or canteen worker.', '💐', 15,
+   public.week_start() - interval '7 days', public.week_start(), '00000000-0000-0000-0000-0000000000a1', now() - interval '8 days');
+
+-- Last week's challenge: many approved entries (points dated last week).
+insert into public.challenge_submissions (school_id, challenge_id, profile_id, note, status, reviewed_by, reviewed_at, created_at)
+select '00000000-0000-0000-0000-00000000a001', '00000000-0000-0000-0000-000000000c03', p.id,
+       'I wrote a card for the school guard and he smiled all day.', 'approved',
+       '00000000-0000-0000-0000-0000000000a2', public.week_start() - interval '2 days', public.week_start() - interval '3 days'
+from public.profiles p
+where p.grade is not null and abs(hashtext(p.id::text || 'c03')) % 10 < 5;
+select public.award_points(profile_id, 15, 'challenge', challenge_id, reviewed_at)
+from public.challenge_submissions where challenge_id = '00000000-0000-0000-0000-000000000c03';
+
+-- This week: some approved already, some waiting for a moderator.
+insert into public.challenge_submissions (school_id, challenge_id, profile_id, note, status, reviewed_by, reviewed_at, created_at)
+select '00000000-0000-0000-0000-00000000a001', '00000000-0000-0000-0000-000000000c01', p.id,
+       'I read two chapters of "Men in the Sun" every evening.',
+       case when abs(hashtext(p.id::text)) % 3 = 0 then 'pending' else 'approved' end,
+       case when abs(hashtext(p.id::text)) % 3 = 0 then null else '00000000-0000-0000-0000-0000000000a2'::uuid end,
+       case when abs(hashtext(p.id::text)) % 3 = 0 then null else now() - interval '20 minutes' end,
+       now() - interval '40 minutes'
+from public.profiles p
+where p.grade is not null and p.id <> '00000000-0000-0000-0000-0000000000a5' and abs(hashtext(p.id::text || 'c01')) % 10 < 4;
+select public.award_points(profile_id, 20, 'challenge', challenge_id, reviewed_at)
+from public.challenge_submissions where challenge_id = '00000000-0000-0000-0000-000000000c01' and status = 'approved';
+
+-- ---------------------------------------------------------------------------
+-- Polls
+-- ---------------------------------------------------------------------------
+insert into public.polls (id, school_id, club_id, question, options, closes_at, created_by, created_at) values
+  ('00000000-0000-0000-0000-000000000d01', '00000000-0000-0000-0000-00000000a001', null,
+   'Where should the spring school trip go?', '{"Jericho & the Dead Sea","Sebastia ruins","Jenin nature reserve","Bethlehem old city"}',
+   now() + interval '5 days', '00000000-0000-0000-0000-0000000000a1', now() - interval '1 day'),
+  ('00000000-0000-0000-0000-000000000d02', '00000000-0000-0000-0000-00000000a001', null,
+   'Best time for club meetings?', '{"Morning break","Lunch break","Right after school"}',
+   now() - interval '2 days', '00000000-0000-0000-0000-0000000000a2', now() - interval '9 days'),
+  ('00000000-0000-0000-0000-000000000d03', '00000000-0000-0000-0000-00000000a001', '00000000-0000-0000-0000-00000000c001',
+   'What should our next robot be?', '{"Line follower 2.0","Robotic arm","Mini drone"}',
+   now() + interval '3 days', '00000000-0000-0000-0000-0000000000a3', now() - interval '6 hours');
+
+insert into public.poll_votes (poll_id, profile_id, school_id, option_index, created_at)
+select '00000000-0000-0000-0000-000000000d01', p.id, p.school_id, abs(hashtext(p.id::text || 'd01')) % 4, now() - interval '3 hours'
+from public.profiles p
+where p.grade is not null and p.id <> '00000000-0000-0000-0000-0000000000a5' and abs(hashtext(p.id::text)) % 10 < 7;
+insert into public.poll_votes (poll_id, profile_id, school_id, option_index, created_at)
+select '00000000-0000-0000-0000-000000000d02', p.id, p.school_id, abs(hashtext(p.id::text || 'd02')) % 3, now() - interval '8 days'
+from public.profiles p
+where p.grade is not null and abs(hashtext(p.id::text)) % 10 < 8;
+insert into public.poll_votes (poll_id, profile_id, school_id, option_index, created_at)
+select '00000000-0000-0000-0000-000000000d03', cm.profile_id, '00000000-0000-0000-0000-00000000a001', abs(hashtext(cm.profile_id::text)) % 3, now() - interval '2 hours'
+from public.club_members cm
+where cm.club_id = '00000000-0000-0000-0000-00000000c001' and cm.profile_id <> '00000000-0000-0000-0000-0000000000a5';
+
+-- ---------------------------------------------------------------------------
+-- Volunteering hours
+-- ---------------------------------------------------------------------------
+insert into public.volunteer_entries (school_id, profile_id, organization, description, activity_date, hours, supervisor_name, status, reviewed_by, reviewed_at, created_at) values
+  ('00000000-0000-0000-0000-00000000a001', '00000000-0000-0000-0000-0000000000a5', 'Ramallah Public Library',
+   'Helped sort children''s books and read stories to kids.', current_date - 20, 4, 'Mrs. Nadia Khoury', 'approved',
+   '00000000-0000-0000-0000-0000000000a2', now() - interval '18 days', now() - interval '19 days'),
+  ('00000000-0000-0000-0000-00000000a001', '00000000-0000-0000-0000-0000000000a5', 'Green School club',
+   'Olive tree planting morning at school.', current_date - 4, 1.5, 'Ahmad Barghouti', 'approved',
+   '00000000-0000-0000-0000-0000000000a2', now() - interval '3 days', now() - interval '4 days'),
+  ('00000000-0000-0000-0000-00000000a001', '00000000-0000-0000-0000-0000000000a5', 'Neighbourhood clean-up',
+   'Cleaning the park near my house with my cousins.', current_date - 1, 2, 'Mr. Sami Taha', 'pending', null, null, now() - interval '20 hours'),
+  ('00000000-0000-0000-0000-00000000a001', '00000000-0000-0000-0000-0000000000a1', 'Red Crescent first-aid day',
+   'Helped run the first-aid training stand.', current_date - 30, 6, 'Dr. Lina Hamdan', 'approved',
+   '00000000-0000-0000-0000-0000000000a2', now() - interval '28 days', now() - interval '29 days'),
+  ('00000000-0000-0000-0000-00000000a001', '00000000-0000-0000-0000-0000000000a1', 'Ramadan food baskets',
+   'Packing and delivering food baskets.', current_date - 12, 5, 'Mr. Issa Jaber', 'approved',
+   '00000000-0000-0000-0000-0000000000a2', now() - interval '10 days', now() - interval '11 days'),
+  ('00000000-0000-0000-0000-00000000a001', '00000000-0000-0000-0000-000000001014', 'Green School club',
+   'Recycling drive: collected and sorted bottles.', current_date - 2, 3, 'Ms. Haneen Qasem', 'pending', null, null, now() - interval '1 day');
+select public.award_points(profile_id, greatest(1, round(hours * 10)::int), 'volunteer', id, reviewed_at)
+from public.volunteer_entries where status = 'approved';
+
+-- ---------------------------------------------------------------------------
+-- Tawjihi corner
+-- ---------------------------------------------------------------------------
+insert into public.tawjihi_questions (id, school_id, author_id, subject, title, body, created_at) values
+  ('00000000-0000-0000-0000-000000000e01', '00000000-0000-0000-0000-00000000a001', '00000000-0000-0000-0000-000000001003',
+   'Physics', 'How many past exams should I solve before Tawjihi?', 'I have 6 months left. Is solving past papers better than reading the book again?', now() - interval '3 days'),
+  ('00000000-0000-0000-0000-000000000e02', '00000000-0000-0000-0000-00000000a001', '00000000-0000-0000-0000-0000000000a1',
+   'Study tips', 'How did you manage stress in the last month?', 'Any routine that helped you sleep and stay focused?', now() - interval '2 days'),
+  ('00000000-0000-0000-0000-000000000e03', '00000000-0000-0000-0000-00000000a001', '00000000-0000-0000-0000-000000001007',
+   'University', 'Scientific or literary stream for engineering?', 'I''m in grade 11. Which stream do I need for engineering at Birzeit?', now() - interval '1 day'),
+  ('00000000-0000-0000-0000-000000000e04', '00000000-0000-0000-0000-00000000a001', '00000000-0000-0000-0000-00000000100b',
+   'Chemistry', 'Best way to memorise organic chemistry reactions?', '', now() - interval '4 hours');
+
+insert into public.tawjihi_answers (school_id, question_id, author_id, body, created_at) values
+  ('00000000-0000-0000-0000-00000000a001', '00000000-0000-0000-0000-000000000e01', '00000000-0000-0000-0000-0000000000b2',
+   'Past papers! I solved the last 10 years for physics, twice. First month: understand each chapter, then 2 papers a week, then 1 paper a day in the last month. Mark yourself honestly.', now() - interval '2 days'),
+  ('00000000-0000-0000-0000-00000000a001', '00000000-0000-0000-0000-000000000e01', '00000000-0000-0000-0000-0000000000a3',
+   'My brother did the same and got 97. Also keep a notebook of every mistake you make.', now() - interval '2 days'),
+  ('00000000-0000-0000-0000-00000000a001', '00000000-0000-0000-0000-000000000e02', '00000000-0000-0000-0000-0000000000b3',
+   'Sleep is part of studying, not a waste of time. I studied in 50-minute blocks with 10-minute walks, and stopped phones at 10 pm. And talk to someone when it feels heavy — the school counselor helped me a lot.', now() - interval '1 day'),
+  ('00000000-0000-0000-0000-00000000a001', '00000000-0000-0000-0000-000000000e03', '00000000-0000-0000-0000-0000000000b2',
+   'You need the scientific stream for engineering at Birzeit (and most universities). Check the minimum average each year — it changes.', now() - interval '20 hours');
+
+-- ---------------------------------------------------------------------------
+-- Student council, elections and the suggestion box
+-- ---------------------------------------------------------------------------
+insert into public.council_members (school_id, profile_id, position, sort) values
+  ('00000000-0000-0000-0000-00000000a001', '00000000-0000-0000-0000-0000000000a1', 'President', 1),
+  ('00000000-0000-0000-0000-00000000a001', '00000000-0000-0000-0000-0000000000a2', 'Vice president', 2),
+  ('00000000-0000-0000-0000-00000000a001', '00000000-0000-0000-0000-000000001007', 'Secretary', 3),
+  ('00000000-0000-0000-0000-00000000a001', '00000000-0000-0000-0000-00000000100b', 'Events officer', 4);
+
+insert into public.elections (id, school_id, title, description, opens_at, closes_at, eligible_grades, created_by, created_at) values
+  ('00000000-0000-0000-0000-000000000a11', '00000000-0000-0000-0000-00000000a001', 'Grade 10 representative',
+   'Choose who will speak for grade 10 in the student council this year. Only grade 10 students can vote.',
+   now() - interval '1 day', now() + interval '3 days', '{10}', '00000000-0000-0000-0000-0000000000a1', now() - interval '3 days'),
+  ('00000000-0000-0000-0000-000000000a12', '00000000-0000-0000-0000-00000000a001', 'Sports officer',
+   'Organises tournaments and sports day. All grades vote.',
+   now() - interval '10 days', now() - interval '5 days', null, '00000000-0000-0000-0000-0000000000a1', now() - interval '12 days');
+
+insert into public.election_candidates (id, election_id, profile_id, statement) values
+  ('00000000-0000-0000-0000-000000000a21', '00000000-0000-0000-0000-000000000a11', '00000000-0000-0000-0000-0000000000a3',
+   'I''ll push for a robotics corner in the library and more after-school clubs.'),
+  ('00000000-0000-0000-0000-000000000a22', '00000000-0000-0000-0000-000000000a11', '00000000-0000-0000-0000-000000001001',
+   'Water fountains on every floor and a suggestion meeting every month.'),
+  ('00000000-0000-0000-0000-000000000a23', '00000000-0000-0000-0000-000000000a11', '00000000-0000-0000-0000-000000001005',
+   'More trips and a grade 10 football league!'),
+  ('00000000-0000-0000-0000-000000000a24', '00000000-0000-0000-0000-000000000a12', '00000000-0000-0000-0000-0000000000a4',
+   'A school-wide football and volleyball tournament every term.'),
+  ('00000000-0000-0000-0000-000000000a25', '00000000-0000-0000-0000-000000000a12', '00000000-0000-0000-0000-000000001010',
+   'New equipment and a girls'' basketball team.');
+
+insert into public.election_votes (election_id, voter_id, candidate_id, school_id, created_at)
+select '00000000-0000-0000-0000-000000000a11', p.id,
+       (array['00000000-0000-0000-0000-000000000a21','00000000-0000-0000-0000-000000000a22','00000000-0000-0000-0000-000000000a23']::uuid[])[1 + abs(hashtext(p.id::text)) % 3],
+       p.school_id, now() - interval '10 hours'
+from public.profiles p where p.grade = 10 and p.id not in ('00000000-0000-0000-0000-0000000000a3') and abs(hashtext(p.id::text || 'v')) % 10 < 6;
+insert into public.election_votes (election_id, voter_id, candidate_id, school_id, created_at)
+select '00000000-0000-0000-0000-000000000a12', p.id,
+       (array['00000000-0000-0000-0000-000000000a24','00000000-0000-0000-0000-000000000a25']::uuid[])[1 + abs(hashtext(p.id::text || 's')) % 2],
+       p.school_id, now() - interval '7 days'
+from public.profiles p where p.grade is not null and abs(hashtext(p.id::text || 'w')) % 10 < 8;
+
+insert into public.suggestions (school_id, author_id, category, title, body, status, response, responded_by, responded_at, created_at) values
+  ('00000000-0000-0000-0000-00000000a001', '00000000-0000-0000-0000-0000000000a5', 'facilities',
+   'More benches in the courtyard', 'There are not enough places to sit at break, especially for grade 9.', 'planned',
+   'Great idea — the principal agreed to add 6 benches before winter.', '00000000-0000-0000-0000-0000000000a1', now() - interval '2 days', now() - interval '6 days'),
+  ('00000000-0000-0000-0000-00000000a001', '00000000-0000-0000-0000-000000001004', 'activities',
+   'A movie afternoon every month', 'We could watch a film in the hall and discuss it.', 'new', null, null, null, now() - interval '1 day'),
+  ('00000000-0000-0000-0000-00000000a001', '00000000-0000-0000-0000-000000001008', 'app',
+   'Dark mode for Pbs Go', 'It would be easier on the eyes at night.', 'reviewing', null, '00000000-0000-0000-0000-0000000000a1', now() - interval '1 day', now() - interval '3 days'),
+  ('00000000-0000-0000-0000-00000000a001', '00000000-0000-0000-0000-00000000100d', 'clubs',
+   'A chess club', 'Lots of us play at break already.', 'done', 'The Chess Club request is waiting for approval now!', '00000000-0000-0000-0000-0000000000a2', now() - interval '3 hours', now() - interval '8 days');
+
+-- ---------------------------------------------------------------------------
+-- One private counselor conversation (only the student and counselor see it)
+-- ---------------------------------------------------------------------------
+insert into public.counselor_requests (id, school_id, student_id, topic, urgent, status, created_at, last_message_at) values
+  ('00000000-0000-0000-0000-000000000cc1', '00000000-0000-0000-0000-00000000a001', '00000000-0000-0000-0000-0000000000a4',
+   'stress', false, 'in_progress', now() - interval '2 days', now() - interval '1 day');
+insert into public.counselor_messages (request_id, school_id, sender_id, body, created_at) values
+  ('00000000-0000-0000-0000-000000000cc1', '00000000-0000-0000-0000-00000000a001', '00000000-0000-0000-0000-0000000000a4',
+   'Hi Ms. Hiba, I''ve been really stressed about exams and football at the same time and I can''t sleep well.', now() - interval '2 days'),
+  ('00000000-0000-0000-0000-000000000cc1', '00000000-0000-0000-0000-00000000a001', '00000000-0000-0000-0000-0000000000b1',
+   'Thank you for telling me, Yousef. That sounds like a lot. Would you like to come to my office on Tuesday at 10:00 so we can make a plan together?', now() - interval '1 day');
+
 -- Mark older notifications as read so the demo shows a realistic mix.
 update public.notifications set read_at = now() where created_at < now() - interval '2 days';
 update public.notifications set pushed_at = now();

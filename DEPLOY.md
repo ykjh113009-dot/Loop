@@ -95,6 +95,8 @@ Google blocks students **under 18** from signing in to outside apps until the sc
 
 3. Reload the site. The chart icon (Admin) and shield icon (Moderation) now appear at the top. From now on you can make other people moderators or admins in **Admin → Students**.
 
+**The school counselor:** ask the counselor to sign in once with their school Google account. Then, in **Admin → Students**, open their account and set **Role → School counselor (staff)**. Only the counselor can read "Talk to the counselor" messages. You, as admin, can't. Alumni mentors are set up on the same page (**Alumni mentor → graduation year**). You can also add both in advance in **Admin → Settings → email list**.
+
 **Recommended before students join:** In **Admin → Settings**, paste the list of student emails with their grades, then tick **Only allow emails on the list**. That way teachers, staff and graduates can't join by accident.
 
 ## 6. Phone alerts (optional)
@@ -123,6 +125,7 @@ Students turn alerts on in **Alerts → Turn on**. On iPhones they first need to
 
 Repeat steps 1 and 3 with a **second** Supabase project and a **second** Vercel project, with these changes:
 
+- If you already made a demo project with an older version of `demo-setup.sql`, create a **new** Supabase project for the new version. It now includes Phase 2.
 - Skip step 1.4 (no terminal needed). Instead, in step 1.5 paste the whole of **`supabase/demo-setup.sql`** into the SQL Editor and click Run. It creates the database and the demo data in one go.
 - Keep **Email** sign-in **on** (step 1.6). The demo accounts use it.
 - In Vercel, set `DEMO_MODE` to `true` and add `DEMO_PASSWORD` = `pbsgo-demo`.

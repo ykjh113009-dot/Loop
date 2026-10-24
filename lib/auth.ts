@@ -10,6 +10,10 @@ export type Me = Profile & {
   isSuspended: boolean;
   isStaff: boolean;
   isAdmin: boolean;
+  isCounselor: boolean;
+  isAlumni: boolean;
+  /** A current student (not an alumni mentor or the counselor). */
+  isStudent: boolean;
 };
 
 // Looks up the signed-in student once per request.
@@ -21,7 +25,7 @@ export const getMe = cache(async (): Promise<Me | null> => {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("*, school:schools(id, name, grades)")
+    .select("*, school:schools!profiles_school_id_fkey(id, name, grades)")
     .eq("id", userId)
     .single();
   if (!profile || !profile.school) return null;
@@ -34,6 +38,9 @@ export const getMe = cache(async (): Promise<Me | null> => {
     // Suspended moderators lose their powers until the suspension ends.
     isStaff: !isSuspended && (profile.role === "moderator" || profile.role === "admin"),
     isAdmin: !isSuspended && profile.role === "admin",
+    isCounselor: !isSuspended && profile.role === "counselor",
+    isAlumni: profile.alumni_year !== null,
+    isStudent: profile.role !== "counselor" && profile.alumni_year === null,
   };
 });
 

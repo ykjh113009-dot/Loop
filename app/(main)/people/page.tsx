@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { requireMe } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
+import { personLabel } from "@/lib/people";
 import { Avatar } from "@/components/avatar";
 import { Empty } from "@/components/empty";
 import { PageHeader } from "@/components/page-header";
@@ -22,7 +23,7 @@ async function People({ searchParams }: { searchParams: PageProps<"/people">["se
 
   let query = supabase
     .from("profiles")
-    .select(picked ? "id, full_name, avatar, grade, bio, profile_interests!inner(interest_id)" : "id, full_name, avatar, grade, bio")
+    .select(picked ? "id, full_name, avatar, grade, bio, role, alumni_year, profile_interests!inner(interest_id)" : "id, full_name, avatar, grade, bio, role, alumni_year")
     .not("onboarded_at", "is", null)
     .is("deactivated_at", null)
     .neq("id", me.id)
@@ -33,7 +34,7 @@ async function People({ searchParams }: { searchParams: PageProps<"/people">["se
   if (grade) query = query.eq("grade", grade);
   if (picked) query = query.eq("profile_interests.interest_id", picked.id);
   const { data } = await query;
-  const people = (data ?? []) as unknown as { id: string; full_name: string; avatar: string; grade: number | null; bio: string }[];
+  const people = (data ?? []) as unknown as { id: string; full_name: string; avatar: string; grade: number | null; bio: string; role: string; alumni_year: number | null }[];
 
   const link = (changes: Record<string, string | null>) => {
     const params = new URLSearchParams();
@@ -76,7 +77,7 @@ async function People({ searchParams }: { searchParams: PageProps<"/people">["se
                 <Avatar avatar={p.avatar} />
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-medium">{p.full_name}</p>
-                  <p className="truncate text-xs text-black/50">Grade {p.grade}{p.bio && ` · ${p.bio}`}</p>
+                  <p className="truncate text-xs text-black/50">{personLabel(p)}{p.bio && ` · ${p.bio}`}</p>
                 </div>
               </Link>
             </li>

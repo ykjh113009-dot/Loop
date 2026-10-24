@@ -50,3 +50,19 @@ export async function reviewEvent(_: ActionResult, formData: FormData) {
     p_note: String(formData.get("note") ?? ""),
   });
 }
+
+export async function reviewChallenge(_: ActionResult, formData: FormData) {
+  return run("review_challenge_submission", {
+    p_submission: String(formData.get("id")),
+    p_approve: formData.get("decision") === "approve",
+    p_note: String(formData.get("note") ?? ""),
+  });
+}
+
+export async function reviewHours(_: ActionResult, formData: FormData) {
+  return run("review_volunteer", {
+    p_entry: String(formData.get("id")),
+    p_approve: formData.get("decision") === "approve",
+    p_note: String(formData.get("note") ?? ""),
+  });
+}

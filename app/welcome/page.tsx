@@ -22,7 +22,12 @@ async function Welcome() {
         <h1 className="text-2xl font-bold">Welcome, {me.full_name.split(" ")[0]}! 👋</h1>
         <p className="mt-1 text-black/60">Set up your profile for {me.school.name}. It takes 30 seconds.</p>
       </div>
-      <WelcomeForm grades={me.school.grades} fixedGrade={me.grade} interests={interests ?? []} />
+      <WelcomeForm
+        grades={me.school.grades}
+        fixedGrade={me.grade}
+        noGradeReason={me.role === "counselor" ? "You are set up as the school counselor." : me.alumni_year ? `You are set up as an alumni mentor (class of ${me.alumni_year}).` : null}
+        interests={interests ?? []}
+      />
     </>
   );
 }

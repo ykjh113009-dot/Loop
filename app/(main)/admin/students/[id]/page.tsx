@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { requireMe } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { formatDateTime } from "@/lib/time";
-import { setDeactivated, unsuspendMember, updateMember } from "@/app/actions/admin";
+import { setAlumni, setDeactivated, unsuspendMember, updateMember } from "@/app/actions/admin";
 import { suspendStudent } from "@/app/actions/moderation";
 import { ActionForm } from "@/components/action-form";
 import { Avatar } from "@/components/avatar";
@@ -19,7 +19,7 @@ async function Student({ params }: { params: PageProps<"/admin/students/[id]">["
   const [{ data: s }, { data: history }] = await Promise.all([
     supabase
       .from("profiles")
-      .select("id, full_name, avatar, grade, role, suspended_until, suspension_reason, deactivated_at, created_at, private:private_profiles(email)")
+      .select("id, full_name, avatar, grade, role, alumni_year, suspended_until, suspension_reason, deactivated_at, created_at, private:private_profiles(email)")
       .eq("id", id)
       .maybeSingle(),
     supabase.from("moderation_log").select("id, action, details, created_at").eq("target_id", id).order("created_at", { ascending: false }).limit(20),
@@ -57,14 +57,33 @@ async function Student({ params }: { params: PageProps<"/admin/students/[id]">["
                 <option value="student">Student</option>
                 <option value="moderator">Moderator</option>
                 <option value="admin">Admin</option>
+                <option value="counselor">School counselor (staff)</option>
               </select>
               {isMe && <input type="hidden" name="role" value={s.role} />}
             </label>
           </div>
-          <p className="text-xs text-black/50">Moderators review reports and approve clubs and events. Admins can also manage accounts and settings.</p>
+          <p className="text-xs text-black/50">
+            Moderators review reports and approve clubs and events. Admins can also manage accounts and settings. The
+            counselor is an adult staff member who reads the private &quot;Talk to the counselor&quot; messages — nobody else can.
+          </p>
           <SubmitButton className="btn-primary w-full">Save</SubmitButton>
         </ActionForm>
       </section>
+
+      {!isMe && s.role !== "counselor" && (
+        <section className="card space-y-3 p-4">
+          <h2 className="font-semibold">Alumni mentor</h2>
+          <p className="text-sm text-black/55">
+            Graduates who help in the Tawjihi corner. They don&apos;t have a grade, don&apos;t collect points, and can&apos;t send
+            private messages to students.
+          </p>
+          <ActionForm action={setAlumni} className="flex gap-2">
+            <input type="hidden" name="profileId" value={s.id} />
+            <input name="alumni_year" type="number" min={1990} max={2100} defaultValue={s.alumni_year ?? ""} placeholder="Graduation year, empty = current student" className="input" />
+            <SubmitButton className="btn-secondary shrink-0">Save</SubmitButton>
+          </ActionForm>
+        </section>
+      )}
 
       {!isMe && (
         <section className="card space-y-3 p-4">

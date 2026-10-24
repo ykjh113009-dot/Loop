@@ -25,6 +25,17 @@ type Stats = {
   top_clubs: { name: string; emoji: string; members: number }[];
 };
 
+type Phase2Stats = {
+  volunteer_hours: number;
+  volunteers: number;
+  tutors: number;
+  tutoring_done: number;
+  listings_active: number;
+  challenge_entries_week: number;
+  suggestions_new: number;
+  tawjihi_questions: number;
+};
+
 const pct = (part: number, total: number) => (total ? Math.round((part / total) * 100) : 0);
 
 function Tile({ label, value, sub, href }: { label: string; value: string | number; sub?: string; href?: string }) {
@@ -63,8 +74,9 @@ function Bars({ rows }: { rows: { label: string; value: number; max: number; tex
 async function Dashboard() {
   const me = await requireMe("admin");
   const supabase = await createClient();
-  const { data } = await supabase.rpc("school_stats");
+  const [{ data }, { data: more }] = await Promise.all([supabase.rpc("school_stats"), supabase.rpc("school_stats_phase2")]);
   const s = data as unknown as Stats;
+  const p2 = more as unknown as Phase2Stats;
   const topMax = Math.max(1, ...s.top_clubs.map((c) => c.members));
 
   return (
@@ -85,6 +97,18 @@ async function Dashboard() {
         <Tile label="Open reports" value={s.reports_open} sub={`${s.reports_30d} sent in 30 days`} href="/moderation" />
         <Tile label="Suspended now" value={s.suspended_now} href="/admin/students?filter=suspended" />
       </div>
+
+      <section>
+        <h2 className="section-title">Helping & taking part</h2>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+          <Tile label="Volunteering hours" value={Number(p2.volunteer_hours)} sub={`by ${p2.volunteers} students`} />
+          <Tile label="Peer tutors" value={p2.tutors} sub={`${p2.tutoring_done} sessions done`} />
+          <Tile label="Challenge entries" value={p2.challenge_entries_week} sub="this week" href="/challenges" />
+          <Tile label="New suggestions" value={p2.suggestions_new} href="/suggestions?tab=inbox" />
+          <Tile label="Tawjihi questions" value={p2.tawjihi_questions} href="/tawjihi" />
+          <Tile label="Items for sale/swap" value={p2.listings_active} href="/market" />
+        </div>
+      </section>
 
       <section className="card p-4">
         <h2 className="font-semibold">Club participation by grade</h2>

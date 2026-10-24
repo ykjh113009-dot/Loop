@@ -70,3 +70,11 @@ export function fromLocalInput(value: string): Date | null {
   result = new Date(guess - offsetMinutes(result) * 60000);
   return result;
 }
+
+/** Sunday 00:00 of this week, Palestine time (weeks start on Sunday). */
+export function weekStart(now = new Date()) {
+  const p = localParts(now);
+  const day = new Date(Date.UTC(p.year, p.month - 1, p.day));
+  day.setUTCDate(day.getUTCDate() - day.getUTCDay());
+  return fromLocalInput(`${day.toISOString().slice(0, 10)}T00:00`)!;
+}

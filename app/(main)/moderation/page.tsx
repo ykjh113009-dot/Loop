@@ -2,8 +2,9 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { requireMe } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { formatDateTime, timeAgo } from "@/lib/time";
-import { moderateReport, reviewClub, reviewEvent, suspendStudent } from "@/app/actions/moderation";
+import { formatDateTime, formatShortDate, timeAgo } from "@/lib/time";
+import { moderateReport, reviewChallenge, reviewClub, reviewEvent, reviewHours, suspendStudent } from "@/app/actions/moderation";
+import { signImages } from "@/lib/images";
 import { ActionForm } from "@/components/action-form";
 import { Avatar } from "@/components/avatar";
 import { Empty } from "@/components/empty";
@@ -22,7 +23,16 @@ const REASONS: Record<string, string> = {
   other: "Other",
   filter: "🤖 Bad-word filter",
 };
-const TARGETS: Record<string, string> = { post: "Post", message: "Message", profile: "Profile", club: "Club", event: "Event" };
+const TARGETS: Record<string, string> = {
+  post: "Post",
+  message: "Message",
+  profile: "Profile",
+  club: "Club",
+  event: "Event",
+  listing: "Listing",
+  question: "Question",
+  answer: "Answer",
+};
 
 type Report = {
   id: string;
@@ -158,7 +168,7 @@ function ReviewButtons({ action, idName, id }: { action: typeof reviewClub; idNa
 async function Approvals() {
   await requireMe("staff");
   const supabase = await createClient();
-  const [{ data: clubs }, { data: events }] = await Promise.all([
+  const [{ data: clubs }, { data: events }, { data: submissions }, { data: hours }] = await Promise.all([
     supabase
       .from("clubs")
       .select("id, name, emoji, description, created_at, requester:profiles!clubs_requested_by_fkey(id, full_name, grade)")
@@ -169,8 +179,21 @@ async function Approvals() {
       .select("id, title, description, location, starts_at, club:clubs(name, emoji), creator:profiles!events_created_by_fkey(id, full_name)")
       .eq("status", "pending")
       .order("starts_at"),
+    supabase
+      .from("challenge_submissions")
+      .select("id, note, image_path, created_at, challenge:challenges(title, emoji, points), student:profiles!challenge_submissions_profile_id_fkey(id, full_name, grade)")
+      .eq("status", "pending")
+      .order("created_at"),
+    supabase
+      .from("volunteer_entries")
+      .select("id, organization, description, activity_date, hours, supervisor_name, student:profiles!volunteer_entries_profile_id_fkey(id, full_name, grade)")
+      .eq("status", "pending")
+      .order("created_at"),
   ]);
-  if (!clubs?.length && !events?.length) return <Empty emoji="✅" title="Nothing waiting for approval" />;
+  if (!clubs?.length && !events?.length && !submissions?.length && !hours?.length) {
+    return <Empty emoji="✅" title="Nothing waiting for approval" />;
+  }
+  const photos = await signImages(supabase, (submissions ?? []).map((x) => x.image_path));
 
   return (
     <div className="space-y-6">
@@ -205,6 +228,40 @@ async function Approvals() {
           ))}
         </section>
       )}
+      {!!submissions?.length && (
+        <section className="space-y-3">
+          <h2 className="section-title">Challenge entries</h2>
+          {submissions.map((x) => (
+            <article key={x.id} className="card space-y-2 p-4">
+              <p className="text-sm">
+                <strong>{x.student?.full_name}</strong> <span className="text-black/45">(grade {x.student?.grade}) · {x.challenge?.emoji} {x.challenge?.title} · +{x.challenge?.points}</span>
+              </p>
+              <p className="text-sm whitespace-pre-wrap text-black/75">{x.note}</p>
+              {x.image_path && photos.get(x.image_path) && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={photos.get(x.image_path)!} alt="" loading="lazy" className="max-h-56 rounded-xl object-cover" />
+              )}
+              <ReviewButtons action={reviewChallenge} idName="id" id={x.id} />
+            </article>
+          ))}
+        </section>
+      )}
+      {!!hours?.length && (
+        <section className="space-y-3">
+          <h2 className="section-title">Volunteering hours</h2>
+          {hours.map((h) => (
+            <article key={h.id} className="card space-y-1 p-4 text-sm">
+              <p>
+                <strong>{h.student?.full_name}</strong> <span className="text-black/45">(grade {h.student?.grade})</span> ·{" "}
+                <strong>{Number(h.hours)} h</strong> at {h.organization}
+              </p>
+              <p className="text-black/55">{formatShortDate(h.activity_date)}{h.supervisor_name && ` · supervisor: ${h.supervisor_name}`}</p>
+              {h.description && <p className="text-black/70">{h.description}</p>}
+              <ReviewButtons action={reviewHours} idName="id" id={h.id} />
+            </article>
+          ))}
+        </section>
+      )}
     </div>
   );
 }
@@ -225,6 +282,12 @@ const ACTIONS: Record<string, string> = {
   change_role: "changed role of",
   remove_account: "removed account of",
   restore_account: "restored account of",
+  approve_challenge: "approved a challenge entry for",
+  reject_challenge: "said no to a challenge entry for",
+  approve_hours: "approved volunteering hours:",
+  reject_hours: "said no to volunteering hours:",
+  set_alumni: "marked as alumni mentor:",
+  unset_alumni: "marked as current student:",
 };
 
 async function Log() {

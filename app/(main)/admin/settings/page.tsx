@@ -15,7 +15,7 @@ async function Settings() {
   const supabase = await createClient();
   const [{ data: school }, { data: roster, count: rosterCount }, { data: words }] = await Promise.all([
     supabase.from("schools").select("name, email_domain, grades, roster_required").eq("id", me.school_id).single(),
-    supabase.from("roster").select("email, grade", { count: "exact" }).order("email").limit(200),
+    supabase.from("roster").select("email, grade, role, alumni_year", { count: "exact" }).order("email").limit(200),
     supabase.from("blocked_words").select("id, word, school_id").order("word"),
   ]);
   const ours = (words ?? []).filter((w) => w.school_id);
@@ -47,14 +47,22 @@ async function Settings() {
 
       <section className="card p-4">
         <h2 className="font-semibold">Student email list <span className="font-normal text-black/45">({rosterCount ?? 0})</span></h2>
-        <p className="mt-1 text-sm text-black/55">Paste student emails (one per line or separated by commas). Their grade is set automatically when they join.</p>
+        <p className="mt-1 text-sm text-black/55">Paste emails (one per line or separated by commas). Their grade — or alumni / counselor account — is set automatically when they join.</p>
         <ActionForm action={addToRoster} className="mt-3 space-y-2">
           <textarea name="emails" rows={4} required placeholder={`ahmad.k@${school?.email_domain}\nsara.m@${school?.email_domain}`} className="input resize-none font-mono text-sm" />
-          <div className="flex gap-2">
-            <select name="grade" className="input" aria-label="Grade">
-              <option value="">No grade (student picks)</option>
+          <div className="grid grid-cols-2 gap-2">
+            <select name="kind" className="input" aria-label="Account type" defaultValue="student">
+              <option value="student">Students</option>
+              <option value="alumni">Alumni mentors</option>
+              <option value="counselor">School counselor</option>
+            </select>
+            <select name="grade" className="input" aria-label="Grade (students)">
+              <option value="">Grade: student picks</option>
               {me.school.grades.map((g) => <option key={g} value={g}>Grade {g}</option>)}
             </select>
+          </div>
+          <div className="flex gap-2">
+            <input name="alumni_year" type="number" min={1990} max={2100} placeholder="Graduation year (alumni only)" className="input" />
             <SubmitButton className="btn-primary shrink-0">Add</SubmitButton>
           </div>
         </ActionForm>
@@ -63,7 +71,9 @@ async function Settings() {
             {roster.map((r) => (
               <li key={r.email} className="flex items-center gap-2 px-3 py-1.5">
                 <span className="min-w-0 flex-1 truncate font-mono text-xs">{r.email}</span>
-                <span className="text-xs text-black/45">{r.grade ? `G${r.grade}` : ""}</span>
+                <span className="text-xs text-black/45">
+                  {r.role === "counselor" ? "counselor" : r.alumni_year ? `alumni ${r.alumni_year}` : r.grade ? `G${r.grade}` : ""}
+                </span>
                 <ActionForm action={removeFromRoster}>
                   <input type="hidden" name="email" value={r.email} />
                   <SubmitButton className="text-xs text-black/40 hover:text-red-600" pendingText="…">Remove</SubmitButton>

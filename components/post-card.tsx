@@ -3,6 +3,7 @@ import { Avatar } from "@/components/avatar";
 import { ReportButton } from "@/components/report-button";
 import { deletePost } from "@/app/actions/content";
 import { timeAgo } from "@/lib/time";
+import { personLabel } from "@/lib/people";
 import type { FeedPost } from "@/lib/queries";
 
 export function PostCard({ post, meId, showClub = true }: { post: FeedPost; meId: string; showClub?: boolean }) {
@@ -17,7 +18,7 @@ export function PostCard({ post, meId, showClub = true }: { post: FeedPost; meId
           <Link href={`/profile/${post.author_id}`} className="font-semibold hover:underline">
             {post.author?.full_name}
           </Link>
-          <span className="text-black/45"> · Grade {post.author?.grade} · {timeAgo(post.created_at)}</span>
+          <span className="text-black/45"> · {personLabel(post.author)} · {timeAgo(post.created_at)}</span>
           {showClub && post.club && (
             <Link href={`/clubs/${post.club.id}`} className="block truncate text-xs text-brand-700 hover:underline">
               {post.club.emoji} {post.club.name}

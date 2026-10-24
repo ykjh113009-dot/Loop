@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { getClub } from "@/lib/clubs";
 import { createClient } from "@/lib/supabase/server";
+import { personLabel } from "@/lib/people";
 import { Avatar } from "@/components/avatar";
 import { PageSkeleton } from "@/components/skeleton";
 
@@ -11,7 +12,7 @@ async function Members({ params }: { params: PageProps<"/clubs/[id]/members">["p
   const supabase = await createClient();
   const { data } = await supabase
     .from("club_members")
-    .select("role, joined_at, profile:profiles(id, full_name, avatar, grade)")
+    .select("role, joined_at, profile:profiles(id, full_name, avatar, grade, role, alumni_year)")
     .eq("club_id", club.id)
     .order("joined_at");
   // Leaders first, then everyone else alphabetically.
@@ -30,7 +31,7 @@ async function Members({ params }: { params: PageProps<"/clubs/[id]/members">["p
               <Avatar avatar={m.profile.avatar} />
               <div className="min-w-0 flex-1">
                 <p className="truncate font-medium">{m.profile.full_name}</p>
-                <p className="text-xs text-black/50">Grade {m.profile.grade}</p>
+                <p className="text-xs text-black/50">{personLabel(m.profile)}</p>
               </div>
               {m.role === "leader" && <span className="chip bg-brand-50 text-brand-800">Leader</span>}
             </Link>

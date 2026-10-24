@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { requireMe } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
+import { personLabel } from "@/lib/people";
 import { AdminNav } from "@/components/admin-nav";
 import { Avatar } from "@/components/avatar";
 import { Empty } from "@/components/empty";
@@ -20,7 +21,7 @@ async function Students({ searchParams }: { searchParams: PageProps<"/admin/stud
 
   let query = supabase
     .from("profiles")
-    .select("id, full_name, avatar, grade, role, suspended_until, deactivated_at, onboarded_at, private:private_profiles(email)")
+    .select("id, full_name, avatar, grade, role, alumni_year, suspended_until, deactivated_at, onboarded_at, private:private_profiles(email)")
     .order("grade")
     .order("full_name")
     .limit(400);
@@ -29,7 +30,8 @@ async function Students({ searchParams }: { searchParams: PageProps<"/admin/stud
   if (filter === "suspended") query = query.gt("suspended_until", new Date().toISOString());
   if (filter === "removed") query = query.not("deactivated_at", "is", null);
   else query = query.is("deactivated_at", null);
-  if (filter === "staff") query = query.in("role", ["moderator", "admin"]);
+  if (filter === "staff") query = query.in("role", ["moderator", "admin", "counselor"]);
+  if (filter === "alumni") query = query.not("alumni_year", "is", null);
   const { data } = await query;
   const students = data ?? [];
 
@@ -48,7 +50,8 @@ async function Students({ searchParams }: { searchParams: PageProps<"/admin/stud
       <div className="flex gap-1.5 overflow-x-auto pb-1">
         {chip("Everyone", {})}
         {me.school.grades.map((g) => chip(`Grade ${g}`, { grade: String(g) }))}
-        {chip("Moderators & admins", { filter: "staff" })}
+        {chip("Staff roles", { filter: "staff" })}
+        {chip("Alumni", { filter: "alumni" })}
         {chip("Suspended", { filter: "suspended" })}
         {chip("Removed", { filter: "removed" })}
       </div>
@@ -68,8 +71,8 @@ async function Students({ searchParams }: { searchParams: PageProps<"/admin/stud
                     <p className="truncate text-xs text-black/45">{s.private?.email}</p>
                   </div>
                   <div className="flex shrink-0 flex-col items-end gap-0.5 text-xs">
-                    <span className="text-black/60">{s.grade ? `Grade ${s.grade}` : "No grade"}</span>
-                    {s.role !== "student" && <span className="font-semibold text-brand-700">{s.role}</span>}
+                    <span className="text-black/60">{personLabel(s) || "No grade"}</span>
+                    {(s.role === "moderator" || s.role === "admin") && <span className="font-semibold text-brand-700">{s.role}</span>}
                     {suspended && <span className="font-semibold text-red-700">suspended</span>}
                     {!s.onboarded_at && <span className="text-amber-700">not set up</span>}
                   </div>

@@ -10,17 +10,21 @@ import { FormMessage } from "@/components/form-message";
 export function WelcomeForm({
   grades,
   fixedGrade,
+  noGradeReason,
   interests,
 }: {
   grades: number[];
   fixedGrade: number | null;
+  noGradeReason: string | null;
   interests: { id: number; name: string; emoji: string }[];
 }) {
   const [state, action] = useActionState(completeOnboarding, null);
 
   return (
     <form action={action} className="space-y-6">
-      {fixedGrade ? (
+      {noGradeReason ? (
+        <p className="rounded-xl bg-brand-50 px-3 py-2 text-sm">{noGradeReason}</p>
+      ) : fixedGrade ? (
         <p className="rounded-xl bg-brand-50 px-3 py-2 text-sm">
           Your school has you in <strong>grade {fixedGrade}</strong>.
         </p>

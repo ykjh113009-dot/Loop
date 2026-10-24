@@ -87,11 +87,21 @@ export async function addToRoster(_: ActionResult, formData: FormData): Promise<
   const bad = emails.filter((e) => !e.endsWith(`@${domain}`));
   if (emails.length === 0) return { error: "Paste at least one email." };
   if (bad.length) return { error: `These are not @${domain} emails: ${bad.slice(0, 5).join(", ")}` };
-  const grade = Number(formData.get("grade")) || null;
+  const kind = String(formData.get("kind") ?? "student");
+  const alumniYear = kind === "alumni" ? Number(formData.get("alumni_year")) : null;
+  if (kind === "alumni" && !(alumniYear && alumniYear >= 1990 && alumniYear <= 2100)) return { error: "Enter the graduation year for alumni." };
+  const grade = kind === "student" ? Number(formData.get("grade")) || null : null;
   const supabase = await createClient();
-  const { error } = await supabase
-    .from("roster")
-    .upsert(emails.map((email) => ({ school_id: me.school_id, email, grade, added_by: me.id })));
+  const { error } = await supabase.from("roster").upsert(
+    emails.map((email) => ({
+      school_id: me.school_id,
+      email,
+      grade,
+      role: kind === "counselor" ? "counselor" : "student",
+      alumni_year: alumniYear,
+      added_by: me.id,
+    })),
+  );
   return done(error, `Added ${emails.length} email(s).`);
 }
 
@@ -116,4 +126,14 @@ export async function removeBlockedWord(_: ActionResult, formData: FormData) {
   const supabase = await createClient();
   const { error } = await supabase.from("blocked_words").delete().eq("id", Number(formData.get("id")));
   return done(error);
+}
+
+export async function setAlumni(_: ActionResult, formData: FormData) {
+  await requireMe("admin");
+  const raw = String(formData.get("alumni_year") ?? "").trim();
+  const year = raw ? Number(raw) : null;
+  if (year !== null && !(Number.isInteger(year) && year >= 1990 && year <= 2100)) return { error: "Enter a graduation year like 2024." };
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("admin_set_alumni", { p_user: String(formData.get("profileId")), p_year: year as number });
+  return done(error, year ? `Now an alumni mentor (class of ${year}).` : "Now a current student again.");
 }
