@@ -8,7 +8,8 @@ import { HelpNow } from "@/components/help-now";
 import { PageHeader } from "@/components/page-header";
 import { PageSkeleton } from "@/components/skeleton";
 import { SubmitButton } from "@/components/submit-button";
-import { ReplyForm, TOPICS } from "../forms";
+import { ReplyForm } from "../forms";
+import { COUNSELOR_TOPICS as TOPICS } from "@/lib/labels";
 
 async function Thread({ params }: { params: PageProps<"/counselor/[id]">["params"] }) {
   const { id } = await params;

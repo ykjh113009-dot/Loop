@@ -4,15 +4,7 @@ import { useActionState, useRef } from "react";
 import { replyCounselor, startCounselorRequest } from "@/app/actions/counselor";
 import { FormMessage } from "@/components/form-message";
 import { SubmitButton } from "@/components/submit-button";
-
-export const TOPICS: Record<string, string> = {
-  stress: "Stress or worry",
-  friends: "Friends",
-  family: "Family",
-  school: "School work",
-  future: "My future",
-  other: "Something else",
-};
+import { COUNSELOR_TOPICS as TOPICS } from "@/lib/labels";
 
 export function CounselorRequestForm() {
   const [state, action] = useActionState(startCounselorRequest, null);

@@ -6,7 +6,8 @@ import { timeAgo } from "@/lib/time";
 import { Empty } from "@/components/empty";
 import { PageHeader } from "@/components/page-header";
 import { PageSkeleton } from "@/components/skeleton";
-import { RespondForm, SUGGESTION_CATEGORIES, SuggestionForm } from "./forms";
+import { RespondForm, SuggestionForm } from "./forms";
+import { SUGGESTION_CATEGORIES } from "@/lib/labels";
 
 export const metadata = { title: "Suggestion box" };
 

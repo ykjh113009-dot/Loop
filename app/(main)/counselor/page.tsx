@@ -8,7 +8,8 @@ import { Empty } from "@/components/empty";
 import { HelpNow } from "@/components/help-now";
 import { PageHeader } from "@/components/page-header";
 import { PageSkeleton } from "@/components/skeleton";
-import { CounselorRequestForm, TOPICS } from "./forms";
+import { CounselorRequestForm } from "./forms";
+import { COUNSELOR_TOPICS as TOPICS } from "@/lib/labels";
 
 export const metadata = { title: "Talk to the counselor" };
 

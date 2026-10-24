@@ -4,15 +4,7 @@ import { useActionState, useRef } from "react";
 import { respondSuggestion, sendSuggestion } from "@/app/actions/suggestions";
 import { FormMessage } from "@/components/form-message";
 import { SubmitButton } from "@/components/submit-button";
-
-export const SUGGESTION_CATEGORIES: Record<string, string> = {
-  activities: "🎉 Activities",
-  facilities: "🏫 Buildings & facilities",
-  clubs: "🧩 Clubs",
-  events: "📅 Events",
-  app: "📱 Pbs Go app",
-  other: "💬 Other",
-};
+import { SUGGESTION_CATEGORIES } from "@/lib/labels";
 
 export function SuggestionForm() {
   const form = useRef<HTMLFormElement>(null);
