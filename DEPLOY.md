@@ -123,7 +123,7 @@ Students turn alerts on in **Alerts → Turn on**. On iPhones they first need to
 
 Repeat steps 1 and 3 with a **second** Supabase project and a **second** Vercel project, with these changes:
 
-- In step 1.5, instead of adding the school, paste the whole of `supabase/seed.sql` into the SQL Editor and run it.
+- Skip step 1.4 (no terminal needed). Instead, in step 1.5 paste the whole of **`supabase/demo-setup.sql`** into the SQL Editor and click Run. It creates the database and the demo data in one go.
 - Keep **Email** sign-in **on** (step 1.6). The demo accounts use it.
 - In Vercel, set `DEMO_MODE` to `true` and add `DEMO_PASSWORD` = `pbsgo-demo`.
 - Skip Google sign-in.
