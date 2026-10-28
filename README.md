@@ -1,4 +1,4 @@
-# Pbs Go
+# Loop
 
 A private social app for high-school students. Students meet around clubs, events and shared interests. It is **not** a homework or grades system.
 

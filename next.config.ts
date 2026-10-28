@@ -24,7 +24,7 @@ const nextConfig: NextConfig = {
       {
         source: "/:path*",
         headers: [
-          // Pbs Go is private: tell search engines not to index anything.
+          // Loop is private: tell search engines not to index anything.
           { key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" },
           { key: "X-Frame-Options", value: "DENY" },
           { key: "X-Content-Type-Options", value: "nosniff" },

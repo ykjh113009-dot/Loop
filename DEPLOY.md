@@ -1,4 +1,4 @@
-# Putting Pbs Go online
+# Putting Loop online
 
 This takes about an hour the first time. You'll create three accounts (Supabase, Google Cloud, Vercel). Then the school's IT person approves the app.
 
@@ -44,10 +44,10 @@ This takes about an hour the first time. You'll create three accounts (Supabase,
 ## 2. Google sign-in
 
 1. Go to https://console.cloud.google.com and sign in. It's best to use the school's or your own Google account, not a student's.
-2. Create a project called `Pbs Go`.
+2. Create a project called `Loop`.
 3. Open **Google Auth Platform** (search for "OAuth consent screen").
-   - **Branding**: App name `Pbs Go`, your support email, and your logo if you have one.
-   - **Audience**: User type **External**, then **Publish app** so it's "In production". Pbs Go only asks for name and email, so Google doesn't need to review it.
+   - **Branding**: App name `Loop`, your support email, and your logo if you have one.
+   - **Audience**: User type **External**, then **Publish app** so it's "In production". Loop only asks for name and email, so Google doesn't need to review it.
 4. **Clients → Create client → Web application**.
    - **Authorized redirect URIs**: `https://abcdefghijkl.supabase.co/auth/v1/callback` (your Project URL + `/auth/v1/callback`).
    - Click Create. Copy the **Client ID** and **Client secret**.
@@ -79,7 +79,7 @@ From now on, every time code is pushed to GitHub's `main` branch, Vercel updates
 
 Google blocks students **under 18** from signing in to outside apps until the school allows them. Send the school's Google Workspace admin this message:
 
-> Hi! Please allow our student app "Pbs Go" for student accounts.
+> Hi! Please allow our student app "Loop" for student accounts.
 > In the Google Admin console: **Security → Access and data control → API controls → Manage Third-Party App Access → Add app → OAuth App Name Or Client ID**, search for this Client ID: `PASTE-YOUR-CLIENT-ID`, pick it, apply it to the students' organisational unit, and set access to **Trusted**.
 > It only asks for students' name and email address. Thank you!
 

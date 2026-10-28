@@ -25,9 +25,10 @@ export default function LoginPage(props: PageProps<"/login">) {
   return (
     <main className="mx-auto flex min-h-dvh max-w-md flex-col justify-center gap-6 px-5 py-10">
       <div className="text-center">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/icon.svg" alt="" className="mx-auto size-16" />
-        <h1 className="mt-3 text-3xl font-bold tracking-tight">Pbs Go</h1>
+        <h1>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/brand/loop-wordmark.png" alt="Loop" width={191} height={80} className="mx-auto h-20 w-auto" />
+        </h1>
         <p className="mt-1 text-black/60">Clubs, events and friends — just for your school.</p>
       </div>
 

@@ -81,7 +81,7 @@ async function Certificate({ searchParams }: { searchParams: PageProps<"/volunte
           </div>
         </div>
         <p className="mt-6 text-[10px] text-black/40">
-          Certificate no. {code} · Hours checked by the school&apos;s Pbs Go moderators
+          Certificate no. {code} · Hours checked by the school&apos;s Loop moderators
         </p>
       </article>
     </div>

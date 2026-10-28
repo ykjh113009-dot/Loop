@@ -14,6 +14,6 @@ export const SUGGESTION_CATEGORIES: Record<string, string> = {
   facilities: "🏫 Buildings & facilities",
   clubs: "🧩 Clubs",
   events: "📅 Events",
-  app: "📱 Pbs Go app",
+  app: "📱 Loop app",
   other: "💬 Other",
 };

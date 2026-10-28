@@ -1,10 +1,13 @@
 {
-  "name": "Pbs Go",
-  "short_name": "Pbs Go",
+  "name": "Loop",
+  "short_name": "Loop",
   "description": "Your school's private space for clubs, events and friends.",
   "start_url": "/home",
   "display": "standalone",
   "background_color": "#f5f6f4",
   "theme_color": "#047857",
-  "icons": [{ "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
+  "icons": [
+    { "src": "/brand/loop-icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/brand/loop-icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
 }

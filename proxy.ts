@@ -43,6 +43,6 @@ export async function proxy(request: NextRequest) {
 export const config = {
   matcher: [
     // Everything except static files.
-    "/((?!_next/static|_next/image|favicon.ico|icon.svg|avatars/|sw.js|manifest.webmanifest|robots.txt).*)",
+    "/((?!_next/static|_next/image|favicon.ico|brand/|avatars/|sw.js|manifest.webmanifest|robots.txt).*)",
   ],
 };

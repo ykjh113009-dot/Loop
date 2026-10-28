@@ -1,5 +1,5 @@
 -- =============================================================================
--- Pbs Go: DEMO data (fake students, clubs, events and chats)
+-- Loop: DEMO data (fake students, clubs, events and chats)
 --
 -- Only use this on a local or demo database, never on the real school one.
 -- Every demo account can sign in with the password: pbsgo-demo
@@ -37,7 +37,7 @@ update public.profiles set role = 'admin', grade = 12, avatar = 'a07',
   bio = 'Student council president. Ask me anything about school activities!'
   where id = '00000000-0000-0000-0000-0000000000a1';
 update public.profiles set role = 'moderator', grade = 11, avatar = 'a03',
-  bio = 'Football, coding, and keeping Pbs Go friendly.'
+  bio = 'Football, coding, and keeping Loop friendly.'
   where id = '00000000-0000-0000-0000-0000000000a2';
 update public.profiles set grade = 10, avatar = 'a05', bio = 'I love robots and drawing. Building a line-following car this term.'
   where id = '00000000-0000-0000-0000-0000000000a3';
@@ -282,7 +282,7 @@ from public.events e where e.id = r.event_id and e.starts_at < now();
 -- ---------------------------------------------------------------------------
 insert into public.announcements (school_id, author_id, title, body, created_at) values
   ('00000000-0000-0000-0000-00000000a001', '00000000-0000-0000-0000-0000000000a1',
-   'Welcome to Pbs Go! 👋',
+   'Welcome to Loop! 👋',
    'This is our school''s own space to find clubs, events and friends who like the same things as you. Be kind, use your real name, and report anything that makes you uncomfortable.',
    now() - interval '20 days'),
   ('00000000-0000-0000-0000-00000000a001', '00000000-0000-0000-0000-0000000000a1',
@@ -543,7 +543,7 @@ insert into public.suggestions (school_id, author_id, category, title, body, sta
   ('00000000-0000-0000-0000-00000000a001', '00000000-0000-0000-0000-000000001004', 'activities',
    'A movie afternoon every month', 'We could watch a film in the hall and discuss it.', 'new', null, null, null, now() - interval '1 day'),
   ('00000000-0000-0000-0000-00000000a001', '00000000-0000-0000-0000-000000001008', 'app',
-   'Dark mode for Pbs Go', 'It would be easier on the eyes at night.', 'reviewing', null, '00000000-0000-0000-0000-0000000000a1', now() - interval '1 day', now() - interval '3 days'),
+   'Dark mode for Loop', 'It would be easier on the eyes at night.', 'reviewing', null, '00000000-0000-0000-0000-0000000000a1', now() - interval '1 day', now() - interval '3 days'),
   ('00000000-0000-0000-0000-00000000a001', '00000000-0000-0000-0000-00000000100d', 'clubs',
    'A chess club', 'Lots of us play at break already.', 'done', 'The Chess Club request is waiting for approval now!', '00000000-0000-0000-0000-0000000000a2', now() - interval '3 hours', now() - interval '8 days');
 

@@ -76,7 +76,7 @@ async function Counselor() {
         <CounselorRequestForm />
       ) : (
         <p className="card p-4 text-sm text-black/65">
-          Your school hasn&apos;t added a counselor to Pbs Go yet. Please talk to a teacher or adult you trust at school.
+          Your school hasn&apos;t added a counselor to Loop yet. Please talk to a teacher or adult you trust at school.
         </p>
       )}
       {requests.length > 0 && (

@@ -5,9 +5,9 @@ export const metadata = { title: "Privacy notice" };
 export default function PrivacyPage() {
   return (
     <StaticPage title="Privacy notice">
-      <p>This page explains, in plain words, what Pbs Go stores and who can see it.</p>
-      <h2>Who can use Pbs Go</h2>
-      <p>Only students who sign in with their school Google account. Nothing on Pbs Go is public, and search engines are told not to list it.</p>
+      <p>This page explains, in plain words, what Loop stores and who can see it.</p>
+      <h2>Who can use Loop</h2>
+      <p>Only students who sign in with their school Google account. Nothing on Loop is public, and search engines are told not to list it.</p>
       <h2>What we store</h2>
       <ul>
         <li>Your name and school email (from your school Google account).</li>
@@ -30,7 +30,7 @@ export default function PrivacyPage() {
         <li><strong>Suggestions</strong> are read by the student council and school admins.</li>
       </ul>
       <h2>Where it is stored</h2>
-      <p>Data is stored securely with Supabase (a database service) on servers in the EU. Only the school&apos;s Pbs Go team can manage it.</p>
+      <p>Data is stored securely with Supabase (a database service) on servers in the EU. Only the school&apos;s Loop team can manage it.</p>
       <h2>Leaving</h2>
       <p>When students leave the school, their accounts are removed. Ask your school admin if you want your account deleted sooner.</p>
     </StaticPage>

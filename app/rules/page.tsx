@@ -5,7 +5,7 @@ export const metadata = { title: "Community rules" };
 export default function RulesPage() {
   return (
     <StaticPage title="Community rules">
-      <p>Pbs Go is a space for students at our school to meet people who like the same things. To keep it safe and friendly for everyone:</p>
+      <p>Loop is a space for students at our school to meet people who like the same things. To keep it safe and friendly for everyone:</p>
       <h2>Be kind</h2>
       <ul>
         <li>No bullying, insults, threats, or making fun of anyone.</li>

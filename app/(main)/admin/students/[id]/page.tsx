@@ -119,7 +119,7 @@ async function Student({ params }: { params: PageProps<"/admin/students/[id]">["
           <h2 className="font-semibold">{s.deactivated_at ? "Account removed" : "Remove account"}</h2>
           <p className="text-sm text-black/55">
             {s.deactivated_at
-              ? "This student can't use Pbs Go and is hidden from everyone."
+              ? "This student can't use Loop and is hidden from everyone."
               : "For students who left the school. They can't sign in to the app any more and disappear from lists. You can undo this."}
           </p>
           <ActionForm action={setDeactivated}>

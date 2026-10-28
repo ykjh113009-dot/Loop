@@ -1,11 +1,11 @@
-// Service worker: shows phone notifications sent by Pbs Go.
+// Service worker: shows phone notifications sent by Loop.
 self.addEventListener("push", (event) => {
   const data = event.data ? event.data.json() : {};
   event.waitUntil(
-    self.registration.showNotification(data.title || "Pbs Go", {
+    self.registration.showNotification(data.title || "Loop", {
       body: data.body || "",
-      icon: "/icon.svg",
-      badge: "/icon.svg",
+      icon: "/brand/loop-icon-192.png",
+      badge: "/brand/favicon-48.png",
       data: { url: data.url || "/notifications" },
     }),
   );

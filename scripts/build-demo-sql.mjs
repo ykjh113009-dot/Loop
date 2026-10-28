@@ -4,7 +4,7 @@
 import { readdirSync, readFileSync, writeFileSync } from "node:fs";
 
 const header = `-- =============================================================================
--- Pbs Go: ONE-STEP DEMO SETUP
+-- Loop: ONE-STEP DEMO SETUP
 --
 -- Paste this whole file into a NEW Supabase project (SQL Editor → New query →
 -- paste → Run). It creates all the tables and security rules, then fills them

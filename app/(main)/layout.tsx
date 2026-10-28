@@ -66,10 +66,9 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   return (
     <div className="mx-auto min-h-dvh max-w-2xl pb-24">
       <header className="sticky top-0 z-20 print:hidden flex items-center justify-between border-b border-black/5 bg-[#f5f6f4]/90 px-4 py-2 backdrop-blur">
-        <Link href="/home" className="flex items-center gap-2 font-bold tracking-tight text-brand-800">
+        <Link href="/home" className="flex items-center" aria-label="Loop home">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/icon.svg" alt="" className="size-7" />
-          Pbs Go
+          <img src="/brand/loop-wordmark.png" alt="Loop" width={67} height={28} className="h-7 w-auto" />
         </Link>
         <Suspense fallback={<div className="size-8" />}>
           <HeaderActions />
