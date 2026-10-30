@@ -4,12 +4,19 @@ import { GoogleButton } from "./google-button";
 import { demoSignIn } from "@/app/actions/auth";
 import { DEMO_ACCOUNTS, isDemoMode } from "@/lib/demo";
 import { Avatar } from "@/components/avatar";
+import { LoopRibbon } from "@/components/loop-ribbon";
 
 export const metadata = { title: "Sign in" };
 
+// Shown on the sign-in screen. The school domain is set per site, so other
+// schools can use the same page later.
+const SCHOOL_DOMAIN = process.env.NEXT_PUBLIC_GOOGLE_HOSTED_DOMAIN ?? "pioneers.edu.ps";
+
+const WRONG_ACCOUNT = `We couldn't sign you in with that account. Choose your @${SCHOOL_DOMAIN} school account. If you did, ask your school admin to add your email.`;
+
 const ERRORS: Record<string, string> = {
-  "school-email": "Please use your school email address (it ends with @pioneers.edu.ps).",
-  roster: "Your school hasn't added your email yet. Please ask your school admin.",
+  "school-email": WRONG_ACCOUNT,
+  roster: WRONG_ACCOUNT,
   demo: "Demo sign-in didn't work. Is the demo data loaded?",
   failed: "Sign-in didn't finish. Please try again.",
 };
@@ -18,54 +25,82 @@ async function ErrorMessage({ searchParams }: { searchParams: PageProps<"/login"
   const { error } = await searchParams;
   const message = typeof error === "string" ? (ERRORS[error] ?? ERRORS.failed) : null;
   if (!message) return null;
-  return <p role="alert" className="rounded-xl bg-red-50 px-3 py-2 text-sm text-red-700">{message}</p>;
+  return (
+    <p role="alert" className="lp-notice">
+      {message}
+    </p>
+  );
 }
 
 export default function LoginPage(props: PageProps<"/login">) {
   return (
-    <main className="mx-auto flex min-h-dvh max-w-md flex-col justify-center gap-6 px-5 py-10">
-      <div className="text-center">
-        <h1>
+    <main className="lp">
+      <aside className="lp-art" aria-hidden="true">
+        <LoopRibbon />
+      </aside>
+
+      <div className="lp-main">
+        <div className="lp-brand">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/brand/loop-wordmark.png" alt="Loop" width={191} height={80} className="mx-auto h-20 w-auto" />
-        </h1>
-        <p className="mt-1 text-black/60">Clubs, events and friends — just for your school.</p>
-      </div>
+          <img src="/brand/loop-wordmark.png" alt="Loop" width={574} height={240} className="lp-wordmark" />
+        </div>
 
-      <div className="card space-y-4 p-5">
-        <Suspense>
-          <ErrorMessage searchParams={props.searchParams} />
-        </Suspense>
-        <GoogleButton />
-        <p className="text-center text-xs text-black/50">
-          Only students with a school email can join. By signing in you agree to the{" "}
-          <Link href="/rules" className="underline">community rules</Link> and{" "}
-          <Link href="/privacy" className="underline">privacy notice</Link>.
-        </p>
-      </div>
-
-      {isDemoMode() && (
-        <div className="card space-y-3 border-amber-300 bg-amber-50 p-5">
+        <div className="lp-center">
           <div>
-            <p className="font-semibold">Demo mode</p>
-            <p className="text-sm text-black/60">Tap a fake account to look around. Turn this off on the real site.</p>
+            <h1 className="lp-headline">
+              <span>Your school.</span>
+              <span className="lp-accent">Your community.</span>
+            </h1>
+            <p className="lp-lede">Clubs, events, skills and friends, in one private place for students.</p>
           </div>
-          <div className="space-y-2">
-            {DEMO_ACCOUNTS.map((account) => (
-              <form key={account.email} action={demoSignIn}>
-                <input type="hidden" name="email" value={account.email} />
-                <button className="flex w-full items-center gap-3 rounded-xl bg-white px-3 py-2 text-left shadow-sm hover:bg-black/5">
-                  <Avatar avatar={account.avatar} size="sm" />
-                  <span className="min-w-0">
-                    <span className="block text-sm font-semibold">{account.name}</span>
-                    <span className="block text-xs text-black/55">{account.label}</span>
-                  </span>
-                </button>
-              </form>
-            ))}
+
+          <div className="lp-action">
+            <Suspense>
+              <ErrorMessage searchParams={props.searchParams} />
+            </Suspense>
+            <GoogleButton />
+            <p className="lp-domain">
+              Use your <span className="lp-pill">@{SCHOOL_DOMAIN}</span> school account. Personal Gmail and other
+              accounts can&apos;t join.
+            </p>
+
+            {isDemoMode() && (
+              <div className="lp-demo space-y-3">
+                <div>
+                  <p className="font-semibold">Demo mode</p>
+                  <p className="text-sm text-black/60">Tap a fake account to look around. Turn this off on the real site.</p>
+                </div>
+                <div className="space-y-2">
+                  {DEMO_ACCOUNTS.map((account) => (
+                    <form key={account.email} action={demoSignIn}>
+                      <input type="hidden" name="email" value={account.email} />
+                      <button className="flex w-full items-center gap-3 rounded-xl bg-white px-3 py-2 text-left shadow-sm hover:bg-black/5">
+                        <Avatar avatar={account.avatar} size="sm" />
+                        <span className="min-w-0">
+                          <span className="block text-sm font-semibold">{account.name}</span>
+                          <span className="block text-xs text-black/55">{account.label}</span>
+                        </span>
+                      </button>
+                    </form>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
-      )}
+
+        <div className="lp-foot">
+          <span className="lp-private">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <rect x="5" y="11" width="14" height="9" rx="2" />
+              <path d="M8 11V8a4 4 0 0 1 8 0v3" />
+            </svg>
+            Private to your school
+          </span>
+          <Link href="/rules">Community rules</Link>
+          <Link href="/privacy">Privacy</Link>
+        </div>
+      </div>
     </main>
   );
 }
