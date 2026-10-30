@@ -939,14 +939,14 @@ isOneToOne: false
                   ]
                 },"schools": {
                   Row: {
-                    "created_at": string,"email_domain": string,"grades": (number)[],"id": string,"name": string,"roster_required": boolean
+                    "created_at": string,"email_domain": string,"google_only": boolean,"grades": (number)[],"id": string,"name": string,"roster_required": boolean
                   }
                   ComputedFields: never
                   Insert: {
-                    "created_at"?: string,"email_domain": string,"grades"?: (number)[],"id"?: string,"name": string,"roster_required"?: boolean
+                    "created_at"?: string,"email_domain": string,"google_only"?: boolean,"grades"?: (number)[],"id"?: string,"name": string,"roster_required"?: boolean
                   }
                   Update: {
-                    "created_at"?: string,"email_domain"?: string,"grades"?: (number)[],"id"?: string,"name"?: string,"roster_required"?: boolean
+                    "created_at"?: string,"email_domain"?: string,"google_only"?: boolean,"grades"?: (number)[],"id"?: string,"name"?: string,"roster_required"?: boolean
                   }
                   Relationships: [
                     

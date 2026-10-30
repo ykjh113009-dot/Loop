@@ -5,8 +5,8 @@
 -- Every demo account can sign in with the password: pbsgo-demo
 -- =============================================================================
 
-insert into public.schools (id, name, email_domain, grades)
-values ('00000000-0000-0000-0000-00000000a001', 'Pioneers School', 'pioneers.edu.ps', '{9,10,11,12}');
+insert into public.schools (id, name, email_domain, grades, google_only)
+values ('00000000-0000-0000-0000-00000000a001', 'Pioneers School', 'pioneers.edu.ps', '{9,10,11,12}', false);
 
 -- Creates a demo login (email + password). Real students use Google instead.
 create function pg_temp.demo_user(p_id uuid, p_email text, p_name text) returns void
