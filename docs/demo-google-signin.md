@@ -50,6 +50,15 @@ where email_domain = 'pioneers.edu.ps'
 on conflict do nothing;
 ```
 
+Admins are approved separately. An email on the `admin_emails` list becomes an admin the first
+time it signs in (it must also be on the roster). Only the database owner can edit that list;
+nothing in the app can. The demo currently has `ytj30809@pioneers.edu.ps` on both lists:
+
+```sql
+insert into public.admin_emails (school_id, email)
+select id, 'someone@pioneers.edu.ps' from public.schools where email_domain = 'pioneers.edu.ps';
+```
+
 ## 4. The school's Google admin
 
 Google blocks students **under 18** from signing in to outside apps until the school's
