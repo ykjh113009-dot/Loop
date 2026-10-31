@@ -1,27 +1,68 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+
+// Asks Supabase whether Google sign-in is switched on for this site, so a
+// missing setup shows a clear message instead of a raw error page.
+async function googleIsOff(): Promise<boolean> {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/auth/v1/settings`, {
+      headers: { apikey: process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY! },
+    });
+    if (!res.ok) return false;
+    const settings = await res.json();
+    return settings?.external?.google === false;
+  } catch {
+    return false; // offline: let the sign-in attempt report the problem
+  }
+}
 
 export function GoogleButton() {
   const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+
+  // Coming back with the browser's Back button should not leave the button stuck on "Opening Google…".
+  useEffect(() => {
+    const reset = (event: PageTransitionEvent) => {
+      if (event.persisted) setLoading(false);
+    };
+    window.addEventListener("pageshow", reset);
+    return () => window.removeEventListener("pageshow", reset);
+  }, []);
 
   async function signIn() {
     setLoading(true);
+    setMessage(null);
+    if (await googleIsOff()) {
+      setMessage("Google sign-in isn't switched on for this site yet. Please ask the site owner to finish the setup.");
+      setLoading(false);
+      return;
+    }
     const hostedDomain = process.env.NEXT_PUBLIC_GOOGLE_HOSTED_DOMAIN;
     // "hd" only makes Google suggest school accounts. The database is what
     // actually refuses other emails.
-    await createClient().auth.signInWithOAuth({
+    const { error } = await createClient().auth.signInWithOAuth({
       provider: "google",
       options: {
         redirectTo: `${window.location.origin}/auth/callback`,
         queryParams: { prompt: "select_account", ...(hostedDomain ? { hd: hostedDomain } : {}) },
       },
     });
+    if (error) {
+      setMessage("We couldn't reach Google. Please try again.");
+      setLoading(false);
+    }
   }
 
   return (
-    <button type="button" onClick={signIn} disabled={loading} className="lp-gbtn">
+    <>
+      {message && (
+        <p role="alert" className="lp-notice">
+          {message}
+        </p>
+      )}
+      <button type="button" onClick={signIn} disabled={loading} className="lp-gbtn">
       {loading ? (
         <>
           <span className="lp-spin" aria-hidden="true" />
@@ -40,6 +81,7 @@ export function GoogleButton() {
           Continue with Google
         </>
       )}
-    </button>
+      </button>
+    </>
   );
 }

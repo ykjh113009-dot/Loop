@@ -31,6 +31,15 @@ export async function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname;
   const isPublic = PUBLIC_PATHS.some((p) => path === p || path.startsWith(p + "/"));
 
+  // Already signed in: skip the login page. (Not when it is showing an error,
+  // so a signed-in account without a profile cannot bounce back and forth.)
+  if (data?.claims && path === "/login" && !request.nextUrl.searchParams.has("error")) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/home";
+    url.search = "";
+    return NextResponse.redirect(url);
+  }
+
   if (!data?.claims && !isPublic && !path.startsWith("/api/")) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";

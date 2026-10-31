@@ -48,7 +48,7 @@ export const getMe = cache(async (): Promise<Me | null> => {
 // if they are signed out, have not finished the welcome screen, or were removed.
 export async function requireMe(need?: "staff" | "admin"): Promise<Me> {
   const me = await getMe();
-  if (!me) redirect("/login");
+  if (!me) redirect("/login?error=failed");
   if (me.deactivated_at) redirect("/removed");
   if (!me.onboarded_at) redirect("/welcome");
   if (need === "staff" && !me.isStaff) redirect("/home");

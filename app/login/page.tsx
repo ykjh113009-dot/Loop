@@ -17,6 +17,7 @@ const WRONG_ACCOUNT = `We couldn't sign you in with that account. Choose your @$
 const ERRORS: Record<string, string> = {
   "school-email": WRONG_ACCOUNT,
   roster: WRONG_ACCOUNT,
+  cancelled: "You closed Google before finishing. Tap Continue with Google to try again.",
   demo: "Demo sign-in didn't work. Is the demo data loaded?",
   failed: "Sign-in didn't finish. Please try again.",
 };

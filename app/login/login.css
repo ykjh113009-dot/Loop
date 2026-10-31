@@ -259,7 +259,10 @@
     padding-bottom: 14px;
   }
   .lp-headline {
-    font-size: clamp(52px, 4.9vw, 80px);
+    font-size: clamp(46px, 4.6vw, 80px);
+  }
+  .lp-headline span {
+    white-space: nowrap;
   }
   .lp-lede {
     max-width: 31ch;
