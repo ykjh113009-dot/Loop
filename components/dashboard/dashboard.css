@@ -1,0 +1,89 @@
+/* The Home dashboard grid. One column on a phone, two on a tablet, and on a big
+   screen the reference layout: two wide columns plus a narrow side column. */
+.dash {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    "greet"
+    "actions"
+    "upcoming"
+    "chats"
+    "feed"
+    "announce"
+    "leader"
+    "quick"
+    "council"
+    "calendar"
+    "week"
+    "next"
+    "featured";
+}
+.dash > * { min-width: 0; }
+.dash-greet { grid-area: greet; }
+.dash-actions { grid-area: actions; }
+.dash-upcoming { grid-area: upcoming; }
+.dash-chats { grid-area: chats; }
+.dash-announce { grid-area: announce; }
+.dash-feed { grid-area: feed; }
+.dash-leader { grid-area: leader; }
+.dash-quick { grid-area: quick; }
+.dash-council { grid-area: council; }
+.dash-calendar { grid-area: calendar; }
+.dash-week { grid-area: week; }
+.dash-next { grid-area: next; }
+.dash-featured { grid-area: featured; }
+
+@media (min-width: 768px) {
+  .dash {
+    gap: 16px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-areas:
+      "greet greet"
+      "actions actions"
+      "chats announce"
+      "feed feed"
+      "upcoming leader"
+      "quick council"
+      "calendar week"
+      "next featured";
+  }
+}
+
+/* On a phone and a tablet the two wrappers disappear, so every block is a grid item above. */
+.dash-main,
+.dash-side { display: contents; }
+
+/* Cards in the same row grow to the same height. */
+.dash > div > section,
+.dash-main > div > section,
+.dash-side > div > section { height: 100%; }
+
+@media (min-width: 1280px) {
+  .dash {
+    gap: 18px;
+    grid-template-columns: minmax(0, 1fr) 320px;
+    grid-template-areas: none;
+    align-items: start;
+  }
+  /* Left: the wide blocks. */
+  .dash-main {
+    display: grid;
+    gap: 18px;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    grid-template-areas:
+      "greet greet greet greet greet greet"
+      "actions actions actions actions actions actions"
+      "chats chats chats announce announce announce"
+      "feed feed feed feed feed feed"
+      "calendar calendar week week next next"
+      "featured featured featured featured featured featured";
+  }
+  /* Right: a plain stack of cards. */
+  .dash-side {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .dash-side > div { grid-area: auto; }
+}

@@ -1,123 +1,67 @@
 import { Suspense } from "react";
-import Link from "next/link";
-import { requireMe } from "@/lib/auth";
-import { createClient } from "@/lib/supabase/server";
-import { EVENT_FIELDS, loadPosts, type EventSummary } from "@/lib/queries";
-import { timeAgo } from "@/lib/time";
-import { PostCard } from "@/components/post-card";
-import { EventCard } from "@/components/event-card";
-import { Empty } from "@/components/empty";
-import { Icon } from "@/components/icons";
-import { PageSkeleton } from "@/components/skeleton";
+import { CardSkeleton } from "@/components/dashboard/card";
+import { Announcements } from "@/components/dashboard/announcements";
+import { CommunityFeed } from "@/components/dashboard/community-feed";
+import { Featured } from "@/components/dashboard/featured";
+import { Greeting } from "@/components/dashboard/greeting";
+import { LeaderboardCard } from "@/components/dashboard/leaderboard-card";
+import { MiniCalendar } from "@/components/dashboard/mini-calendar";
+import { NextUp } from "@/components/dashboard/next-up";
+import { QuickActions } from "@/components/dashboard/quick-actions";
+import { QuickChats } from "@/components/dashboard/quick-chats";
+import { RecentChats } from "@/components/dashboard/recent-chats";
+import { StudentCouncil } from "@/components/dashboard/student-council";
+import { UpcomingActivities } from "@/components/dashboard/upcoming-activities";
+import { WeekEvents } from "@/components/dashboard/week-events";
+import "@/components/dashboard/dashboard.css";
 
 export const metadata = { title: "Home" };
 
-async function Home() {
-  const me = await requireMe();
-  const supabase = await createClient();
-
-  const [{ data: announcements }, { data: memberships }, { data: events }, { data: myRsvps }] = await Promise.all([
-    supabase.from("announcements").select("id, title, body, created_at").order("created_at", { ascending: false }).limit(2),
-    supabase.from("club_members").select("club_id").eq("profile_id", me.id),
-    supabase
-      .from("events")
-      .select(EVENT_FIELDS)
-      .eq("status", "approved")
-      .gt("starts_at", new Date().toISOString())
-      .order("starts_at")
-      .limit(3),
-    supabase.from("event_rsvps").select("event_id").eq("profile_id", me.id),
-  ]);
-
-  const nowIso = new Date().toISOString();
-  const [{ data: challenge }, { count: openPolls }] = await Promise.all([
-    supabase.from("challenges").select("id, title, emoji, points").lte("starts_at", nowIso).gt("ends_at", nowIso).order("starts_at", { ascending: false }).limit(1).maybeSingle(),
-    supabase.from("polls").select("id", { count: "exact", head: true }).gt("closes_at", nowIso),
-  ]);
-  const clubIds = (memberships ?? []).map((m) => m.club_id);
-  const goingTo = new Set((myRsvps ?? []).map((r) => r.event_id));
-  const posts = await loadPosts(supabase, clubIds, 20);
-
-  return (
-    <div className="space-y-6">
-      <h1 className="page-title">Hi {me.full_name.split(" ")[0]} 👋</h1>
-
-      {announcements && announcements.length > 0 && (
-        <section className="space-y-2">
-          {announcements.map((a) => (
-            <article key={a.id} className="rounded-2xl bg-brand-700 p-4 text-white shadow-sm">
-              <p className="flex items-center gap-2 text-xs font-semibold tracking-wide text-white/70 uppercase">
-                <Icon name="megaphone" className="size-4" /> School announcement · {timeAgo(a.created_at)}
-              </p>
-              <h2 className="mt-1 font-bold">{a.title}</h2>
-              <p className="mt-1 line-clamp-3 text-sm whitespace-pre-wrap text-white/90">{a.body}</p>
-            </article>
-          ))}
-        </section>
-      )}
-
-      <section className="grid grid-cols-2 gap-2">
-        {challenge && me.isStudent ? (
-          <Link href="/challenges" className="card p-3 hover:bg-black/[0.02]">
-            <p className="text-xs font-semibold text-brand-700">This week&apos;s challenge</p>
-            <p className="mt-1 text-sm leading-tight font-semibold">{challenge.emoji} {challenge.title}</p>
-            <p className="mt-0.5 text-xs text-black/50">+{challenge.points} points for your grade</p>
-          </Link>
-        ) : (
-          <Link href="/tawjihi" className="card p-3 hover:bg-black/[0.02]">
-            <p className="text-xs font-semibold text-brand-700">Tawjihi corner</p>
-            <p className="mt-1 text-sm leading-tight font-semibold">🎓 Ask alumni mentors</p>
-          </Link>
-        )}
-        <Link href="/polls" className="card p-3 hover:bg-black/[0.02]">
-          <p className="text-xs font-semibold text-brand-700">Polls</p>
-          <p className="mt-1 text-sm leading-tight font-semibold">📊 {openPolls ? `${openPolls} open ${openPolls === 1 ? "poll" : "polls"}` : "No open polls"}</p>
-          <p className="mt-0.5 text-xs text-black/50">Have your say</p>
-        </Link>
-        <Link href="/more" className="card col-span-2 flex items-center justify-between p-3 text-sm hover:bg-black/[0.02]">
-          <span>📚 Tutors · 🛍️ Market · 💚 Volunteering · 🗳️ Council · 💡 Ideas</span>
-          <span className="text-brand-700">More →</span>
-        </Link>
-      </section>
-
-      <section>
-        <div className="flex items-baseline justify-between">
-          <h2 className="section-title">Coming up</h2>
-          <Link href="/events" className="text-sm font-medium text-brand-700">Calendar →</Link>
-        </div>
-        <div className="space-y-2">
-          {(events as EventSummary[] | null)?.length ? (
-            (events as EventSummary[]).map((e) => <EventCard key={e.id} event={e} going={goingTo.has(e.id)} />)
-          ) : (
-            <Empty emoji="📅" title="No upcoming events yet" />
-          )}
-        </div>
-      </section>
-
-      <section>
-        <h2 className="section-title">From your clubs</h2>
-        {clubIds.length === 0 ? (
-          <Empty emoji="🧭" title="You haven't joined any clubs yet">
-            <Link href="/clubs" className="btn-primary mt-3">Find a club</Link>
-          </Empty>
-        ) : posts.length === 0 ? (
-          <Empty emoji="✏️" title="No posts yet">Be the first to post in one of your clubs.</Empty>
-        ) : (
-          <div className="space-y-3">
-            {posts.map((p) => (
-              <PostCard key={p.id} post={p} meId={me.id} />
-            ))}
-          </div>
-        )}
-      </section>
-    </div>
-  );
-}
-
+// Each block loads on its own, so the page appears at once and fills in.
 export default function HomePage() {
   return (
-    <Suspense fallback={<PageSkeleton />}>
-      <Home />
-    </Suspense>
+    <div data-wide className="dash">
+      <div className="dash-main">
+        <div className="dash-greet">
+          <Suspense fallback={<div className="card h-[104px] animate-pulse" />}>
+            <Greeting />
+          </Suspense>
+        </div>
+        <div className="dash-actions"><QuickActions /></div>
+        <div className="dash-chats">
+          <Suspense fallback={<CardSkeleton />}><RecentChats /></Suspense>
+        </div>
+        <div className="dash-announce">
+          <Suspense fallback={<CardSkeleton />}><Announcements /></Suspense>
+        </div>
+        <div className="dash-feed">
+          <Suspense fallback={<CardSkeleton rows={4} />}><CommunityFeed /></Suspense>
+        </div>
+        <div className="dash-calendar">
+          <Suspense fallback={<CardSkeleton rows={4} />}><MiniCalendar /></Suspense>
+        </div>
+        <div className="dash-week">
+          <Suspense fallback={<CardSkeleton />}><WeekEvents /></Suspense>
+        </div>
+        <div className="dash-next">
+          <Suspense fallback={<CardSkeleton rows={2} />}><NextUp /></Suspense>
+        </div>
+        <div className="dash-featured"><Featured /></div>
+      </div>
+      <div className="dash-side">
+        <div className="dash-upcoming">
+          <Suspense fallback={<CardSkeleton />}><UpcomingActivities /></Suspense>
+        </div>
+        <div className="dash-leader">
+          <Suspense fallback={<CardSkeleton rows={4} />}><LeaderboardCard /></Suspense>
+        </div>
+        <div className="dash-quick">
+          <Suspense fallback={<CardSkeleton rows={4} />}><QuickChats /></Suspense>
+        </div>
+        <div className="dash-council">
+          <Suspense fallback={<CardSkeleton rows={2} />}><StudentCouncil /></Suspense>
+        </div>
+      </div>
+    </div>
   );
 }

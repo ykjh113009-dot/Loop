@@ -3,6 +3,7 @@ import { cache } from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import type { Tables } from "@/lib/database.types";
+import { NO_BADGES, type Badges } from "@/lib/badges";
 
 export type Profile = Tables<"profiles">;
 export type Me = Profile & {
@@ -55,3 +56,10 @@ export async function requireMe(need?: "staff" | "admin"): Promise<Me> {
   if (need === "admin" && !me.isAdmin) redirect("/home");
   return me;
 }
+
+// The numbers on the bell and chat icons (unread alerts and chats).
+export const getBadges = cache(async (): Promise<Badges> => {
+  const supabase = await createClient();
+  const { data } = await supabase.rpc("my_badges");
+  return (data as Badges | null) ?? NO_BADGES;
+});

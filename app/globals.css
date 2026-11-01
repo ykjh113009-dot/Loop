@@ -1,15 +1,23 @@
 @import "tailwindcss";
 
 @theme {
-  --color-brand-50: #ecfdf5;
-  --color-brand-100: #d1fae5;
-  --color-brand-200: #a7f3d0;
-  --color-brand-500: #10b981;
-  --color-brand-600: #059669;
-  --color-brand-700: #047857;
-  --color-brand-800: #065f46;
-  --color-brand-900: #064e3b;
-  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", "Noto Sans Arabic", Tahoma, sans-serif;
+  /* Loop palette: warm cream, soft sage, forest green. Shared with the sign-in page. */
+  --color-brand-50: #f3f7ea;
+  --color-brand-100: #e6eeda;
+  --color-brand-200: #cfddb8;
+  --color-brand-500: #7e9a62;
+  --color-brand-600: #5f7a47;
+  --color-brand-700: #466237;
+  --color-brand-800: #3a5230;
+  --color-brand-900: #2b3e24;
+  --color-cream: #f7f6ec;
+  --color-sage: #99ab78;
+  --color-sage-soft: #dde6cc;
+  --color-sky: #dce9ef;
+  --color-ink: #243020;
+  --color-ink-2: #5a6652;
+  --font-sans: var(--font-body), system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", "Noto Sans Arabic", Tahoma, sans-serif;
+  --font-heading: var(--font-display), var(--font-body), system-ui, sans-serif;
 }
 
 :root {
@@ -27,14 +35,14 @@
 }
 
 body {
-  background: #f5f6f4;
-  color: #1c1f1d;
+  background: var(--color-cream);
+  color: var(--color-ink);
   -webkit-tap-highlight-color: transparent;
 }
 
 /* Reusable building blocks, used like normal Tailwind classes. */
 @utility card {
-    @apply rounded-2xl border border-black/5 bg-white shadow-sm;
+    @apply rounded-2xl border border-brand-700/10 bg-white shadow-[0_1px_2px_rgba(36,48,32,0.05)];
 }
 
 @utility input {

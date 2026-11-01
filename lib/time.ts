@@ -78,3 +78,19 @@ export function weekStart(now = new Date()) {
   day.setUTCDate(day.getUTCDate() - day.getUTCDay());
   return fromLocalInput(`${day.toISOString().slice(0, 10)}T00:00`)!;
 }
+
+const activityDayFmt = new Intl.DateTimeFormat("en-US", { timeZone: TIME_ZONE, month: "short", day: "numeric" });
+const activityTimeFmt = new Intl.DateTimeFormat("en-US", { timeZone: TIME_ZONE, hour: "numeric", minute: "2-digit", hour12: true });
+
+/** "Nov 5 \u2022 9:00 AM \u2013 3:00 PM" (the end time is left out when there is none). */
+export function formatActivityTime(start: string | Date, end?: string | Date | null) {
+  const day = activityDayFmt.format(new Date(start));
+  const from = activityTimeFmt.format(new Date(start));
+  return end ? `${day} \u2022 ${from} \u2013 ${activityTimeFmt.format(new Date(end))}` : `${day} \u2022 ${from}`;
+}
+
+/** The weekday number (0 = Sunday) of a moment in Palestine time. */
+export function localWeekday(d: string | Date) {
+  const p = localParts(d);
+  return new Date(Date.UTC(p.year, p.month - 1, p.day)).getUTCDay();
+}
