@@ -1,11 +1,12 @@
 import { getBadges, getMe } from "@/lib/auth";
 import { personLabel } from "@/lib/people";
 import { ShellFrame } from "@/components/shell/shell-frame";
+import { getLocale } from "@/lib/i18n-server";
 
 // Looks up who is signed in, then draws the sidebar, top bar and tabs around them.
 export async function Shell() {
-  const me = await getMe();
-  if (!me) return <ShellFrame user={null} initial={{ notifications: 0, messages: 0, moderation: 0 }} />;
+  const [me, locale] = await Promise.all([getMe(), getLocale()]);
+  if (!me) return <ShellFrame user={null} initial={{ notifications: 0, messages: 0, moderation: 0 }} locale={locale} />;
   const badges = await getBadges();
   return (
     <ShellFrame
@@ -20,6 +21,7 @@ export async function Shell() {
         isCounselor: me.isCounselor,
       }}
       initial={badges}
+      locale={locale}
     />
   );
 }

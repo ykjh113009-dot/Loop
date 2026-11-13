@@ -5,6 +5,7 @@ import Link from "next/link";
 import { signOut } from "@/app/actions/auth";
 import { Avatar } from "@/components/avatar";
 import { LineIcon, type LineIconName } from "@/components/line-icon";
+import { makeT, type Locale } from "@/lib/i18n";
 
 export type ShellUser = {
   id: string;
@@ -17,7 +18,8 @@ export type ShellUser = {
 };
 
 // The profile button in the top bar, with the small menu under it.
-export function ProfileMenu({ user, compact = false }: { user: ShellUser; compact?: boolean }) {
+export function ProfileMenu({ user, compact = false, locale = "en" }: { user: ShellUser; compact?: boolean; locale?: Locale }) {
+  const t = makeT(locale);
   const [open, setOpen] = useState(false);
   const box = useRef<HTMLDivElement>(null);
 
@@ -38,8 +40,10 @@ export function ProfileMenu({ user, compact = false }: { user: ShellUser; compac
   const items: { href: string; label: string; icon: LineIconName }[] = [
     { href: `/profile/${user.id}`, label: "My profile", icon: "user" },
     { href: "/profile/edit", label: "Edit profile", icon: "pencil" },
+    { href: "/friends", label: "Friends", icon: "community" },
+    { href: "/saved", label: "Saved posts", icon: "bookmark" },
     { href: "/more", label: "More features", icon: "grid" },
-    { href: "/security", label: "Security", icon: "lock" },
+    { href: "/settings", label: "Settings", icon: "lock" },
   ];
   if (user.isCounselor) items.push({ href: "/counselor", label: "Counselor inbox", icon: "lock" });
   if (user.isStaff) items.push({ href: "/moderation", label: "Moderation", icon: "shield" });
@@ -53,12 +57,12 @@ export function ProfileMenu({ user, compact = false }: { user: ShellUser; compac
         aria-expanded={open}
         aria-haspopup="menu"
         aria-label="Profile menu"
-        className="flex items-center gap-2.5 rounded-full py-1 pr-2 pl-1 hover:bg-brand-700/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700"
+        className="flex items-center gap-2.5 rounded-full py-1 pe-2 ps-1 hover:bg-brand-700/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700"
       >
         <Avatar avatar={user.avatar} size="md" className="ring-2 ring-white" />
         {!compact && (
           <>
-            <span className="text-left leading-tight">
+            <span className="text-start leading-tight">
               <span className="block max-w-36 truncate text-sm font-semibold">{user.name}</span>
               <span className="block text-xs text-ink-2">{user.label}</span>
             </span>
@@ -67,7 +71,7 @@ export function ProfileMenu({ user, compact = false }: { user: ShellUser; compac
         )}
       </button>
       {open && (
-        <div role="menu" className="absolute right-0 z-50 mt-2 w-56 overflow-hidden rounded-2xl border border-brand-700/10 bg-white p-1.5 shadow-[0_12px_32px_-12px_rgba(36,48,32,0.35)]">
+        <div role="menu" className="absolute end-0 z-50 mt-2 w-56 overflow-hidden rounded-2xl border border-brand-700/10 bg-white p-1.5 shadow-[0_12px_32px_-12px_rgba(36,48,32,0.35)]">
           {items.map((item) => (
             <Link
               key={item.href}
@@ -77,13 +81,13 @@ export function ProfileMenu({ user, compact = false }: { user: ShellUser; compac
               className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium hover:bg-brand-50"
             >
               <LineIcon name={item.icon} className="size-[18px] text-brand-700" />
-              {item.label}
+              {t(item.label)}
             </Link>
           ))}
           <form action={signOut} className="mt-1 border-t border-brand-700/10 pt-1">
-            <button role="menuitem" className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left text-sm font-medium hover:bg-brand-50">
+            <button role="menuitem" className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-start text-sm font-medium hover:bg-brand-50">
               <LineIcon name="logout" className="size-[18px] text-brand-700" />
-              Sign out
+              {t("Sign out")}
             </button>
           </form>
         </div>

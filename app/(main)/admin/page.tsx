@@ -64,7 +64,7 @@ function Bars({ rows }: { rows: { label: string; value: number; max: number; tex
           <span className="h-3 rounded-full bg-black/[0.06]">
             <span className="block h-3 rounded-full bg-brand-600" style={{ width: `${r.max ? Math.max(2, (r.value / r.max) * 100) : 0}%` }} />
           </span>
-          <span className="text-right text-xs font-medium tabular-nums text-black/70">{r.text}</span>
+          <span className="text-end text-xs font-medium tabular-nums text-black/70">{r.text}</span>
         </li>
       ))}
     </ul>

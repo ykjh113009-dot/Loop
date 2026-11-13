@@ -73,7 +73,7 @@ async function Tawjihi({ searchParams }: { searchParams: PageProps<"/tawjihi">["
           return (
             <Link key={q.id} href={`/tawjihi/${q.id}`} className="card block p-4 hover:bg-black/[0.02]">
               <p className="text-xs text-black/45">
-                <span className="chip mr-1 bg-brand-50 text-brand-800">{q.subject}</span>
+                <span className="chip me-1 bg-brand-50 text-brand-800">{q.subject}</span>
                 {q.author?.full_name} · {timeAgo(q.created_at)}
               </p>
               <p className="mt-1.5 font-semibold">{q.title}</p>

@@ -134,7 +134,7 @@ export function Chat({
                   )}
                   <div
                     className={`rounded-2xl px-3 py-2 break-words whitespace-pre-wrap ${
-                      mine ? "rounded-br-md bg-brand-700 text-white" : "rounded-bl-md bg-white shadow-sm"
+                      mine ? "rounded-ee-md bg-brand-700 text-white" : "rounded-es-md bg-white shadow-sm"
                     } ${m.status === "held" ? "opacity-60" : ""}`}
                   >
                     {m.body}

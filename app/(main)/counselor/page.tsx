@@ -43,7 +43,7 @@ async function Counselor() {
                 <Link href={`/counselor/${r.id}`} className="flex items-center gap-3 px-4 py-3 hover:bg-black/[0.02]">
                   <div className="min-w-0 flex-1">
                     <p className={r.status === "open" ? "font-bold" : "font-medium"}>
-                      {r.urgent && r.status !== "closed" && <span className="mr-1 text-red-600">● Urgent</span>}
+                      {r.urgent && r.status !== "closed" && <span className="me-1 text-red-600">● Urgent</span>}
                       {r.student?.full_name} <span className="text-xs font-normal text-black/45">grade {r.student?.grade}</span>
                     </p>
                     <p className="text-xs text-black/50">{TOPICS[r.topic]} · {timeAgo(r.last_message_at)}</p>

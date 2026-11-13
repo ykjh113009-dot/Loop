@@ -18,7 +18,7 @@ export function ClubCard({ club, joined = false }: { club: ClubSummary; joined?:
         <p className="truncate font-semibold">{club.name}</p>
         <p className="line-clamp-1 text-xs text-black/55">{club.description}</p>
       </div>
-      <div className="shrink-0 text-right text-xs text-black/50">
+      <div className="shrink-0 text-end text-xs text-black/50">
         {members} {members === 1 ? "member" : "members"}
         {joined && <span className="block font-semibold text-brand-700">✓ Joined</span>}
       </div>

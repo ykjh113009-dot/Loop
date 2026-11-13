@@ -123,7 +123,7 @@ export function MfaPanel({ required, needsStep }: { required: boolean; needsStep
         )
       ) : enrolment ? (
         <form onSubmit={(e) => { e.preventDefault(); verify(enrolment.id, "mfa_enabled"); }} className="space-y-3">
-          <ol className="list-decimal space-y-1 pl-5 text-sm">
+          <ol className="list-decimal space-y-1 ps-5 text-sm">
             <li>Open an authenticator app on your phone (for example Google Authenticator).</li>
             <li>Scan this square, or type the key under it.</li>
             <li>Enter the 6-digit code the app shows.</li>

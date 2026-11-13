@@ -16,8 +16,8 @@
   --color-sky: #dce9ef;
   --color-ink: #243020;
   --color-ink-2: #5a6652;
-  --font-sans: var(--font-body), system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", "Noto Sans Arabic", Tahoma, sans-serif;
-  --font-heading: var(--font-display), var(--font-body), system-ui, sans-serif;
+  --font-sans: var(--font-body), var(--font-arabic), system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", "Noto Sans Arabic", Tahoma, sans-serif;
+  --font-heading: var(--font-display), var(--font-arabic), var(--font-body), system-ui, sans-serif;
 }
 
 :root {
@@ -83,4 +83,20 @@ body {
 
 @utility section-title {
     @apply mb-2 text-sm font-semibold uppercase tracking-wide text-black/50;
+}
+
+/* Accessibility choices from Settings */
+html.a11y-large {
+  font-size: 112.5%;
+}
+html.a11y-calm *,
+html.a11y-calm *::before,
+html.a11y-calm *::after {
+  animation: none !important;
+  transition: none !important;
+  scroll-behavior: auto !important;
+}
+/* Arabic: headings use the Arabic face and need no tight tracking */
+html[lang="ar"] * {
+  letter-spacing: 0 !important;
 }

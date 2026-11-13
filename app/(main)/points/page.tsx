@@ -93,7 +93,7 @@ async function Points() {
               <li key={r.id} className="flex items-center justify-between px-4 py-2">
                 <span>{POINT_REASONS[r.reason] ?? r.reason}</span>
                 <span className="text-xs text-black/40">{timeAgo(r.created_at)}</span>
-                <span className="w-10 text-right font-semibold tabular-nums text-brand-700">+{r.points}</span>
+                <span className="w-10 text-end font-semibold tabular-nums text-brand-700">+{r.points}</span>
               </li>
             ))}
           </ul>

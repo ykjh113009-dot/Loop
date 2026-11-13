@@ -75,7 +75,7 @@ export default function LoginPage(props: PageProps<"/login">) {
                   {DEMO_ACCOUNTS.map((account) => (
                     <form key={account.email} action={demoSignIn}>
                       <input type="hidden" name="email" value={account.email} />
-                      <button className="flex w-full items-center gap-3 rounded-xl bg-white px-3 py-2 text-left shadow-sm hover:bg-black/5">
+                      <button className="flex w-full items-center gap-3 rounded-xl bg-white px-3 py-2 text-start shadow-sm hover:bg-black/5">
                         <Avatar avatar={account.avatar} size="sm" />
                         <span className="min-w-0">
                           <span className="block text-sm font-semibold">{account.name}</span>

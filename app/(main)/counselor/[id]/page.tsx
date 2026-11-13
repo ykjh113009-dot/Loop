@@ -36,7 +36,7 @@ async function Thread({ params }: { params: PageProps<"/counselor/[id]">["params
           const mine = m.sender_id === me.id;
           return (
             <div key={m.id} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
-              <div className={`max-w-[85%] rounded-2xl px-3 py-2 ${mine ? "rounded-br-md bg-brand-700 text-white" : "rounded-bl-md bg-white shadow-sm"}`}>
+              <div className={`max-w-[85%] rounded-2xl px-3 py-2 ${mine ? "rounded-ee-md bg-brand-700 text-white" : "rounded-es-md bg-white shadow-sm"}`}>
                 <p className="whitespace-pre-wrap break-words">{m.body}</p>
                 <p className={`mt-1 text-[11px] ${mine ? "text-white/70" : "text-black/40"}`}>
                   {mine ? "You" : isCounselor ? "Student" : "Counselor"} · {formatDateTime(m.created_at)}

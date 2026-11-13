@@ -42,7 +42,7 @@ export function PhotoField({ schoolId, userId, label = "Add a photo" }: { school
                 setPath("");
                 setPreview(null);
               }}
-              className="absolute top-2 left-2 rounded-full bg-black/60 px-2 text-sm text-white"
+              className="absolute top-2 start-2 rounded-full bg-black/60 px-2 text-sm text-white"
               aria-label="Remove photo"
             >
               ✕

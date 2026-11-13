@@ -55,7 +55,7 @@ async function Security() {
             <li key={e.id} className="flex flex-wrap items-center gap-x-2 py-2">
               <span className={e.kind === "new_device" ? "font-semibold text-amber-800" : "font-medium"}>{EVENTS[e.kind] ?? e.kind}</span>
               <span className="text-black/55">{browserName(e.user_agent)}</span>
-              <span className="ml-auto text-xs text-black/45">{formatDateTime(e.created_at)}</span>
+              <span className="ms-auto text-xs text-black/45">{formatDateTime(e.created_at)}</span>
             </li>
           ))}
           {(events ?? []).length === 0 && <li className="py-2 text-black/55">Nothing recorded yet.</li>}

@@ -43,8 +43,8 @@ async function Leaderboard({ searchParams }: { searchParams: PageProps<"/leaderb
             <li key={r.grade} className={`card p-4 ${mine ? "ring-2 ring-brand-600" : ""}`}>
               <div className="flex items-baseline justify-between">
                 <p className="font-bold">
-                  <span className="mr-1">{MEDALS[i] ?? `${i + 1}.`}</span> Grade {r.grade}
-                  {mine && <span className="ml-2 chip bg-brand-50 text-brand-800">Your grade</span>}
+                  <span className="me-1">{MEDALS[i] ?? `${i + 1}.`}</span> Grade {r.grade}
+                  {mine && <span className="ms-2 chip bg-brand-50 text-brand-800">Your grade</span>}
                 </p>
                 <p className="text-sm tabular-nums">
                   <strong>{avg}</strong> <span className="text-black/50">points per student</span>

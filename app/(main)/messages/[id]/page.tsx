@@ -25,7 +25,7 @@ async function DirectChat({ params }: { params: PageProps<"/messages/[id]">["par
   return (
     <>
       <div className="sticky top-12 z-10 -mx-4 -mt-4 mb-2 flex items-center gap-2 border-b border-black/5 bg-[#f5f6f4]/95 px-4 py-2 backdrop-blur">
-        <Link href="/messages" className="-ml-2 rounded-full p-2 text-black/60 hover:bg-black/5" aria-label="Back">
+        <Link href="/messages" className="-ms-2 rounded-full p-2 text-black/60 hover:bg-black/5" aria-label="Back">
           <Icon name="back" />
         </Link>
         {other && (

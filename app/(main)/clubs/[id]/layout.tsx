@@ -14,7 +14,7 @@ async function ClubHeader({ params }: { params: LayoutProps<"/clubs/[id]">["para
 
   return (
     <div className="mb-4">
-      <Link href="/clubs" className="-ml-2 inline-flex items-center rounded-full p-2 text-sm text-black/60 hover:bg-black/5">
+      <Link href="/clubs" className="-ms-2 inline-flex items-center rounded-full p-2 text-sm text-black/60 hover:bg-black/5">
         <Icon name="back" className="size-4" /> Clubs
       </Link>
       <div className="card mt-1 p-4">

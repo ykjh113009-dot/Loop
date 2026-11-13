@@ -42,7 +42,7 @@ async function Leadership() {
               <Link href={`/admin/students/${r.student?.id}`} className="font-semibold hover:underline">{r.student?.full_name}</Link>
               {r.student?.grade && <span className="text-sm text-black/45">Grade {r.student.grade}</span>}
               <span className="chip bg-amber-50 text-amber-900">{leadershipLabel(r.kind, r.scope, r.club?.name)}</span>
-              <span className="ml-auto text-xs text-black/45">{formatDateTime(r.created_at)}</span>
+              <span className="ms-auto text-xs text-black/45">{formatDateTime(r.created_at)}</span>
             </div>
             <p className="text-sm whitespace-pre-wrap">{r.reason}</p>
             {r.profile_id === me.id ? (
@@ -68,7 +68,7 @@ async function Leadership() {
               <Link href={`/profile/${r.student?.id}`} className="font-medium hover:underline">{r.student?.full_name}</Link>
               <span className="chip bg-brand-50 text-brand-800">{leadershipLabel(r.kind, r.scope, r.club?.name)}</span>
               {me.isSuperAdmin && (
-                <ActionForm action={removeLeadershipRole} className="ml-auto">
+                <ActionForm action={removeLeadershipRole} className="ms-auto">
                   <input type="hidden" name="roleId" value={r.id} />
                   <SubmitButton className="btn-secondary px-3 py-1.5" pendingText="…">Remove</SubmitButton>
                 </ActionForm>

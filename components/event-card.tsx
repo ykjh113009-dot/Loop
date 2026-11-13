@@ -22,7 +22,7 @@ export function EventCard({ event, going = false }: { event: EventSummary; going
           {event.club && ` · ${event.club.emoji} ${event.club.name}`}
         </p>
       </div>
-      <div className="shrink-0 text-right text-xs">
+      <div className="shrink-0 text-end text-xs">
         {cancelled ? (
           <span className="chip bg-red-50 text-red-700">Cancelled</span>
         ) : event.status === "pending" ? (

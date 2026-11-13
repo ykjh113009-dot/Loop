@@ -59,13 +59,13 @@ async function Certificate({ searchParams }: { searchParams: PageProps<"/volunte
         <p className="mt-3 text-sm sm:text-base">
           completed <strong className="text-brand-800">{total} hours</strong> of community volunteering:
         </p>
-        <table className="mx-auto mt-3 w-full max-w-md text-left text-xs sm:text-sm">
+        <table className="mx-auto mt-3 w-full max-w-md text-start text-xs sm:text-sm">
           <tbody>
             {rows.map((r) => (
               <tr key={r.id} className="border-b border-black/10">
-                <td className="py-1 pr-2 whitespace-nowrap text-black/55">{formatShortDate(r.activity_date)}</td>
-                <td className="py-1 pr-2" dir="auto">{r.organization}</td>
-                <td className="py-1 text-right tabular-nums">{Number(r.hours)} h</td>
+                <td className="py-1 pe-2 whitespace-nowrap text-black/55">{formatShortDate(r.activity_date)}</td>
+                <td className="py-1 pe-2" dir="auto">{r.organization}</td>
+                <td className="py-1 text-end tabular-nums">{Number(r.hours)} h</td>
               </tr>
             ))}
           </tbody>

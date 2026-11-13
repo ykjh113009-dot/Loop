@@ -54,7 +54,7 @@ export function PostComposer({ clubId, schoolId, userId }: { clubId: string; sch
         <div className="relative">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={preview} alt="" className="max-h-48 rounded-xl object-cover" />
-          <button type="button" onClick={() => pickFile(null)} className="absolute top-2 left-2 rounded-full bg-black/60 px-2 text-sm text-white">
+          <button type="button" onClick={() => pickFile(null)} className="absolute top-2 start-2 rounded-full bg-black/60 px-2 text-sm text-white">
             ✕
           </button>
         </div>

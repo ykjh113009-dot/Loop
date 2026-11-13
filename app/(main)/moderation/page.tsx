@@ -86,7 +86,7 @@ async function Reports() {
                 <span key={reason} className={`chip ${reason === "self_harm" ? "bg-red-100 text-red-800" : ""}`}>{REASONS[reason]}</span>
               ))}
               {first.admin_only && <span className="chip bg-purple-50 text-purple-800">Private message · admins only</span>}
-              <span className="ml-auto text-black/40">{timeAgo(first.created_at)}</span>
+              <span className="ms-auto text-black/40">{timeAgo(first.created_at)}</span>
             </div>
 
             {author && (

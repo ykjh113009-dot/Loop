@@ -73,9 +73,9 @@ async function Conversations() {
                   {last ? `${last.sender_id === me.id ? "You: " : ""}${last.body}` : "No messages yet"}
                 </p>
               </div>
-              <div className="shrink-0 text-right text-xs text-black/40">
+              <div className="shrink-0 text-end text-xs text-black/40">
                 {c.last_message_at && timeAgo(c.last_message_at)}
-                {unread && <span className="mt-1 ml-auto block size-2.5 rounded-full bg-brand-600" />}
+                {unread && <span className="mt-1 ms-auto block size-2.5 rounded-full bg-brand-600" />}
               </div>
             </Link>
           </li>
