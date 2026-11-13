@@ -299,14 +299,14 @@ isOneToOne: false
                   ]
                 },"conversation_members": {
                   Row: {
-                    "conversation_id": string,"last_read_at": string,"profile_id": string
+                    "accepted_at": string | null,"conversation_id": string,"last_read_at": string,"profile_id": string,"role": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "conversation_id": string,"last_read_at"?: string,"profile_id": string
+                    "accepted_at"?: string | null,"conversation_id": string,"last_read_at"?: string,"profile_id": string,"role"?: string
                   }
                   Update: {
-                    "conversation_id"?: string,"last_read_at"?: string,"profile_id"?: string
+                    "accepted_at"?: string | null,"conversation_id"?: string,"last_read_at"?: string,"profile_id"?: string,"role"?: string
                   }
                   Relationships: [
                     {
@@ -325,14 +325,14 @@ isOneToOne: false
                   ]
                 },"conversations": {
                   Row: {
-                    "club_id": string | null,"created_at": string,"id": string,"kind": string,"last_message_at": string | null,"school_id": string
+                    "club_id": string | null,"created_at": string,"created_by": string | null,"id": string,"kind": string,"last_message_at": string | null,"school_id": string,"title": string | null
                   }
                   ComputedFields: never
                   Insert: {
-                    "club_id"?: string | null,"created_at"?: string,"id"?: string,"kind": string,"last_message_at"?: string | null,"school_id": string
+                    "club_id"?: string | null,"created_at"?: string,"created_by"?: string | null,"id"?: string,"kind": string,"last_message_at"?: string | null,"school_id": string,"title"?: string | null
                   }
                   Update: {
-                    "club_id"?: string | null,"created_at"?: string,"id"?: string,"kind"?: string,"last_message_at"?: string | null,"school_id"?: string
+                    "club_id"?: string | null,"created_at"?: string,"created_by"?: string | null,"id"?: string,"kind"?: string,"last_message_at"?: string | null,"school_id"?: string,"title"?: string | null
                   }
                   Relationships: [
                     {
@@ -340,6 +340,12 @@ isOneToOne: false
       columns: ["club_id"]
 isOneToOne: true
       referencedRelation: "clubs"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "conversations_created_by_fkey"
+      columns: ["created_by"]
+isOneToOne: false
+      referencedRelation: "profiles"
       referencedColumns: ["id"]
     },{
       foreignKeyName: "conversations_school_id_fkey"
@@ -593,6 +599,102 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"follows": {
+                  Row: {
+                    "created_at": string,"followed_id": string,"follower_id": string,"school_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"followed_id": string,"follower_id": string,"school_id": string
+                  }
+                  Update: {
+                    "created_at"?: string,"followed_id"?: string,"follower_id"?: string,"school_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "follows_followed_id_fkey"
+      columns: ["followed_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "follows_follower_id_fkey"
+      columns: ["follower_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "follows_school_id_fkey"
+      columns: ["school_id"]
+isOneToOne: false
+      referencedRelation: "schools"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"friend_requests": {
+                  Row: {
+                    "created_at": string,"from_id": string,"id": string,"responded_at": string | null,"school_id": string,"status": string,"to_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"from_id": string,"id"?: string,"responded_at"?: string | null,"school_id": string,"status"?: string,"to_id": string
+                  }
+                  Update: {
+                    "created_at"?: string,"from_id"?: string,"id"?: string,"responded_at"?: string | null,"school_id"?: string,"status"?: string,"to_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "friend_requests_from_id_fkey"
+      columns: ["from_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "friend_requests_school_id_fkey"
+      columns: ["school_id"]
+isOneToOne: false
+      referencedRelation: "schools"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "friend_requests_to_id_fkey"
+      columns: ["to_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"friendships": {
+                  Row: {
+                    "a_id": string,"b_id": string,"created_at": string,"school_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "a_id": string,"b_id": string,"created_at"?: string,"school_id": string
+                  }
+                  Update: {
+                    "a_id"?: string,"b_id"?: string,"created_at"?: string,"school_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "friendships_a_id_fkey"
+      columns: ["a_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "friendships_b_id_fkey"
+      columns: ["b_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "friendships_school_id_fkey"
+      columns: ["school_id"]
+isOneToOne: false
+      referencedRelation: "schools"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"interests": {
                   Row: {
                     "emoji": string,"id": number,"name": string,"slug": string
@@ -709,16 +811,48 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
-                },"messages": {
+                },"message_reactions": {
                   Row: {
-                    "body": string,"conversation_id": string,"created_at": string,"id": string,"school_id": string,"sender_id": string,"status": string
+                    "conversation_id": string,"created_at": string,"emoji": string,"message_id": string,"profile_id": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "body": string,"conversation_id": string,"created_at"?: string,"id"?: string,"school_id": string,"sender_id": string,"status"?: string
+                    "conversation_id": string,"created_at"?: string,"emoji": string,"message_id": string,"profile_id": string
                   }
                   Update: {
-                    "body"?: string,"conversation_id"?: string,"created_at"?: string,"id"?: string,"school_id"?: string,"sender_id"?: string,"status"?: string
+                    "conversation_id"?: string,"created_at"?: string,"emoji"?: string,"message_id"?: string,"profile_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "message_reactions_conversation_id_fkey"
+      columns: ["conversation_id"]
+isOneToOne: false
+      referencedRelation: "conversations"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "message_reactions_message_id_fkey"
+      columns: ["message_id"]
+isOneToOne: false
+      referencedRelation: "messages"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "message_reactions_profile_id_fkey"
+      columns: ["profile_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"messages": {
+                  Row: {
+                    "attachment_kind": string | null,"attachment_name": string | null,"attachment_path": string | null,"body": string,"conversation_id": string,"created_at": string,"id": string,"school_id": string,"sender_id": string,"status": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "attachment_kind"?: string | null,"attachment_name"?: string | null,"attachment_path"?: string | null,"body": string,"conversation_id": string,"created_at"?: string,"id"?: string,"school_id": string,"sender_id": string,"status"?: string
+                  }
+                  Update: {
+                    "attachment_kind"?: string | null,"attachment_name"?: string | null,"attachment_path"?: string | null,"body"?: string,"conversation_id"?: string,"created_at"?: string,"id"?: string,"school_id"?: string,"sender_id"?: string,"status"?: string
                   }
                   Relationships: [
                     {
@@ -769,14 +903,14 @@ isOneToOne: false
                   ]
                 },"notifications": {
                   Row: {
-                    "body": string,"created_at": string,"id": string,"kind": string,"link": string | null,"pushed_at": string | null,"read_at": string | null,"recipient_id": string,"school_id": string,"title": string
+                    "body": string,"created_at": string,"id": string,"kind": string,"link": string | null,"pushed_at": string | null,"read_at": string | null,"recipient_id": string,"school_id": string,"silent": boolean,"title": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "body"?: string,"created_at"?: string,"id"?: string,"kind": string,"link"?: string | null,"pushed_at"?: string | null,"read_at"?: string | null,"recipient_id": string,"school_id": string,"title": string
+                    "body"?: string,"created_at"?: string,"id"?: string,"kind": string,"link"?: string | null,"pushed_at"?: string | null,"read_at"?: string | null,"recipient_id": string,"school_id": string,"silent"?: boolean,"title": string
                   }
                   Update: {
-                    "body"?: string,"created_at"?: string,"id"?: string,"kind"?: string,"link"?: string | null,"pushed_at"?: string | null,"read_at"?: string | null,"recipient_id"?: string,"school_id"?: string,"title"?: string
+                    "body"?: string,"created_at"?: string,"id"?: string,"kind"?: string,"link"?: string | null,"pushed_at"?: string | null,"read_at"?: string | null,"recipient_id"?: string,"school_id"?: string,"silent"?: boolean,"title"?: string
                   }
                   Relationships: [
                     {
@@ -883,16 +1017,184 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
-                },"posts": {
+                },"post_comments": {
                   Row: {
-                    "author_id": string,"body": string,"club_id": string,"created_at": string,"id": string,"image_path": string | null,"school_id": string,"status": string
+                    "author_id": string,"body": string,"created_at": string,"id": string,"parent_id": string | null,"post_id": string,"school_id": string,"status": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "author_id": string,"body": string,"club_id": string,"created_at"?: string,"id"?: string,"image_path"?: string | null,"school_id": string,"status"?: string
+                    "author_id": string,"body": string,"created_at"?: string,"id"?: string,"parent_id"?: string | null,"post_id": string,"school_id": string,"status"?: string
                   }
                   Update: {
-                    "author_id"?: string,"body"?: string,"club_id"?: string,"created_at"?: string,"id"?: string,"image_path"?: string | null,"school_id"?: string,"status"?: string
+                    "author_id"?: string,"body"?: string,"created_at"?: string,"id"?: string,"parent_id"?: string | null,"post_id"?: string,"school_id"?: string,"status"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "post_comments_author_id_fkey"
+      columns: ["author_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "post_comments_parent_id_fkey"
+      columns: ["parent_id"]
+isOneToOne: false
+      referencedRelation: "post_comments"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "post_comments_post_id_fkey"
+      columns: ["post_id"]
+isOneToOne: false
+      referencedRelation: "posts"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "post_comments_school_id_fkey"
+      columns: ["school_id"]
+isOneToOne: false
+      referencedRelation: "schools"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"post_poll_options": {
+                  Row: {
+                    "idx": number,"label": string,"post_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "idx": number,"label": string,"post_id": string
+                  }
+                  Update: {
+                    "idx"?: number,"label"?: string,"post_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "post_poll_options_post_id_fkey"
+      columns: ["post_id"]
+isOneToOne: false
+      referencedRelation: "posts"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"post_poll_votes": {
+                  Row: {
+                    "created_at": string,"idx": number,"post_id": string,"profile_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"idx": number,"post_id": string,"profile_id": string
+                  }
+                  Update: {
+                    "created_at"?: string,"idx"?: number,"post_id"?: string,"profile_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "post_poll_votes_post_id_fkey"
+      columns: ["post_id"]
+isOneToOne: false
+      referencedRelation: "posts"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "post_poll_votes_post_id_idx_fkey"
+      columns: ["post_id","idx"]
+isOneToOne: false
+      referencedRelation: "post_poll_options"
+      referencedColumns: ["post_id","idx"]
+    },{
+      foreignKeyName: "post_poll_votes_profile_id_fkey"
+      columns: ["profile_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"post_reactions": {
+                  Row: {
+                    "created_at": string,"kind": string,"post_id": string,"profile_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"kind"?: string,"post_id": string,"profile_id": string
+                  }
+                  Update: {
+                    "created_at"?: string,"kind"?: string,"post_id"?: string,"profile_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "post_reactions_post_id_fkey"
+      columns: ["post_id"]
+isOneToOne: false
+      referencedRelation: "posts"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "post_reactions_profile_id_fkey"
+      columns: ["profile_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"post_saves": {
+                  Row: {
+                    "created_at": string,"post_id": string,"profile_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"post_id": string,"profile_id": string
+                  }
+                  Update: {
+                    "created_at"?: string,"post_id"?: string,"profile_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "post_saves_post_id_fkey"
+      columns: ["post_id"]
+isOneToOne: false
+      referencedRelation: "posts"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "post_saves_profile_id_fkey"
+      columns: ["profile_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"post_tags": {
+                  Row: {
+                    "created_at": string,"post_id": string,"school_id": string,"tag": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"post_id": string,"school_id": string,"tag": string
+                  }
+                  Update: {
+                    "created_at"?: string,"post_id"?: string,"school_id"?: string,"tag"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "post_tags_post_id_fkey"
+      columns: ["post_id"]
+isOneToOne: false
+      referencedRelation: "posts"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "post_tags_school_id_fkey"
+      columns: ["school_id"]
+isOneToOne: false
+      referencedRelation: "schools"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"posts": {
+                  Row: {
+                    "author_id": string,"body": string,"club_id": string | null,"comment_count": number,"created_at": string,"id": string,"image_path": string | null,"kind": string,"reaction_count": number,"repost_of": string | null,"school_id": string,"status": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "author_id": string,"body": string,"club_id"?: string | null,"comment_count"?: number,"created_at"?: string,"id"?: string,"image_path"?: string | null,"kind"?: string,"reaction_count"?: number,"repost_of"?: string | null,"school_id": string,"status"?: string
+                  }
+                  Update: {
+                    "author_id"?: string,"body"?: string,"club_id"?: string | null,"comment_count"?: number,"created_at"?: string,"id"?: string,"image_path"?: string | null,"kind"?: string,"reaction_count"?: number,"repost_of"?: string | null,"school_id"?: string,"status"?: string
                   }
                   Relationships: [
                     {
@@ -906,6 +1208,12 @@ isOneToOne: false
       columns: ["club_id"]
 isOneToOne: false
       referencedRelation: "clubs"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "posts_repost_of_fkey"
+      columns: ["repost_of"]
+isOneToOne: false
+      referencedRelation: "posts"
       referencedColumns: ["id"]
     },{
       foreignKeyName: "posts_school_id_fkey"
@@ -993,16 +1301,36 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
-                },"profiles": {
+                },"profile_settings": {
                   Row: {
-                    "alumni_year": number | null,"avatar": string,"bio": string,"created_at": string,"deactivated_at": string | null,"full_name": string,"grade": number | null,"id": string,"is_owner": boolean,"major": string,"onboarded_at": string | null,"role": string,"school_id": string,"section": string | null,"suspended_until": string | null,"suspension_reason": string | null,"university": string
+                    "large_text": boolean,"locale": string,"notifications_enabled": boolean,"profile_id": string,"reduce_motion": boolean,"updated_at": string,"who_can_message": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "alumni_year"?: number | null,"avatar"?: string,"bio"?: string,"created_at"?: string,"deactivated_at"?: string | null,"full_name": string,"grade"?: number | null,"id": string,"is_owner"?: boolean,"major"?: string,"onboarded_at"?: string | null,"role"?: string,"school_id": string,"section"?: string | null,"suspended_until"?: string | null,"suspension_reason"?: string | null,"university"?: string
+                    "large_text"?: boolean,"locale"?: string,"notifications_enabled"?: boolean,"profile_id": string,"reduce_motion"?: boolean,"updated_at"?: string,"who_can_message"?: string
                   }
                   Update: {
-                    "alumni_year"?: number | null,"avatar"?: string,"bio"?: string,"created_at"?: string,"deactivated_at"?: string | null,"full_name"?: string,"grade"?: number | null,"id"?: string,"is_owner"?: boolean,"major"?: string,"onboarded_at"?: string | null,"role"?: string,"school_id"?: string,"section"?: string | null,"suspended_until"?: string | null,"suspension_reason"?: string | null,"university"?: string
+                    "large_text"?: boolean,"locale"?: string,"notifications_enabled"?: boolean,"profile_id"?: string,"reduce_motion"?: boolean,"updated_at"?: string,"who_can_message"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "profile_settings_profile_id_fkey"
+      columns: ["profile_id"]
+isOneToOne: true
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"profiles": {
+                  Row: {
+                    "accent": string,"alumni_year": number | null,"avatar": string,"bio": string,"cover_path": string | null,"created_at": string,"deactivated_at": string | null,"favorite_subjects": (string)[],"full_name": string,"grade": number | null,"handle": string | null,"id": string,"is_owner": boolean,"major": string,"onboarded_at": string | null,"photo_path": string | null,"role": string,"school_id": string,"section": string | null,"self_deactivated": boolean,"skills": (string)[],"suspended_until": string | null,"suspension_reason": string | null,"university": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "accent"?: string,"alumni_year"?: number | null,"avatar"?: string,"bio"?: string,"cover_path"?: string | null,"created_at"?: string,"deactivated_at"?: string | null,"favorite_subjects"?: (string)[],"full_name": string,"grade"?: number | null,"handle"?: string | null,"id": string,"is_owner"?: boolean,"major"?: string,"onboarded_at"?: string | null,"photo_path"?: string | null,"role"?: string,"school_id": string,"section"?: string | null,"self_deactivated"?: boolean,"skills"?: (string)[],"suspended_until"?: string | null,"suspension_reason"?: string | null,"university"?: string
+                  }
+                  Update: {
+                    "accent"?: string,"alumni_year"?: number | null,"avatar"?: string,"bio"?: string,"cover_path"?: string | null,"created_at"?: string,"deactivated_at"?: string | null,"favorite_subjects"?: (string)[],"full_name"?: string,"grade"?: number | null,"handle"?: string | null,"id"?: string,"is_owner"?: boolean,"major"?: string,"onboarded_at"?: string | null,"photo_path"?: string | null,"role"?: string,"school_id"?: string,"section"?: string | null,"self_deactivated"?: boolean,"skills"?: (string)[],"suspended_until"?: string | null,"suspension_reason"?: string | null,"university"?: string
                   }
                   Relationships: [
                     {
@@ -1369,7 +1697,10 @@ isOneToOne: false
             [_ in never]: never
           }
           Functions: {
-            "admin_set_alumni":
+            "add_group_members":
+{ Args: { "p_conversation": string,"p_members": (string)[] }; Returns: number
+                           },
+"admin_set_alumni":
 { Args: { "p_user": string,"p_year": number }; Returns: undefined
                            },
 "admin_set_deactivated":
@@ -1380,6 +1711,9 @@ isOneToOne: false
                            },
 "archive_club":
 { Args: { "p_club": string,"p_reason": string }; Returns: undefined
+                           },
+"are_friends":
+{ Args: { "a": string,"b": string }; Returns: boolean
                            },
 "assign_leadership_role":
 { Args: { "p_club": string,"p_kind": string,"p_scope": string,"p_user": string }; Returns: undefined
@@ -1399,6 +1733,9 @@ isOneToOne: false
 "cancel_event":
 { Args: { "p_event": string,"p_reason": string }; Returns: undefined
                            },
+"cancel_friend_request":
+{ Args: { "p_request": string }; Returns: undefined
+                           },
 "challenge_completions":
 { Args: { "p_challenge": string }; Returns: number
                            },
@@ -1416,9 +1753,42 @@ isOneToOne: false
 "contains_blocked_word":
 { Args: { "p_school": string,"p_text": string }; Returns: boolean
                            },
+"create_group_conversation":
+{ Args: { "p_members": (string)[],"p_title": string }; Returns: string
+                           },
+"create_post":
+{ Args: { "p_body": string,"p_club": string,"p_image": string,"p_kind": string,"p_options": (string)[],"p_repost_of": string }; Returns: string
+                           },
+"deactivate_my_account":
+{ Args: Record<PropertyKey, never>; Returns: undefined
+                           },
+"delete_my_account":
+{ Args: { "p_confirm": string }; Returns: undefined
+                           },
 "election_summary":
 { Args: { "p_election": string }; Returns: Json
                            },
+"feed_posts":
+{ Args: { "p_limit": number,"p_offset": number,"p_tag"?: string }; Returns: {
+              "author_id": string,
+"body": string,
+"club_id": string | null,
+"comment_count": number,
+"created_at": string,
+"id": string,
+"image_path": string | null,
+"kind": string,
+"reaction_count": number,
+"repost_of": string | null,
+"school_id": string,
+"status": string
+            }[]
+                          SetofOptions: {
+        from: "*"
+        to: "posts"
+        isOneToOne: false
+        isSetofReturn: true
+      } },
 "finish_tutoring":
 { Args: { "p_completed": boolean,"p_request": string }; Returns: undefined
                            },
@@ -1472,11 +1842,17 @@ isOneToOne: false
 "is_super_admin":
 { Args: Record<PropertyKey, never>; Returns: boolean
                            },
+"leave_conversation":
+{ Args: { "p_conversation": string }; Returns: undefined
+                           },
 "local_time":
 { Args: { "t": string }; Returns: string
                            },
 "log_action":
 { Args: { "p_action": string,"p_details": string,"p_school": string,"p_target_id": string,"p_target_type": string }; Returns: undefined
+                           },
+"make_handle":
+{ Args: { "p_email": string,"p_id": string,"p_school": string }; Returns: string
                            },
 "mfa_ok":
 { Args: Record<PropertyKey, never>; Returns: boolean
@@ -1502,11 +1878,22 @@ isOneToOne: false
 "notify_club_about_event":
 { Args: { "p_event": string }; Returns: undefined
                            },
+"notify_mentions":
+{ Args: { "p_author": string,"p_link": string,"p_school": string,"p_text": string }; Returns: undefined
+                           },
 "points_today":
 { Args: { "p_profile": string,"p_reason": string }; Returns: number
                            },
 "poll_results":
 { Args: { "p_poll": string }; Returns: Json
+                           },
+"post_poll_results":
+{ Args: { "p_posts": (string)[] }; Returns: {
+              "idx": number,"label": string,"mine": boolean,"post_id": string,"votes": number
+            }[]
+                           },
+"reactivate_my_account":
+{ Args: Record<PropertyKey, never>; Returns: undefined
                            },
 "record_security_event":
 { Args: { "p_ip": string,"p_kind": string,"p_user_agent": string }; Returns: undefined
@@ -1528,6 +1915,12 @@ isOneToOne: false
                            },
 "reset_account_mfa":
 { Args: { "p_user": string }; Returns: undefined
+                           },
+"respond_friend_request":
+{ Args: { "p_accept": boolean,"p_request": string }; Returns: undefined
+                           },
+"respond_message_request":
+{ Args: { "p_accept": boolean,"p_conversation": string }; Returns: undefined
                            },
 "respond_suggestion":
 { Args: { "p_response": string,"p_status": string,"p_suggestion": string }; Returns: undefined
@@ -1568,6 +1961,9 @@ isOneToOne: false
 "send_event_reminders":
 { Args: Record<PropertyKey, never>; Returns: undefined
                            },
+"send_friend_request":
+{ Args: { "p_to": string }; Returns: undefined
+                           },
 "set_counselor_status":
 { Args: { "p_request": string,"p_status": string }; Returns: undefined
                            },
@@ -1589,8 +1985,19 @@ isOneToOne: false
 "suspend_user":
 { Args: { "p_days": number,"p_reason": string,"p_user": string }; Returns: undefined
                            },
+"trending_tags":
+{ Args: { "p_limit"?: number }; Returns: {
+              "posts": number,"tag": string
+            }[]
+                           },
+"unfriend":
+{ Args: { "p_other": string }; Returns: undefined
+                           },
 "unsuspend_user":
 { Args: { "p_user": string }; Returns: undefined
+                           },
+"vote_post_poll":
+{ Args: { "p_idx": number,"p_post": string }; Returns: undefined
                            },
 "week_start":
 { Args: Record<PropertyKey, never>; Returns: string
