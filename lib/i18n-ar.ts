@@ -1,2 +1,87 @@
 // Arabic translations. Key = the English text used in the code.
-export const AR: Record<string, string> = {};
+// Anything missing here is shown in English.
+export const AR: Record<string, string> = {
+  // Shell
+  "Home": "الرئيسية", "Community": "المجتمع", "Chats": "المحادثات", "Calendar": "التقويم", "Activities": "الأنشطة",
+  "Marketplace": "السوق", "More": "المزيد", "One Loop.": "لوب واحدة.", "Endless Possibilities.": "إمكانيات بلا حدود.",
+  "Search in Loop…": "ابحث في لوب…", "Search in Loop": "ابحث في لوب", "Notifications": "الإشعارات", "Messages": "الرسائل",
+  "New post": "منشور جديد", "My profile": "ملفي الشخصي", "Edit profile": "تعديل الملف الشخصي", "Friends": "الأصدقاء",
+  "Saved posts": "المنشورات المحفوظة", "More features": "ميزات أخرى", "Settings": "الإعدادات", "Counselor inbox": "رسائل المرشد",
+  "Moderation": "الإشراف", "Admin dashboard": "لوحة الإدارة", "Sign out": "تسجيل الخروج", "Back": "رجوع",
+
+  // Feed
+  "Community Feed": "آخر المنشورات", "Post": "منشور", "Question": "سؤال", "Achievement": "إنجاز", "Poll": "استطلاع",
+  "Kind of post": "نوع المنشور", "Share something with your school…": "شارك شيئًا مع مدرستك…",
+  "Ask your school a question…": "اسأل مدرستك سؤالًا…", "Share something you are proud of…": "شارك شيئًا تفخر به…",
+  "Ask a question for the poll…": "اكتب سؤال الاستطلاع…", "Write a post": "اكتب منشورًا", "Choice {n}": "الخيار {n}",
+  "+ Add a choice": "+ أضف خيارًا", "Chosen photo": "الصورة المختارة", "Remove": "إزالة", "Who can see this": "من يمكنه رؤية هذا",
+  "Whole school": "كل المدرسة", "Add a photo": "أضف صورة", "Posting…": "جارٍ النشر…",
+  "Use #hashtags and @names. Lost or found something? Post it here.": "استخدم #الوسوم و@الأسماء. فقدت شيئًا أو وجدته؟ انشره هنا.",
+  "No posts yet. Be the first to share something with your school.": "لا توجد منشورات بعد. كن أول من يشارك شيئًا مع مدرستك.",
+  "No posts yet": "لا توجد منشورات بعد", "No posts yet.": "لا توجد منشورات بعد.",
+  "Be the first to share something with your school.": "كن أول من يشارك شيئًا مع مدرستك.",
+  "Saved": "المحفوظات", "Trending": "الأكثر تداولًا", "Show more": "عرض المزيد", "Post options": "خيارات المنشور",
+  "Delete post": "حذف المنشور", "Only you can see this. It's waiting for a moderator to check it.": "أنت فقط ترى هذا. بانتظار مراجعة المشرف.",
+  "The original post is no longer available.": "المنشور الأصلي لم يعد متاحًا.", "Like": "إعجاب", "Remove your reaction": "إزالة تفاعلك",
+  "Choose a reaction": "اختر تفاعلًا", "Comments": "التعليقات", "Share": "مشاركة", "Shared to your school.": "تمت المشاركة مع مدرستك.",
+  "Save": "حفظ", "Remove from saved": "إزالة من المحفوظات", "1 vote": "صوت واحد", "{n} votes": "{n} أصوات",
+  "Tap another choice to change your vote": "اضغط خيارًا آخر لتغيير صوتك", "Vote to see the results": "صوّت لترى النتائج",
+  "Nothing saved yet": "لا يوجد شيء محفوظ", "Tap the bookmark on a post to keep it here. Only you can see this list.": "اضغط علامة الحفظ على أي منشور ليبقى هنا. أنت فقط ترى هذه القائمة.",
+  "Delete": "حذف", "Reply": "رد", "Write a reply…": "اكتب ردًا…", "Write a comment…": "اكتب تعليقًا…", "Send": "إرسال",
+  "No comments yet.": "لا توجد تعليقات بعد.",
+
+  // Profile and friends
+  "Followers": "المتابِعون", "Following": "أتابع", "Follow": "متابعة", "Add friend": "إضافة صديق", "Friends ✓": "أصدقاء ✓",
+  "Request sent": "تم إرسال الطلب", "Accept friend request": "قبول طلب الصداقة", "Talk privately": "تحدث بخصوصية", "Message": "رسالة",
+  "Block": "حظر", "Unblock": "إلغاء الحظر", "You can't message this student right now.": "لا يمكنك مراسلة هذا الطالب الآن.",
+  "You blocked this student. You are no longer connected and cannot message each other.": "لقد حظرت هذا الطالب. لم تعودا على اتصال ولا يمكنكما المراسلة.",
+  "Manage account (admin)": "إدارة الحساب (للمشرف)", "Badges": "الأوسمة", "Skills and talents": "المهارات والمواهب",
+  "Favourite subjects": "المواد المفضلة", "Peer tutor": "مساعد دراسي", "Interests": "الاهتمامات", "Clubs": "النوادي", "Leader": "قائد",
+  "Not in any clubs yet.": "ليس في أي نادٍ بعد.", "Posts": "المنشورات", "Connections": "العلاقات", "Nobody here yet.": "لا أحد هنا بعد.",
+  "My friends": "أصدقائي", "Friend requests": "طلبات الصداقة", "No requests waiting.": "لا توجد طلبات بانتظارك.", "Accept": "قبول",
+  "Decline": "رفض", "Requests you sent": "طلبات أرسلتها", "Cancel": "إلغاء", "Find students": "ابحث عن طلاب",
+  "Photo, class and more": "الصورة والشعبة وغيرها", "Profile photo": "الصورة الشخصية", "Cover photo": "صورة الغلاف",
+  "Remove my photo and use the avatar": "أزل صورتي واستخدم الصورة الرمزية", "Remove my cover photo": "أزل صورة الغلاف",
+  "Class letter (for example A)": "حرف الشعبة (مثل A)", "Skills and talents (separate with commas)": "المهارات والمواهب (افصل بينها بفواصل)",
+  "Drawing, video editing, public speaking": "الرسم، مونتاج الفيديو، الإلقاء", "Favourite subjects (separate with commas)": "المواد المفضلة (افصل بينها بفواصل)",
+  "Physics, English": "الفيزياء، اللغة الإنجليزية", "Accent colour": "لون الملف", "Saving…": "جارٍ الحفظ…", "Saved!": "تم الحفظ!",
+  "Grade {n}": "الصف {n}",
+
+  // Settings
+  "Language": "اللغة", "Privacy": "الخصوصية", "Who can send you private messages": "من يمكنه إرسال رسائل خاصة لك",
+  "Any student at my school": "أي طالب في مدرستي", "Friends only (others send a request first)": "الأصدقاء فقط (الآخرون يرسلون طلبًا أولًا)",
+  "Nobody new": "لا أحد جديد", "Every student at your school can see your profile. Your email is only visible to you and admins.": "كل طلاب مدرستك يرون ملفك الشخصي. بريدك الإلكتروني يظهر لك وللمشرفين فقط.",
+  "Loop notifications": "إشعارات لوب", "When this is off, Loop sends you nothing and the bell stays quiet. Your activity is still listed when you open Loop.": "عند الإيقاف لن ترسل لوب أي إشعار ويبقى الجرس هادئًا. ستجد نشاطك عند فتح لوب.",
+  "Accessibility": "سهولة الاستخدام", "Larger text": "خط أكبر", "Reduce motion": "تقليل الحركة", "Turns off animations.": "يوقف الحركات.",
+  "Save settings": "حفظ الإعدادات", "Blocked students": "الطلاب المحظورون", "You have not blocked anyone.": "لم تحظر أحدًا.",
+  "Login and security": "الدخول والأمان", "Two-step sign-in and recent activity on your account.": "التحقق بخطوتين وآخر نشاط على حسابك.",
+  "Open security": "فتح الأمان", "Deactivate account": "تعطيل الحساب", "Hides your profile and posts until you come back. Nothing is deleted.": "يخفي ملفك ومنشوراتك حتى تعود. لن يُحذف شيء.",
+  "Yes, deactivate my account for now": "نعم، عطّل حسابي مؤقتًا", "Deactivate": "تعطيل", "Delete account": "حذف الحساب",
+  "Deletes your profile, posts, comments, messages and points for good. This cannot be undone and needs no admin approval.": "يحذف ملفك ومنشوراتك وتعليقاتك ورسائلك ونقاطك نهائيًا. لا يمكن التراجع ولا يحتاج موافقة المشرف.",
+  "Type DELETE to confirm": "اكتب DELETE للتأكيد", "Delete my account": "حذف حسابي",
+
+  // Chats
+  "Write a message…": "اكتب رسالة…", "No messages yet. Say hi! 👋": "لا توجد رسائل بعد. قل مرحبًا! 👋", "No messages yet": "لا توجد رسائل بعد",
+  "Waiting for a moderator. Only you can see this.": "بانتظار المشرف. أنت فقط ترى هذا.", "Attachment": "مرفق", "React": "تفاعل",
+  "Send a photo or file": "أرسل صورة أو ملفًا", "Record a voice message": "سجّل رسالة صوتية", "Stop and send the voice message": "أوقف وأرسل الرسالة الصوتية",
+  "Your message wasn't sent. Please try again.": "لم تُرسل رسالتك. حاول مرة أخرى.", "That file is too big (10 MB at most).": "الملف كبير جدًا (الحد 10 ميغابايت).",
+  "That file could not be sent. Photos, PDFs, documents, short videos and voice messages work.": "تعذر إرسال الملف. يمكن إرسال الصور وملفات PDF والمستندات والفيديو القصير والرسائل الصوتية.",
+  "Loop could not use the microphone. Allow it in your browser and try again.": "تعذر استخدام الميكروفون. اسمح به في المتصفح وحاول مجددًا.",
+  "Leave": "مغادرة", "{name} wants to message you": "{name} يريد مراسلتك",
+  "They are not on your friends list. They cannot write again until you accept.": "ليس من أصدقائك. لن يستطيع الكتابة مجددًا حتى تقبل.",
+  "Group chat. If something feels wrong, tap 🚩 on a message.": "محادثة جماعية. إن شعرت بشيء خاطئ اضغط 🚩 على الرسالة.",
+  "Private chat. If something feels wrong, tap 🚩 on a message or block this student from their profile.": "محادثة خاصة. إن شعرت بشيء خاطئ اضغط 🚩 على الرسالة أو احظر الطالب من ملفه.",
+  "You blocked this student. Unblock them from their profile to chat.": "لقد حظرت هذا الطالب. ألغِ الحظر من ملفه للمحادثة.",
+  "Accept the request to reply.": "اقبل الطلب لترد.", "Your message request was sent. You can write again once it is accepted.": "تم إرسال طلب المراسلة. يمكنك الكتابة مجددًا بعد قبوله.",
+  "You can't send messages while your account is suspended.": "لا يمكنك إرسال رسائل وحسابك موقوف.", "Message request": "طلب مراسلة", "You: ": "أنت: ",
+  "Group name": "اسم المجموعة", "e.g. Physics study group": "مثال: مجموعة دراسة الفيزياء", "Add people (up to 30)": "أضف أشخاصًا (حتى 30)",
+  "Search by name": "ابحث بالاسم", "Friend": "صديق", "Create group": "إنشاء المجموعة",
+  "You can add friends, and students who accept messages from everyone. Others are skipped.": "يمكنك إضافة الأصدقاء والطلاب الذين يقبلون الرسائل من الجميع. يُتجاوز الباقون.",
+
+  // Home dashboard
+  "Good morning": "صباح الخير", "Good afternoon": "مساء الخير", "Good evening": "مساء الخير",
+  "Recent Chats": "آخر المحادثات", "Announcements": "الإعلانات", "Upcoming Activities": "الأنشطة القادمة", "Leaderboard": "لوحة الصدارة",
+  "Quick Chats": "محادثات سريعة", "Student Council": "مجلس الطلبة", "This Week's Events": "فعاليات هذا الأسبوع", "Featured": "مميز",
+  "View all": "عرض الكل", "All": "الكل", "School Announcements": "إعلانات المدرسة", "Grade Leaderboard": "ترتيب الصفوف",
+  "Next Up": "التالي", "New Post": "منشور جديد", "Academy": "الأكاديمية",
+};

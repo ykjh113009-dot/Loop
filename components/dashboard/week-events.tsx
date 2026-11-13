@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getT } from "@/lib/i18n-server";
 import { requireMe } from "@/lib/auth";
 import { getUpcomingEvents, iconFor } from "@/lib/dashboard";
 import { formatActivityTime } from "@/lib/time";
@@ -7,12 +8,13 @@ import { CardEmpty, DashCard, IconTile } from "@/components/dashboard/card";
 // Events happening in the next 7 days.
 export async function WeekEvents() {
   await requireMe();
+  const { t } = await getT();
   const events = await getUpcomingEvents();
   const today = new Date();
   const end = today.getTime() + 7 * 24 * 3600 * 1000;
   const week = events.filter((e) => new Date(e.starts_at).getTime() < end).slice(0, 4);
   return (
-    <DashCard title="This Week's Events" href="/events" linkLabel="All">
+    <DashCard title={t("This Week's Events")} href="/events" linkLabel={t("All")}>
       {week.length === 0 ? (
         <CardEmpty icon="calendar">No events in the next 7 days.</CardEmpty>
       ) : (

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getT } from "@/lib/i18n-server";
 import { requireMe } from "@/lib/auth";
 import { getMyClubs } from "@/lib/dashboard";
 import { LineIcon } from "@/components/line-icon";
@@ -6,9 +7,10 @@ import { CardEmpty, DashCard } from "@/components/dashboard/card";
 
 export async function QuickChats() {
   const me = await requireMe();
+  const { t } = await getT();
   const clubs = (await getMyClubs(me.id)).slice(0, 4);
   return (
-    <DashCard title="Quick Chats" href="/messages">
+    <DashCard title={t("Quick Chats")} href="/messages">
       {clubs.length === 0 ? (
         <CardEmpty icon="community">
           Join a club to get its group chat.

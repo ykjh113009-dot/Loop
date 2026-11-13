@@ -7,7 +7,31 @@ import { Avatar } from "@/components/avatar";
 import { Icon } from "@/components/icons";
 import { ReportButton } from "@/components/report-button";
 import { formatDate, formatTime, localDayKey } from "@/lib/time";
-import type { ChatMessage, ChatPerson } from "@/lib/chat";
+import type { ChatMessage, ChatPerson, ChatReaction } from "@/lib/chat";
+import { makeT, type Locale } from "@/lib/i18n";
+
+const FIELDS = "id, sender_id, body, status, created_at, attachment_path, attachment_kind, attachment_name";
+const EMOJI = ["👍", "❤️", "😂", "😮", "😢", "👏"];
+const MAX_FILE = 10 * 1024 * 1024;
+
+// A photo, voice message, video or file inside a message. Files are private,
+// so the link is created for the signed-in member when the message is shown.
+function Attachment({ message, label }: { message: ChatMessage; label: string }) {
+  const [url, setUrl] = useState<string | null>(null);
+  useEffect(() => {
+    let live = true;
+    createClient().storage.from("chat-files").createSignedUrl(message.attachment_path!, 3600).then(({ data }) => live && setUrl(data?.signedUrl ?? null));
+    return () => { live = false; };
+  }, [message.attachment_path]);
+  if (!url) return <span className="text-xs opacity-70">…</span>;
+  if (message.attachment_kind === "image") {
+    // eslint-disable-next-line @next/next/no-img-element -- private signed link
+    return <a href={url} target="_blank" rel="noreferrer"><img src={url} alt={label} className="max-h-64 rounded-xl" /></a>;
+  }
+  if (message.attachment_kind === "audio") return <audio controls src={url} className="max-w-full" aria-label={label} />;
+  if (message.attachment_kind === "video") return <video controls src={url} className="max-h-64 rounded-xl" aria-label={label} />;
+  return <a href={url} target="_blank" rel="noreferrer" className="underline">📎 {message.attachment_name ?? label}</a>;
+}
 
 export function Chat({
   conversationId,
@@ -18,6 +42,8 @@ export function Chat({
   canSend,
   cannotSendReason,
   showNames,
+  initialReactions = [],
+  locale = "en",
 }: {
   conversationId: string;
   meId: string;
@@ -27,7 +53,14 @@ export function Chat({
   canSend: boolean;
   cannotSendReason?: string;
   showNames: boolean;
+  initialReactions?: ChatReaction[];
+  locale?: Locale;
 }) {
+  const t = makeT(locale);
+  const [reactions, setReactions] = useState(initialReactions);
+  const [recording, setRecording] = useState(false);
+  const recorder = useRef<MediaRecorder | null>(null);
+  const fileInput = useRef<HTMLInputElement>(null);
   const [messages, setMessages] = useState(initialMessages);
   const [people, setPeople] = useState(initialPeople);
   const [text, setText] = useState("");
@@ -66,6 +99,14 @@ export function Chat({
             }
           },
         )
+        .on(
+          "postgres_changes",
+          { event: "*", schema: "public", table: "message_reactions", filter: `conversation_id=eq.${conversationId}` },
+          () => {
+            supabase.from("message_reactions").select("message_id, profile_id, emoji").eq("conversation_id", conversationId).limit(2000)
+              .then(({ data }) => data && setReactions(data));
+          },
+        )
         .subscribe();
     });
     return () => {
@@ -89,30 +130,91 @@ export function Chat({
     bottom.current?.scrollIntoView({ block: "end" });
   }, [messages.length]);
 
-  async function send(e: React.FormEvent) {
-    e.preventDefault();
-    const body = text.trim();
-    if (!body || sending) return;
+  async function post(body: string, attachment?: { path: string; kind: string; name: string }) {
     setSending(true);
     setError(null);
     const { data, error } = await createClient()
       .from("messages")
-      .insert({ conversation_id: conversationId, sender_id: meId, body, school_id: schoolId })
-      .select("id, sender_id, body, status, created_at")
+      .insert({
+        conversation_id: conversationId, sender_id: meId, body, school_id: schoolId,
+        ...(attachment ? { attachment_path: attachment.path, attachment_kind: attachment.kind, attachment_name: attachment.name } : {}),
+      })
+      .select(FIELDS)
       .single();
     setSending(false);
     if (error) {
-      setError("Your message wasn't sent. Please try again.");
+      setError(/RATE_LIMIT|RESTRICTED|request/i.test(error.message) ? error.message.replace(/^[A-Z_]+: /, "") : t("Your message wasn't sent. Please try again."));
+      return false;
+    }
+    add(data as ChatMessage);
+    return true;
+  }
+
+  async function send(e: React.FormEvent) {
+    e.preventDefault();
+    const body = text.trim();
+    if (!body || sending) return;
+    if (await post(body)) setText("");
+  }
+
+  async function sendFile(file: Blob, name: string) {
+    if (file.size > MAX_FILE) return setError(t("That file is too big (10 MB at most)."));
+    const kind = file.type.startsWith("image/") ? "image" : file.type.startsWith("audio/") ? "audio" : file.type.startsWith("video/") ? "video" : "file";
+    const ext = (name.split(".").pop() || "bin").toLowerCase().replace(/[^a-z0-9]/g, "").slice(0, 8);
+    const path = `${conversationId}/${meId}/${crypto.randomUUID()}.${ext}`;
+    setSending(true);
+    setError(null);
+    const { error } = await createClient().storage.from("chat-files").upload(path, file, { contentType: file.type.split(";")[0] });
+    if (error) {
+      setSending(false);
+      return setError(t("That file could not be sent. Photos, PDFs, documents, short videos and voice messages work."));
+    }
+    await post("", { path, kind, name: name.slice(0, 120) });
+  }
+
+  async function toggleRecording() {
+    if (recording) {
+      recorder.current?.stop();
       return;
     }
-    setText("");
-    add(data);
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const rec = new MediaRecorder(stream);
+      const chunks: Blob[] = [];
+      rec.ondataavailable = (e) => chunks.push(e.data);
+      rec.onstop = () => {
+        stream.getTracks().forEach((tr) => tr.stop());
+        setRecording(false);
+        const blob = new Blob(chunks, { type: (rec.mimeType || "audio/webm").split(";")[0] });
+        if (blob.size > 0) sendFile(blob, blob.type.includes("mp4") ? "voice.m4a" : "voice.webm");
+      };
+      recorder.current = rec;
+      rec.start();
+      setRecording(true);
+      setTimeout(() => rec.state === "recording" && rec.stop(), 120000);
+    } catch {
+      setError(t("Loop could not use the microphone. Allow it in your browser and try again."));
+    }
+  }
+
+  async function react(messageId: string, emoji: string) {
+    const mine = reactions.find((r) => r.message_id === messageId && r.profile_id === meId);
+    const supabase = createClient();
+    const rest = reactions.filter((r) => !(r.message_id === messageId && r.profile_id === meId));
+    if (mine?.emoji === emoji) {
+      setReactions(rest);
+      await supabase.from("message_reactions").delete().eq("message_id", messageId).eq("profile_id", meId);
+    } else {
+      setReactions([...rest, { message_id: messageId, profile_id: meId, emoji }]);
+      if (mine) await supabase.from("message_reactions").update({ emoji }).eq("message_id", messageId).eq("profile_id", meId);
+      else await supabase.from("message_reactions").insert({ message_id: messageId, profile_id: meId, conversation_id: conversationId, emoji });
+    }
   }
 
   return (
     <div className="flex min-h-[60dvh] flex-col">
       <div className="flex-1 space-y-1 pb-4">
-        {messages.length === 0 && <p className="py-10 text-center text-sm text-black/45">No messages yet. Say hi! 👋</p>}
+        {messages.length === 0 && <p className="py-10 text-center text-sm text-black/45">{t("No messages yet. Say hi! 👋")}</p>}
         {messages.map((m, i) => {
           const mine = m.sender_id === meId;
           const person = people[m.sender_id];
@@ -137,11 +239,35 @@ export function Chat({
                       mine ? "rounded-ee-md bg-brand-700 text-white" : "rounded-es-md bg-white shadow-sm"
                     } ${m.status === "held" ? "opacity-60" : ""}`}
                   >
+                    {m.attachment_path && <Attachment message={m} label={t("Attachment")} />}
                     {m.body}
                   </div>
+                  {(() => {
+                    const mineR = reactions.filter((r) => r.message_id === m.id);
+                    const counts = EMOJI.map((e) => [e, mineR.filter((r) => r.emoji === e).length] as const).filter(([, n]) => n > 0);
+                    return (
+                      <span className="mt-0.5 flex flex-wrap items-center gap-1 px-1">
+                        {counts.map(([e, n]) => (
+                          <button key={e} type="button" onClick={() => canSend && react(m.id, e)} className="rounded-full bg-white px-1.5 text-xs shadow-sm" aria-label={`${e} ${n}`}>
+                            {e} {n}
+                          </button>
+                        ))}
+                        {canSend && m.status === "visible" && (
+                          <details className="relative">
+                            <summary className="cursor-pointer list-none rounded-full px-1 text-xs text-black/40 opacity-60 group-hover:opacity-100 [&::-webkit-details-marker]:hidden" aria-label={t("React")}>☺</summary>
+                            <span className="absolute bottom-6 z-10 flex gap-0.5 rounded-full border border-black/10 bg-white p-1 shadow-lg">
+                              {EMOJI.map((e) => (
+                                <button key={e} type="button" onClick={(ev) => { react(m.id, e); (ev.currentTarget.closest("details") as HTMLDetailsElement).open = false; }} className="rounded-full px-1 text-lg hover:bg-black/5">{e}</button>
+                              ))}
+                            </span>
+                          </details>
+                        )}
+                      </span>
+                    );
+                  })()}
                   <span className="mt-0.5 flex items-center gap-1 px-1 text-[11px] text-black/40">
                     {formatTime(m.created_at)}
-                    {m.status === "held" && " · Waiting for a moderator — only you can see this"}
+                    {m.status === "held" && ` · ${t("Waiting for a moderator. Only you can see this.")}`}
                     {!mine && (
                       <span className="opacity-60 group-hover:opacity-100">
                         <ReportButton targetType="message" targetId={m.id} compact />
@@ -159,15 +285,19 @@ export function Chat({
       <div className="sticky bottom-[calc(4rem+env(safe-area-inset-bottom))] -mx-4 border-t border-black/5 bg-[#f5f6f4] px-4 py-2">
         {canSend ? (
           <form onSubmit={send} className="flex gap-2">
+            <input ref={fileInput} type="file" hidden accept="image/*,video/mp4,video/webm,audio/*,application/pdf,.docx,.pptx,.xlsx,.txt"
+              onChange={(e) => { const f = e.target.files?.[0]; if (f) sendFile(f, f.name); e.target.value = ""; }} />
+            <button type="button" onClick={() => fileInput.current?.click()} disabled={sending} className="btn-secondary px-3" aria-label={t("Send a photo or file")}>📎</button>
+            <button type="button" onClick={toggleRecording} disabled={sending} className={`px-3 ${recording ? "btn-danger" : "btn-secondary"}`} aria-label={recording ? t("Stop and send the voice message") : t("Record a voice message")}>{recording ? "⏹" : "🎤"}</button>
             <input
               value={text}
               onChange={(e) => setText(e.target.value)}
               maxLength={2000}
-              placeholder="Write a message…"
+              placeholder={t("Write a message…")}
               className="input"
-              aria-label="Message"
+              aria-label={t("Message")}
             />
-            <button className="btn-primary px-3" disabled={sending || !text.trim()} aria-label="Send">
+            <button className="btn-primary px-3" disabled={sending || !text.trim()} aria-label={t("Send")}>
               <Icon name="send" />
             </button>
           </form>

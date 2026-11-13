@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getT } from "@/lib/i18n-server";
 import { requireMe } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { iconFor } from "@/lib/dashboard";
@@ -7,10 +8,11 @@ import { CardEmpty, DashCard, IconTile } from "@/components/dashboard/card";
 
 export async function Announcements() {
   await requireMe();
+  const { t } = await getT();
   const supabase = await createClient();
   const { data } = await supabase.from("announcements").select("id, title, body, created_at").order("created_at", { ascending: false }).limit(3);
   return (
-    <DashCard title="School Announcements" href="/announcements">
+    <DashCard title={t("School Announcements")} href="/announcements">
       {!data || data.length === 0 ? (
         <CardEmpty icon="megaphone">No announcements yet. School news will show up here.</CardEmpty>
       ) : (

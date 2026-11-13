@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getT } from "@/lib/i18n-server";
 import { requireMe } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { formatShortDate } from "@/lib/time";
@@ -7,6 +8,7 @@ import { IconTile, DashCard } from "@/components/dashboard/card";
 
 export async function StudentCouncil() {
   await requireMe();
+  const { t } = await getT();
   const supabase = await createClient();
   const now = new Date().toISOString();
   const [{ data: members }, { data: elections }] = await Promise.all([
@@ -16,7 +18,7 @@ export async function StudentCouncil() {
   const election = elections?.[0];
   const open = election && election.opens_at <= now;
   return (
-    <DashCard title="Student Council" href="/council" linkLabel="View all">
+    <DashCard title={t("Student Council")} href="/council" linkLabel={t("View all")}>
       <div className="flex items-center gap-3">
         <IconTile name="shield" />
         <div className="min-w-0">

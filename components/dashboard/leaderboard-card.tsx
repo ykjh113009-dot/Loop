@@ -1,4 +1,5 @@
 import { requireMe } from "@/lib/auth";
+import { getT } from "@/lib/i18n-server";
 import { createClient } from "@/lib/supabase/server";
 import { LineIcon } from "@/components/line-icon";
 import { CardEmpty, DashCard } from "@/components/dashboard/card";
@@ -13,11 +14,12 @@ const RANK_STYLE = [
 // Grades are ranked by average points per student (never individual students).
 export async function LeaderboardCard() {
   const me = await requireMe();
+  const { t } = await getT();
   const supabase = await createClient();
   const { data } = await supabase.rpc("grade_leaderboard", { p_period: "week" });
   const rows = data ?? [];
   return (
-    <DashCard title="Grade Leaderboard" href="/leaderboard">
+    <DashCard title={t("Grade Leaderboard")} href="/leaderboard">
       {rows.length === 0 ? (
         <CardEmpty icon="trophy">No points yet this week.</CardEmpty>
       ) : (

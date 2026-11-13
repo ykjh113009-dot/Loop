@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getT } from "@/lib/i18n-server";
 import { requireMe } from "@/lib/auth";
 import { getUpcomingEvents } from "@/lib/dashboard";
 import { formatActivityTime } from "@/lib/time";
@@ -7,9 +8,10 @@ import { CardEmpty, DashCard } from "@/components/dashboard/card";
 // The next event on the calendar, as a bigger card.
 export async function NextUp() {
   await requireMe();
+  const { t } = await getT();
   const [event] = await getUpcomingEvents();
   return (
-    <DashCard title="Next Up" href="/events">
+    <DashCard title={t("Next Up")} href="/events">
       {!event ? (
         <CardEmpty icon="calendar">No upcoming events yet.</CardEmpty>
       ) : (

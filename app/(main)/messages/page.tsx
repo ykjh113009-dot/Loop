@@ -3,6 +3,7 @@ import Link from "next/link";
 import { requireMe } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { timeAgo } from "@/lib/time";
+import { getT } from "@/lib/i18n-server";
 import { Avatar } from "@/components/avatar";
 import { Empty } from "@/components/empty";
 import { PageHeader } from "@/components/page-header";
@@ -13,14 +14,15 @@ export const metadata = { title: "Chats" };
 async function Conversations() {
   const me = await requireMe();
   const supabase = await createClient();
+  const { t } = await getT();
   const { data: mine } = await supabase
     .from("conversation_members")
-    .select("last_read_at, conversation:conversations(id, kind, last_message_at, club:clubs(id, name, emoji))")
+    .select("last_read_at, accepted_at, conversation:conversations(id, kind, title, last_message_at, club:clubs(id, name, emoji))")
     .eq("profile_id", me.id);
 
   const conversations = (mine ?? [])
     .filter((m) => m.conversation)
-    .map((m) => ({ ...m.conversation!, lastRead: m.last_read_at }))
+    .map((m) => ({ ...m.conversation!, lastRead: m.last_read_at, request: !m.accepted_at }))
     .sort((a, b) => (b.last_message_at ?? "").localeCompare(a.last_message_at ?? ""));
   const ids = conversations.map((c) => c.id);
 
@@ -60,17 +62,18 @@ async function Conversations() {
         return (
           <li key={c.id}>
             <Link href={href} className="flex items-center gap-3 px-4 py-3 hover:bg-black/[0.02]">
-              {c.kind === "club" ? (
-                <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-brand-50 text-xl">{c.club?.emoji}</div>
+              {c.kind !== "direct" ? (
+                <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-brand-50 text-xl">{c.kind === "group" ? "👥" : c.club?.emoji}</div>
               ) : (
                 <Avatar avatar={other?.avatar ?? "a01"} />
               )}
               <div className="min-w-0 flex-1">
                 <p className={`truncate ${unread ? "font-bold" : "font-medium"}`}>
-                  {c.kind === "club" ? c.club?.name : other?.full_name}
+                  {c.kind === "club" ? c.club?.name : c.kind === "group" ? c.title : other?.full_name}
+                  {c.request && <span className="chip ms-2 bg-amber-50 text-amber-900">{t("Message request")}</span>}
                 </p>
                 <p className={`truncate text-sm ${unread ? "text-black/80" : "text-black/50"}`}>
-                  {last ? `${last.sender_id === me.id ? "You: " : ""}${last.body}` : "No messages yet"}
+                  {last ? `${last.sender_id === me.id ? t("You: ") : ""}${last.body || "📎"}` : t("No messages yet")}
                 </p>
               </div>
               <div className="shrink-0 text-end text-xs text-black/40">
@@ -88,7 +91,7 @@ async function Conversations() {
 export default function MessagesPage() {
   return (
     <>
-      <PageHeader title="Chats" />
+      <PageHeader title="Chats" action={<Link href="/messages/new" className="btn-secondary px-3 py-2">New group</Link>} />
       <Suspense fallback={<PageSkeleton />}>
         <Conversations />
       </Suspense>

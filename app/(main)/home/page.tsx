@@ -27,7 +27,9 @@ export default function HomePage() {
             <Greeting />
           </Suspense>
         </div>
-        <div className="dash-actions"><QuickActions /></div>
+        <div className="dash-actions">
+          <Suspense fallback={<div className="card h-[96px] animate-pulse" />}><QuickActions /></Suspense>
+        </div>
         <div className="dash-chats">
           <Suspense fallback={<CardSkeleton />}><RecentChats /></Suspense>
         </div>

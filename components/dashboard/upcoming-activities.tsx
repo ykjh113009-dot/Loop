@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getT } from "@/lib/i18n-server";
 import { requireMe } from "@/lib/auth";
 import { getUpcomingEvents, iconFor } from "@/lib/dashboard";
 import { formatActivityTime } from "@/lib/time";
@@ -6,9 +7,10 @@ import { CardEmpty, DashCard, IconTile } from "@/components/dashboard/card";
 
 export async function UpcomingActivities() {
   await requireMe();
+  const { t } = await getT();
   const events = (await getUpcomingEvents()).slice(0, 3);
   return (
-    <DashCard title="Upcoming Activities" href="/events">
+    <DashCard title={t("Upcoming Activities")} href="/events">
       {events.length === 0 ? (
         <CardEmpty icon="calendar">Nothing is planned yet. Club leaders can add events.</CardEmpty>
       ) : (

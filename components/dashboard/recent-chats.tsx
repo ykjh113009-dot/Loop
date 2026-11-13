@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getT } from "@/lib/i18n-server";
 import { requireMe } from "@/lib/auth";
 import { getRecentChats } from "@/lib/dashboard";
 import { timeAgo } from "@/lib/time";
@@ -7,9 +8,10 @@ import { CardEmpty, DashCard } from "@/components/dashboard/card";
 
 export async function RecentChats() {
   const me = await requireMe();
+  const { t } = await getT();
   const chats = await getRecentChats(me.id, 3);
   return (
-    <DashCard title="Recent Chats" href="/messages">
+    <DashCard title={t("Recent Chats")} href="/messages">
       {chats.length === 0 ? (
         <CardEmpty icon="chat">No chats yet. Join a club to use its group chat, or open a student&apos;s profile and tap Message.</CardEmpty>
       ) : (

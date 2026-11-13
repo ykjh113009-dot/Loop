@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getT } from "@/lib/i18n-server";
 import { requireMe } from "@/lib/auth";
 import { getMonthEvents } from "@/lib/dashboard";
 import { localDayKey, localParts } from "@/lib/time";
@@ -10,6 +11,7 @@ const MONTHS = ["January", "February", "March", "April", "May", "June", "July", 
 // This month at a glance. Today is filled in, days with an event have a ring.
 export async function MiniCalendar() {
   await requireMe();
+  const { t } = await getT();
   const now = new Date();
   const today = localParts(now);
   const events = await getMonthEvents(today.year, today.month);
@@ -21,7 +23,7 @@ export async function MiniCalendar() {
   const month = `${today.year}-${String(today.month).padStart(2, "0")}`;
 
   return (
-    <DashCard title="Calendar" href={`/events?month=${month}`}>
+    <DashCard title={t("Calendar")} href={`/events?month=${month}`}>
       <p className="mb-2 text-xs font-semibold">{MONTHS[today.month - 1]} {today.year}</p>
       <div className="grid grid-cols-7 text-center text-[10px] font-medium text-ink-2">
         {WEEKDAYS.map((d) => <div key={d} className="py-1">{d}</div>)}
