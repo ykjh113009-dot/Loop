@@ -19,6 +19,7 @@ async function googleIsOff(): Promise<boolean> {
 }
 
 export function GoogleButton() {
+  const [kind, setKind] = useState<"student" | "admin">("student");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
@@ -39,6 +40,8 @@ export function GoogleButton() {
       setLoading(false);
       return;
     }
+    // Remembered for ten minutes so the page after Google knows where to go.
+    document.cookie = `loop_next=${kind === "admin" ? "apply-admin" : ""}; path=/; max-age=${kind === "admin" ? 600 : 0}; samesite=lax`;
     const hostedDomain = process.env.NEXT_PUBLIC_GOOGLE_HOSTED_DOMAIN;
     // "hd" only makes Google suggest school accounts. The database is what
     // actually refuses other emails.
@@ -60,6 +63,19 @@ export function GoogleButton() {
       {message && (
         <p role="alert" className="lp-notice">
           {message}
+        </p>
+      )}
+      <div className="lp-kind" role="radiogroup" aria-label="Account type">
+        {(["student", "admin"] as const).map((k) => (
+          <button key={k} type="button" role="radio" aria-checked={kind === k} onClick={() => setKind(k)} className="lp-kind-btn">
+            {k === "student" ? "Student" : "Admin"}
+          </button>
+        ))}
+      </div>
+      {kind === "admin" && (
+        <p className="lp-kind-note">
+          Sign in with your school account, then fill in a short application. A Super Admin reviews it before you get
+          any admin access.
         </p>
       )}
       <button type="button" onClick={signIn} disabled={loading} className="lp-gbtn">

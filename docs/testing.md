@@ -1,0 +1,22 @@
+# Testing
+
+| Command | What it checks |
+| --- | --- |
+| `npm run lint` | Code style and common mistakes |
+| `npm run typecheck` | TypeScript types |
+| `npm run build` | Production build |
+| `npm run db:test` | 76 database permission checks (roles, 2FA, rate limits, school isolation, log). Runs in a transaction that is rolled back. |
+| `node tests/e2e/phase1.js` | 40 browser checks: admin application, leadership, roles, restrictions, two-step sign-in, phone layout |
+| `node tests/e2e/login.js` | 39 browser checks: sign-in page, redirects, refused accounts (needs `google_only = true`) |
+| `node tests/e2e/dashboard.js` | 59 browser checks: Home dashboard on desktop and phones |
+
+The browser tests need the local database (`npm run db:start`, `npm run db:reset`), the app on
+`localhost:3000` with `DEMO_MODE=true`, and Playwright.
+
+## Phase 1 results (13 Nov 2026)
+
+All of the above pass: 76 database checks and 138 browser checks.
+
+Bugs found and fixed while testing:
+- Club leaders were not listed as leadership roles when the club list changed outside the new functions. Fixed with sync triggers.
+- A database helper that took a whole profile row leaked into the generated types as a fake column. Changed to take an id.

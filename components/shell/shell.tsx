@@ -15,7 +15,8 @@ export async function Shell() {
         avatar: me.avatar,
         label: personLabel(me) || "Student",
         isStaff: me.isStaff,
-        isAdmin: me.isAdmin,
+        // Admins who still need the second sign-in step see the link and are sent to do it.
+        isAdmin: me.isAdmin || me.needsMfa,
         isCounselor: me.isCounselor,
       }}
       initial={badges}

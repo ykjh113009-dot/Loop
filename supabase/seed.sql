@@ -5,8 +5,9 @@
 -- Every demo account can sign in with the password: pbsgo-demo
 -- =============================================================================
 
-insert into public.schools (id, name, email_domain, grades, google_only)
-values ('00000000-0000-0000-0000-00000000a001', 'Pioneers School', 'pioneers.edu.ps', '{9,10,11,12}', false);
+-- Demo school: password sign-in is allowed and admins need no authenticator app.
+insert into public.schools (id, name, email_domain, grades, google_only, admin_mfa_required)
+values ('00000000-0000-0000-0000-00000000a001', 'Pioneers School', 'pioneers.edu.ps', '{9,10,11,12}', false, false);
 
 -- Creates a demo login (email + password). Real students use Google instead.
 create function pg_temp.demo_user(p_id uuid, p_email text, p_name text) returns void
@@ -33,7 +34,7 @@ select pg_temp.demo_user('00000000-0000-0000-0000-0000000000a3', 'demo.layla@pio
 select pg_temp.demo_user('00000000-0000-0000-0000-0000000000a4', 'demo.yousef@pioneers.edu.ps', 'Yousef Saleh');
 select pg_temp.demo_user('00000000-0000-0000-0000-0000000000a5', 'demo.maya@pioneers.edu.ps', 'Maya Odeh');
 
-update public.profiles set role = 'admin', grade = 12, avatar = 'a07',
+update public.profiles set role = 'super_admin', is_owner = true, grade = 12, avatar = 'a07',
   bio = 'Student council president. Ask me anything about school activities!'
   where id = '00000000-0000-0000-0000-0000000000a1';
 update public.profiles set role = 'moderator', grade = 11, avatar = 'a03',

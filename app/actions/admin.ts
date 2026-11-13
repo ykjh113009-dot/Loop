@@ -62,7 +62,7 @@ export async function deleteAnnouncement(_: ActionResult, formData: FormData) {
 }
 
 export async function updateSchool(_: ActionResult, formData: FormData): Promise<ActionResult> {
-  const me = await requireMe("admin");
+  const me = await requireMe("super");
   const grades = String(formData.get("grades") ?? "")
     .split(/[\s,]+/)
     .map(Number)
@@ -136,4 +136,60 @@ export async function setAlumni(_: ActionResult, formData: FormData) {
   const supabase = await createClient();
   const { error } = await supabase.rpc("admin_set_alumni", { p_user: String(formData.get("profileId")), p_year: year as number });
   return done(error, year ? `Now an alumni mentor (class of ${year}).` : "Now a current student again.");
+}
+
+// Pause (days) or restore (no days) one activity for an account.
+export async function setRestriction(_: ActionResult, formData: FormData) {
+  await requireMe("admin");
+  const supabase = await createClient();
+  const days = formData.get("days");
+  const { error } = await supabase.rpc("set_restriction", {
+    p_user: String(formData.get("profileId")),
+    p_kind: String(formData.get("kind")),
+    p_days: days ? Math.round(Number(days)) : (null as unknown as number),
+    p_reason: String(formData.get("reason") ?? ""),
+  });
+  if (!error) after(dispatchPush);
+  return done(error, days ? "Paused." : "Restored.");
+}
+
+export async function reviewAdminApplication(_: ActionResult, formData: FormData) {
+  await requireMe("super");
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("review_admin_application", {
+    p_application: String(formData.get("applicationId")),
+    p_approve: formData.get("decision") === "approve",
+    p_role: String(formData.get("role") ?? ""),
+    p_note: String(formData.get("note") ?? ""),
+  });
+  if (!error) after(dispatchPush);
+  return done(error);
+}
+
+export async function reviewLeadershipRequest(_: ActionResult, formData: FormData) {
+  await requireMe("admin");
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("review_leadership_request", {
+    p_request: String(formData.get("requestId")),
+    p_approve: formData.get("decision") === "approve",
+    p_note: String(formData.get("note") ?? ""),
+  });
+  if (!error) after(dispatchPush);
+  return done(error);
+}
+
+export async function removeLeadershipRole(_: ActionResult, formData: FormData) {
+  await requireMe("super");
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("remove_leadership_role", { p_role: String(formData.get("roleId")) });
+  if (!error) after(dispatchPush);
+  return done(error, "Removed.");
+}
+
+// Clears a lost authenticator so the person can set up two-step sign-in again.
+export async function resetAccountMfa(_: ActionResult, formData: FormData) {
+  await requireMe("super");
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("reset_account_mfa", { p_user: String(formData.get("profileId")) });
+  return done(error, "Two-step sign-in was reset. They can set it up again.");
 }

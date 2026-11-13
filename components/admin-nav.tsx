@@ -2,8 +2,11 @@ import Link from "next/link";
 
 const LINKS = [
   { href: "/admin", label: "Overview" },
-  { href: "/admin/students", label: "Students" },
+  { href: "/admin/students", label: "Accounts" },
   { href: "/admin/announcements", label: "Announcements" },
+  { href: "/admin/leadership", label: "Leadership" },
+  { href: "/admin/applications", label: "Admin applications" },
+  { href: "/admin/log", label: "Activity log" },
   { href: "/admin/settings", label: "Settings" },
 ];
 
@@ -14,7 +17,7 @@ export function AdminNav({ current }: { current: string }) {
         <Link
           key={l.href}
           href={l.href}
-          className={`shrink-0 flex-1 rounded-lg px-3 py-1.5 text-center text-sm font-medium ${current === l.href ? "bg-white shadow-sm" : "text-black/55"}`}
+          className={`shrink-0 flex-1 rounded-lg px-3 py-1.5 text-center text-sm font-medium whitespace-nowrap ${current === l.href ? "bg-white shadow-sm" : "text-black/55"}`}
         >
           {l.label}
         </Link>

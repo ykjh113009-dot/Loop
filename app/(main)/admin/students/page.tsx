@@ -72,7 +72,7 @@ async function Students({ searchParams }: { searchParams: PageProps<"/admin/stud
                   </div>
                   <div className="flex shrink-0 flex-col items-end gap-0.5 text-xs">
                     <span className="text-black/60">{personLabel(s) || "No grade"}</span>
-                    {(s.role === "moderator" || s.role === "admin") && <span className="font-semibold text-brand-700">{s.role}</span>}
+                    {(s.role === "moderator" || s.role === "admin" || s.role === "super_admin") && <span className="font-semibold text-brand-700">{s.role.replace("_", " ")}</span>}
                     {suspended && <span className="font-semibold text-red-700">suspended</span>}
                     {!s.onboarded_at && <span className="text-amber-700">not set up</span>}
                   </div>

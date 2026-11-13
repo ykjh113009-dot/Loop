@@ -31,6 +31,7 @@ const SECTIONS: { title: string; tiles: Tile[] }[] = [
     tiles: [
       { href: "/council", emoji: "🗳️", title: "Student council", text: "Members and elections" },
       { href: "/suggestions", emoji: "💡", title: "Suggestion box", text: "Ideas to make school better" },
+      { href: "/leadership", emoji: "🎖️", title: "Leadership roles", text: "Class rep, club leader, council" },
       { href: "/points", emoji: "⭐", title: "My points & badges", text: "Only you can see your points", studentsOnly: true },
     ],
   },

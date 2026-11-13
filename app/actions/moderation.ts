@@ -27,10 +27,13 @@ export async function moderateReport(_: ActionResult, formData: FormData) {
 }
 
 export async function suspendStudent(_: ActionResult, formData: FormData) {
-  const days = String(formData.get("days"));
+  // "custom" uses the number typed next to the list.
+  const choice = String(formData.get("days"));
+  const days = Math.round(Number(choice === "custom" ? formData.get("customDays") : choice));
+  if (!Number.isFinite(days) || days < 1 || days > 365) return { error: "Choose between 1 and 365 days." };
   return run("suspend_user", {
     p_user: String(formData.get("profileId")),
-    p_days: days === "permanent" ? null : Number(days),
+    p_days: days,
     p_reason: String(formData.get("reason") ?? ""),
   });
 }

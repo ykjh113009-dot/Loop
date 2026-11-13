@@ -169,6 +169,40 @@
   }
 }
 
+/* Student / Admin choice above the Google button */
+.lp-kind {
+  display: inline-flex;
+  gap: 4px;
+  margin: 0 0 12px;
+  padding: 4px;
+  border-radius: 999px;
+  background: var(--c-sage-soft);
+}
+.lp-kind-btn {
+  padding: 7px 18px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--c-ink-2);
+  cursor: pointer;
+}
+.lp-kind-btn[aria-checked="true"] {
+  background: #fff;
+  color: var(--c-olive);
+  box-shadow: 0 1px 3px rgba(36, 48, 32, 0.15);
+}
+.lp-kind-btn:focus-visible {
+  outline: 2px solid var(--c-olive);
+  outline-offset: 2px;
+}
+.lp-kind-note {
+  margin: 0 0 12px;
+  max-width: 44ch;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--c-ink-2);
+}
+
 .lp-domain {
   margin: 14px 0 0;
   text-align: center;

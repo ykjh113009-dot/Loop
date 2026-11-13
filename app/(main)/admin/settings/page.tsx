@@ -23,27 +23,31 @@ async function Settings() {
 
   return (
     <div className="space-y-4">
-      <section className="card p-4">
-        <h2 className="font-semibold">School</h2>
-        <ActionForm action={updateSchool} className="mt-3 space-y-3">
-          <label className="block">
-            <span className="label">Name</span>
-            <input name="name" defaultValue={school?.name} maxLength={100} className="input" />
-          </label>
-          <label className="block">
-            <span className="label">Grades (comma separated)</span>
-            <input name="grades" defaultValue={school?.grades.join(", ")} className="input" />
-          </label>
-          <label className="flex items-start gap-3 text-sm">
-            <input type="checkbox" name="roster_required" defaultChecked={school?.roster_required} className="mt-0.5 size-5 accent-brand-700" />
-            <span>
-              <strong>Only allow emails on the list below.</strong> When off, anyone with an @{school?.email_domain} email can join
-              (including staff). Turn it on once you&apos;ve added all students.
-            </span>
-          </label>
-          <SubmitButton className="btn-primary w-full">Save</SubmitButton>
-        </ActionForm>
-      </section>
+      {me.isSuperAdmin ? (
+        <section className="card p-4">
+          <h2 className="font-semibold">School</h2>
+          <ActionForm action={updateSchool} className="mt-3 space-y-3">
+            <label className="block">
+              <span className="label">Name</span>
+              <input name="name" defaultValue={school?.name} maxLength={100} className="input" />
+            </label>
+            <label className="block">
+              <span className="label">Grades (comma separated)</span>
+              <input name="grades" defaultValue={school?.grades.join(", ")} className="input" />
+            </label>
+            <label className="flex items-start gap-3 text-sm">
+              <input type="checkbox" name="roster_required" defaultChecked={school?.roster_required} className="mt-0.5 size-5 accent-brand-700" />
+              <span>
+                <strong>Only allow emails on the list below.</strong> When off, anyone with an @{school?.email_domain} email can join
+                (including staff). Turn it on once you&apos;ve added all students.
+              </span>
+            </label>
+            <SubmitButton className="btn-primary w-full">Save</SubmitButton>
+          </ActionForm>
+        </section>
+      ) : (
+        <p className="card p-4 text-sm text-black/60">School name, grades and sign-up rules can only be changed by a Super Admin.</p>
+      )}
 
       <section className="card p-4">
         <h2 className="font-semibold">Student email list <span className="font-normal text-black/45">({rosterCount ?? 0})</span></h2>

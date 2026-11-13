@@ -75,7 +75,8 @@ async function Reports() {
         const first = group[0];
         const urgent = group.some((r) => r.reason === "self_harm");
         const author = first.author;
-        const canSuspend = author && author.id !== me.id && (me.isAdmin || author.role === "student");
+        // Only Admins suspend, and only accounts below their own role (the database checks again).
+        const canSuspend = author && author.id !== me.id && me.isAdmin;
         const removable = first.target_type !== "profile";
         return (
           <article key={first.id} className={`card space-y-3 p-4 ${urgent ? "border-2 border-red-500" : ""}`}>
@@ -138,10 +139,12 @@ async function Reports() {
                   <input type="hidden" name="profileId" value={author.id} />
                   <select name="days" className="input w-auto" aria-label="How long">
                     <option value="1">1 day</option>
+                    <option value="3">3 days</option>
                     <option value="7">7 days</option>
                     <option value="30">30 days</option>
-                    {me.isAdmin && <option value="permanent">Until an admin lifts it</option>}
+                    <option value="custom">Custom…</option>
                   </select>
+                  <input name="customDays" type="number" min={1} max={365} placeholder="Days (custom)" aria-label="Custom number of days" className="input w-32" />
                   <input name="reason" required maxLength={200} placeholder="Reason (the student sees this)" className="input min-w-40 flex-1" />
                   <SubmitButton className="btn-danger" pendingText="…">Suspend</SubmitButton>
                 </ActionForm>

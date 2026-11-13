@@ -39,6 +39,7 @@ export function ProfileMenu({ user, compact = false }: { user: ShellUser; compac
     { href: `/profile/${user.id}`, label: "My profile", icon: "user" },
     { href: "/profile/edit", label: "Edit profile", icon: "pencil" },
     { href: "/more", label: "More features", icon: "grid" },
+    { href: "/security", label: "Security", icon: "lock" },
   ];
   if (user.isCounselor) items.push({ href: "/counselor", label: "Counselor inbox", icon: "lock" });
   if (user.isStaff) items.push({ href: "/moderation", label: "Moderation", icon: "shield" });

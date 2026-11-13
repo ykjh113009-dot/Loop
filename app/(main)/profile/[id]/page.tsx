@@ -12,7 +12,7 @@ import { ReportButton } from "@/components/report-button";
 import { SubmitButton } from "@/components/submit-button";
 import { PageSkeleton } from "@/components/skeleton";
 
-const ROLE_BADGE: Record<string, string | null> = { student: null, moderator: "🛡️ Moderator", admin: "⭐ School admin" };
+const ROLE_BADGE: Record<string, string | null> = { student: null, moderator: "🛡️ Moderator", admin: "⭐ School admin", super_admin: "⭐ Super Admin" };
 
 async function Profile({ params, searchParams }: { params: PageProps<"/profile/[id]">["params"]; searchParams: PageProps<"/profile/[id]">["searchParams"] }) {
   const { id } = await params;

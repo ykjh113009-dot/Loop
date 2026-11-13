@@ -5,6 +5,8 @@ import { createClient } from "@/lib/supabase/server";
 // (Building an absolute address here goes wrong behind a proxy.)
 const go = (path: string) => new NextResponse(null, { status: 307, headers: { Location: path } });
 
+const NEXT_COOKIE = "loop_next";
+
 // Google sends students back here after they sign in.
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
@@ -14,7 +16,21 @@ export async function GET(request: NextRequest) {
   if (code && !providerError) {
     const supabase = await createClient();
     const { error } = await supabase.auth.exchangeCodeForSession(code);
-    if (!error) return go("/home");
+    if (!error) {
+      // Security log: where this sign-in came from. Never blocks the sign-in.
+      await supabase
+        .rpc("record_security_event", {
+          p_kind: "sign_in",
+          p_ip: (request.headers.get("x-forwarded-for") ?? "").split(",")[0].trim(),
+          p_user_agent: request.headers.get("user-agent") ?? "",
+        })
+        .then(() => null, () => null);
+      // People who chose "Admin" on the sign-in page continue to the application form.
+      const wantsAdmin = request.cookies.get(NEXT_COOKIE)?.value === "apply-admin";
+      const response = go(wantsAdmin ? "/apply-admin" : "/home");
+      response.cookies.delete(NEXT_COOKIE);
+      return response;
+    }
   }
 
   // Why the sign-in did not finish:

@@ -5,7 +5,91 @@ export type Database = {
   
   "public": {
           Tables: {
-            "announcements": {
+            "account_restrictions": {
+                  Row: {
+                    "created_at": string,"created_by": string | null,"kind": string,"profile_id": string,"reason": string,"school_id": string,"until": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"created_by"?: string | null,"kind": string,"profile_id": string,"reason": string,"school_id": string,"until": string
+                  }
+                  Update: {
+                    "created_at"?: string,"created_by"?: string | null,"kind"?: string,"profile_id"?: string,"reason"?: string,"school_id"?: string,"until"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "account_restrictions_created_by_fkey"
+      columns: ["created_by"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "account_restrictions_profile_id_fkey"
+      columns: ["profile_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "account_restrictions_school_id_fkey"
+      columns: ["school_id"]
+isOneToOne: false
+      referencedRelation: "schools"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"admin_applications": {
+                  Row: {
+                    "applicant_id": string,"assigned_role": string | null,"contribution": string,"created_at": string,"experience": string,"id": string,"motivation": string,"position": string,"requested_role": string,"review_note": string | null,"reviewed_at": string | null,"reviewed_by": string | null,"school_id": string,"status": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "applicant_id": string,"assigned_role"?: string | null,"contribution": string,"created_at"?: string,"experience"?: string,"id"?: string,"motivation": string,"position"?: string,"requested_role": string,"review_note"?: string | null,"reviewed_at"?: string | null,"reviewed_by"?: string | null,"school_id": string,"status"?: string
+                  }
+                  Update: {
+                    "applicant_id"?: string,"assigned_role"?: string | null,"contribution"?: string,"created_at"?: string,"experience"?: string,"id"?: string,"motivation"?: string,"position"?: string,"requested_role"?: string,"review_note"?: string | null,"reviewed_at"?: string | null,"reviewed_by"?: string | null,"school_id"?: string,"status"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "admin_applications_applicant_id_fkey"
+      columns: ["applicant_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "admin_applications_reviewed_by_fkey"
+      columns: ["reviewed_by"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "admin_applications_school_id_fkey"
+      columns: ["school_id"]
+isOneToOne: false
+      referencedRelation: "schools"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"admin_emails": {
+                  Row: {
+                    "created_at": string,"email": string,"is_owner": boolean,"role": string,"school_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"email": string,"is_owner"?: boolean,"role"?: string,"school_id": string
+                  }
+                  Update: {
+                    "created_at"?: string,"email"?: string,"is_owner"?: boolean,"role"?: string,"school_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "admin_emails_school_id_fkey"
+      columns: ["school_id"]
+isOneToOne: false
+      referencedRelation: "schools"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"announcements": {
                   Row: {
                     "author_id": string | null,"body": string,"created_at": string,"id": string,"school_id": string,"title": string
                   }
@@ -523,6 +607,82 @@ isOneToOne: false
                   Relationships: [
                     
                   ]
+                },"leadership_requests": {
+                  Row: {
+                    "club_id": string | null,"created_at": string,"id": string,"kind": string,"profile_id": string,"reason": string,"review_note": string | null,"reviewed_at": string | null,"reviewed_by": string | null,"school_id": string,"scope": string,"status": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "club_id"?: string | null,"created_at"?: string,"id"?: string,"kind": string,"profile_id": string,"reason": string,"review_note"?: string | null,"reviewed_at"?: string | null,"reviewed_by"?: string | null,"school_id": string,"scope"?: string,"status"?: string
+                  }
+                  Update: {
+                    "club_id"?: string | null,"created_at"?: string,"id"?: string,"kind"?: string,"profile_id"?: string,"reason"?: string,"review_note"?: string | null,"reviewed_at"?: string | null,"reviewed_by"?: string | null,"school_id"?: string,"scope"?: string,"status"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "leadership_requests_club_id_fkey"
+      columns: ["club_id"]
+isOneToOne: false
+      referencedRelation: "clubs"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "leadership_requests_profile_id_fkey"
+      columns: ["profile_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "leadership_requests_reviewed_by_fkey"
+      columns: ["reviewed_by"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "leadership_requests_school_id_fkey"
+      columns: ["school_id"]
+isOneToOne: false
+      referencedRelation: "schools"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"leadership_roles": {
+                  Row: {
+                    "assigned_at": string,"assigned_by": string | null,"club_id": string | null,"id": string,"kind": string,"profile_id": string,"school_id": string,"scope": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "assigned_at"?: string,"assigned_by"?: string | null,"club_id"?: string | null,"id"?: string,"kind": string,"profile_id": string,"school_id": string,"scope"?: string
+                  }
+                  Update: {
+                    "assigned_at"?: string,"assigned_by"?: string | null,"club_id"?: string | null,"id"?: string,"kind"?: string,"profile_id"?: string,"school_id"?: string,"scope"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "leadership_roles_assigned_by_fkey"
+      columns: ["assigned_by"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "leadership_roles_club_id_fkey"
+      columns: ["club_id"]
+isOneToOne: false
+      referencedRelation: "clubs"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "leadership_roles_profile_id_fkey"
+      columns: ["profile_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "leadership_roles_school_id_fkey"
+      columns: ["school_id"]
+isOneToOne: false
+      referencedRelation: "schools"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"listings": {
                   Row: {
                     "category": string,"condition": string,"created_at": string,"description": string,"id": string,"image_path": string | null,"kind": string,"price": number | null,"school_id": string,"seller_id": string,"status": string,"title": string
@@ -835,14 +995,14 @@ isOneToOne: false
                   ]
                 },"profiles": {
                   Row: {
-                    "alumni_year": number | null,"avatar": string,"bio": string,"created_at": string,"deactivated_at": string | null,"full_name": string,"grade": number | null,"id": string,"major": string,"onboarded_at": string | null,"role": string,"school_id": string,"suspended_until": string | null,"suspension_reason": string | null,"university": string
+                    "alumni_year": number | null,"avatar": string,"bio": string,"created_at": string,"deactivated_at": string | null,"full_name": string,"grade": number | null,"id": string,"is_owner": boolean,"major": string,"onboarded_at": string | null,"role": string,"school_id": string,"section": string | null,"suspended_until": string | null,"suspension_reason": string | null,"university": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "alumni_year"?: number | null,"avatar"?: string,"bio"?: string,"created_at"?: string,"deactivated_at"?: string | null,"full_name": string,"grade"?: number | null,"id": string,"major"?: string,"onboarded_at"?: string | null,"role"?: string,"school_id": string,"suspended_until"?: string | null,"suspension_reason"?: string | null,"university"?: string
+                    "alumni_year"?: number | null,"avatar"?: string,"bio"?: string,"created_at"?: string,"deactivated_at"?: string | null,"full_name": string,"grade"?: number | null,"id": string,"is_owner"?: boolean,"major"?: string,"onboarded_at"?: string | null,"role"?: string,"school_id": string,"section"?: string | null,"suspended_until"?: string | null,"suspension_reason"?: string | null,"university"?: string
                   }
                   Update: {
-                    "alumni_year"?: number | null,"avatar"?: string,"bio"?: string,"created_at"?: string,"deactivated_at"?: string | null,"full_name"?: string,"grade"?: number | null,"id"?: string,"major"?: string,"onboarded_at"?: string | null,"role"?: string,"school_id"?: string,"suspended_until"?: string | null,"suspension_reason"?: string | null,"university"?: string
+                    "alumni_year"?: number | null,"avatar"?: string,"bio"?: string,"created_at"?: string,"deactivated_at"?: string | null,"full_name"?: string,"grade"?: number | null,"id"?: string,"is_owner"?: boolean,"major"?: string,"onboarded_at"?: string | null,"role"?: string,"school_id"?: string,"section"?: string | null,"suspended_until"?: string | null,"suspension_reason"?: string | null,"university"?: string
                   }
                   Relationships: [
                     {
@@ -867,6 +1027,26 @@ isOneToOne: false
                   Relationships: [
                     {
       foreignKeyName: "push_subscriptions_profile_id_fkey"
+      columns: ["profile_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"rate_events": {
+                  Row: {
+                    "action": string,"created_at": string,"profile_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "action": string,"created_at"?: string,"profile_id": string
+                  }
+                  Update: {
+                    "action"?: string,"created_at"?: string,"profile_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "rate_events_profile_id_fkey"
       columns: ["profile_id"]
 isOneToOne: false
       referencedRelation: "profiles"
@@ -939,17 +1119,43 @@ isOneToOne: false
                   ]
                 },"schools": {
                   Row: {
-                    "created_at": string,"email_domain": string,"google_only": boolean,"grades": (number)[],"id": string,"name": string,"roster_required": boolean
+                    "admin_mfa_required": boolean,"created_at": string,"email_domain": string,"google_only": boolean,"grades": (number)[],"id": string,"name": string,"roster_required": boolean
                   }
                   ComputedFields: never
                   Insert: {
-                    "created_at"?: string,"email_domain": string,"google_only"?: boolean,"grades"?: (number)[],"id"?: string,"name": string,"roster_required"?: boolean
+                    "admin_mfa_required"?: boolean,"created_at"?: string,"email_domain": string,"google_only"?: boolean,"grades"?: (number)[],"id"?: string,"name": string,"roster_required"?: boolean
                   }
                   Update: {
-                    "created_at"?: string,"email_domain"?: string,"google_only"?: boolean,"grades"?: (number)[],"id"?: string,"name"?: string,"roster_required"?: boolean
+                    "admin_mfa_required"?: boolean,"created_at"?: string,"email_domain"?: string,"google_only"?: boolean,"grades"?: (number)[],"id"?: string,"name"?: string,"roster_required"?: boolean
                   }
                   Relationships: [
                     
+                  ]
+                },"security_events": {
+                  Row: {
+                    "created_at": string,"details": string,"id": number,"ip": string | null,"kind": string,"profile_id": string,"school_id": string,"user_agent": string | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"details"?: string,"id"?: never,"ip"?: string | null,"kind": string,"profile_id": string,"school_id": string,"user_agent"?: string | null
+                  }
+                  Update: {
+                    "created_at"?: string,"details"?: string,"id"?: never,"ip"?: string | null,"kind"?: string,"profile_id"?: string,"school_id"?: string,"user_agent"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "security_events_profile_id_fkey"
+      columns: ["profile_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "security_events_school_id_fkey"
+      columns: ["school_id"]
+isOneToOne: false
+      referencedRelation: "schools"
+      referencedColumns: ["id"]
+    }
                   ]
                 },"study_buddy_posts": {
                   Row: {
@@ -1175,11 +1381,17 @@ isOneToOne: false
 "archive_club":
 { Args: { "p_club": string,"p_reason": string }; Returns: undefined
                            },
+"assign_leadership_role":
+{ Args: { "p_club": string,"p_kind": string,"p_scope": string,"p_user": string }; Returns: undefined
+                           },
 "award_badges":
 { Args: { "p_profile": string }; Returns: undefined
                            },
 "award_points":
 { Args: { "p_at"?: string,"p_points": number,"p_profile": string,"p_reason": string,"p_source": string }; Returns: undefined
+                           },
+"can_manage_account":
+{ Args: { "p_user": string }; Returns: boolean
                            },
 "can_manage_event":
 { Args: { "e": Omit<Database["public"]['Tables']["events"]['Row'], Database["public"]['Tables']["events"]['ComputedFields']> }; Returns: boolean
@@ -1189,6 +1401,9 @@ isOneToOne: false
                            },
 "challenge_completions":
 { Args: { "p_challenge": string }; Returns: number
+                           },
+"check_rate":
+{ Args: { "p_action": string,"p_max": number,"p_seconds": number }; Returns: undefined
                            },
 "claim_push_batch":
 { Args: { "p_limit"?: number }; Returns: {
@@ -1211,6 +1426,9 @@ isOneToOne: false
 { Args: { "p_period": string }; Returns: {
               "avg_points": number,"grade": number,"points": number,"students": number
             }[]
+                           },
+"grant_leadership":
+{ Args: { "p_club": string,"p_kind": string,"p_profile": string,"p_scope": string }; Returns: undefined
                            },
 "is_active":
 { Args: Record<PropertyKey, never>; Returns: boolean
@@ -1239,10 +1457,19 @@ isOneToOne: false
 "is_current_student":
 { Args: { "p_profile": string }; Returns: boolean
                            },
+"is_owner":
+{ Args: Record<PropertyKey, never>; Returns: boolean
+                           },
 "is_reader":
 { Args: Record<PropertyKey, never>; Returns: boolean
                            },
+"is_restricted":
+{ Args: { "p_kind": string }; Returns: boolean
+                           },
 "is_staff":
+{ Args: Record<PropertyKey, never>; Returns: boolean
+                           },
+"is_super_admin":
 { Args: Record<PropertyKey, never>; Returns: boolean
                            },
 "local_time":
@@ -1250,6 +1477,9 @@ isOneToOne: false
                            },
 "log_action":
 { Args: { "p_action": string,"p_details": string,"p_school": string,"p_target_id": string,"p_target_type": string }; Returns: undefined
+                           },
+"mfa_ok":
+{ Args: Record<PropertyKey, never>; Returns: boolean
                            },
 "moderate_report":
 { Args: { "p_action": string,"p_note": string,"p_report": string }; Returns: undefined
@@ -1278,8 +1508,17 @@ isOneToOne: false
 "poll_results":
 { Args: { "p_poll": string }; Returns: Json
                            },
+"record_security_event":
+{ Args: { "p_ip": string,"p_kind": string,"p_user_agent": string }; Returns: undefined
+                           },
 "reject_blocked":
 { Args: { "p_school": string,"p_text": string }; Returns: undefined
+                           },
+"remove_leadership_role":
+{ Args: { "p_role": string }; Returns: undefined
+                           },
+"request_leadership_role":
+{ Args: { "p_club": string,"p_kind": string,"p_reason": string,"p_scope": string }; Returns: string
                            },
 "request_tutoring":
 { Args: { "p_message": string,"p_subject": string,"p_tutor": string }; Returns: string
@@ -1287,11 +1526,17 @@ isOneToOne: false
 "reschedule_event":
 { Args: { "p_ends": string,"p_event": string,"p_starts": string }; Returns: undefined
                            },
+"reset_account_mfa":
+{ Args: { "p_user": string }; Returns: undefined
+                           },
 "respond_suggestion":
 { Args: { "p_response": string,"p_status": string,"p_suggestion": string }; Returns: undefined
                            },
 "respond_tutoring":
 { Args: { "p_accept": boolean,"p_request": string }; Returns: string
+                           },
+"review_admin_application":
+{ Args: { "p_application": string,"p_approve": boolean,"p_note": string,"p_role": string }; Returns: undefined
                            },
 "review_challenge_submission":
 { Args: { "p_approve": boolean,"p_note": string,"p_submission": string }; Returns: undefined
@@ -1302,8 +1547,14 @@ isOneToOne: false
 "review_event":
 { Args: { "p_approve": boolean,"p_event": string,"p_note": string }; Returns: undefined
                            },
+"review_leadership_request":
+{ Args: { "p_approve": boolean,"p_note": string,"p_request": string }; Returns: undefined
+                           },
 "review_volunteer":
 { Args: { "p_approve": boolean,"p_entry": string,"p_note": string }; Returns: undefined
+                           },
+"role_rank":
+{ Args: { "p_role": string }; Returns: number
                            },
 "school_has_counselor":
 { Args: Record<PropertyKey, never>; Returns: boolean
@@ -1323,11 +1574,17 @@ isOneToOne: false
 "set_my_interests":
 { Args: { "p_interests": (number)[] }; Returns: undefined
                            },
+"set_restriction":
+{ Args: { "p_days": number,"p_kind": string,"p_reason": string,"p_user": string }; Returns: undefined
+                           },
 "start_counselor_request":
 { Args: { "p_message": string,"p_topic": string,"p_urgent": boolean }; Returns: string
                            },
 "start_direct_conversation":
 { Args: { "p_other": string }; Returns: string
+                           },
+"submit_admin_application":
+{ Args: { "p_contribution": string,"p_experience": string,"p_motivation": string,"p_position": string,"p_role": string }; Returns: string
                            },
 "suspend_user":
 { Args: { "p_days": number,"p_reason": string,"p_user": string }; Returns: undefined
