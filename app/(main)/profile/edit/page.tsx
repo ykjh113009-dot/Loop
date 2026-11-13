@@ -1,4 +1,6 @@
 import { Suspense } from "react";
+import { getT } from "@/lib/i18n-server";
+import { ExtrasForm } from "./extras-form";
 import { requireMe } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { PageHeader } from "@/components/page-header";
@@ -11,6 +13,7 @@ export const metadata = { title: "Edit profile" };
 async function Edit() {
   const me = await requireMe();
   const supabase = await createClient();
+  const { locale } = await getT();
   const [{ data: interests }, { data: mine }] = await Promise.all([
     supabase.from("interests").select("id, name, emoji").order("name"),
     supabase.from("profile_interests").select("interest_id").eq("profile_id", me.id),
@@ -29,6 +32,17 @@ async function Edit() {
           bio={me.bio}
           picked={(mine ?? []).map((m) => m.interest_id)}
           mentor={me.isAlumni ? { university: me.university, major: me.major } : null}
+        />
+        <ExtrasForm
+          schoolId={me.school_id}
+          userId={me.id}
+          locale={locale}
+          section={me.section ?? ""}
+          skills={me.skills}
+          subjects={me.favorite_subjects}
+          accent={me.accent}
+          hasPhoto={!!me.photo_path}
+          hasCover={!!me.cover_path}
         />
         <PushToggle />
       </div>
