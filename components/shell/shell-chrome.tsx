@@ -5,23 +5,27 @@ import { ProfileMenu, type ShellUser } from "@/components/shell/profile-menu";
 import type { Badges } from "@/lib/badges";
 import { makeT, type Locale } from "@/lib/i18n";
 
-type NavItem = { href: string; label: string; icon: LineIconName; also?: string[]; badge?: keyof Badges };
+type NavItem = { href: string; label: string; icon: LineIconName; also?: string[]; badge?: keyof Badges; divider?: boolean };
 
+// The sidebar: the original Loop navigation, a divider, then the four Study Hub sections.
+// Marketplace and More are reached from the profile menu.
 const SIDEBAR: NavItem[] = [
   { href: "/home", label: "Home", icon: "home" },
   { href: "/community", label: "Community", icon: "community", also: ["/clubs", "/groups", "/saved", "/friends"] },
   { href: "/messages", label: "Chats", icon: "chat", badge: "messages" },
   { href: "/events", label: "Calendar", icon: "calendar" },
-  { href: "/challenges", label: "Activities", icon: "trophy", also: ["/polls", "/leaderboard", "/competitions", "/points", "/shop"] },
-  { href: "/market", label: "Marketplace", icon: "store" },
-  { href: "/more", label: "More", icon: "dots", also: ["/tutors", "/tawjihi", "/volunteering", "/council", "/suggestions", "/points", "/counselor", "/people", "/announcements", "/search"] },
+  { href: "/challenges", label: "Activities", icon: "trophy", also: ["/polls", "/leaderboard", "/competitions", "/points"] },
+  { href: "/academic-resources", label: "Academic Resources", icon: "book", divider: true },
+  { href: "/tutors", label: "Tutors Directory", icon: "tutor" },
+  { href: "/opportunities", label: "University & Opportunities", icon: "graduation" },
+  { href: "/shop", label: "Rewards Shop", icon: "gift" },
 ];
 
 const TABS: NavItem[] = [
   { href: "/home", label: "Home", icon: "home" },
   { href: "/community", label: "Community", icon: "community", also: ["/clubs"] },
   { href: "/events", label: "Calendar", icon: "calendar" },
-  { href: "/more", label: "More", icon: "dots", also: ["/messages", "/challenges", "/market", "/tutors", "/tawjihi", "/volunteering", "/council", "/suggestions", "/points", "/counselor", "/people", "/polls", "/leaderboard", "/announcements", "/search"] },
+  { href: "/more", label: "More", icon: "dots", also: ["/messages", "/challenges", "/market", "/academic-resources", "/tutors", "/opportunities", "/shop", "/tawjihi", "/volunteering", "/council", "/suggestions", "/points", "/counselor", "/people", "/polls", "/leaderboard", "/announcements", "/search"] },
 ];
 
 const isActive = (pathname: string, item: NavItem) =>
@@ -63,7 +67,7 @@ export function ShellChrome({ user, badges, pathname, locale = "en" }: { user: S
             {SIDEBAR.map((item) => {
               const active = isActive(current, item);
               return (
-                <li key={item.href}>
+                <li key={item.href} className={item.divider ? "mt-3 border-t border-brand-700/10 pt-3" : undefined}>
                   <Link
                     href={item.href}
                     aria-current={active ? "page" : undefined}

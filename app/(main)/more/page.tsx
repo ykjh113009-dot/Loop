@@ -10,9 +10,17 @@ type Tile = { href: string; emoji: string; title: string; text: string; students
 
 const SECTIONS: { title: string; tiles: Tile[] }[] = [
   {
+    title: "Study Hub",
+    tiles: [
+      { href: "/academic-resources", emoji: "📚", title: "Academic Resources", text: "SAT, AP and more study materials" },
+      { href: "/tutors", emoji: "🧑‍🏫", title: "Tutors Directory", text: "Find an approved student tutor" },
+      { href: "/opportunities", emoji: "🎓", title: "University & Opportunities", text: "Scholarships, programs and deadlines" },
+      { href: "/shop", emoji: "🎁", title: "Rewards Shop", text: "Spend points, Top 10 prizes" },
+    ],
+  },
+  {
     title: "Learn together",
     tiles: [
-      { href: "/tutors", emoji: "📚", title: "Tutors & study buddies", text: "Get help or help a classmate" },
       { href: "/tawjihi", emoji: "🎓", title: "Tawjihi corner", text: "Questions answered by alumni" },
     ],
   },

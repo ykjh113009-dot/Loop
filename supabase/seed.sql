@@ -348,6 +348,9 @@ insert into public.tutor_profiles (profile_id, school_id, subjects, about, avail
   ('00000000-0000-0000-0000-00000000100b', '00000000-0000-0000-0000-00000000a001', '{Islamic Education,Arabic}',
    'Tajweed and Arabic grammar.', 'Mon break');
 
+-- These demo tutors count as already approved.
+update public.tutor_profiles set approved_at = created_at, format = 'in_person' where approved_at is null;
+
 insert into public.tutoring_requests (school_id, learner_id, tutor_id, subject, message, status, created_at, responded_at, completed_at) values
   ('00000000-0000-0000-0000-00000000a001', '00000000-0000-0000-0000-0000000000a5', '00000000-0000-0000-0000-0000000000a3',
    'Math', 'Can you help me with fractions and percentages? I have a quiz next week.', 'accepted', now() - interval '2 days', now() - interval '1 day', null),

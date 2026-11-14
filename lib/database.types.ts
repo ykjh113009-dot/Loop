@@ -2411,14 +2411,14 @@ isOneToOne: false
                   ]
                 },"rewards": {
                   Row: {
-                    "active": boolean,"cost": number,"created_at": string,"created_by": string | null,"description": string,"id": string,"kind": string,"name": string,"per_student_limit": number,"school_id": string,"stock": number | null,"unlock_key": string | null
+                    "active": boolean,"cost": number,"created_at": string,"created_by": string | null,"description": string,"id": string,"image_path": string | null,"kind": string,"name": string,"per_student_limit": number,"school_id": string,"stock": number | null,"unlock_key": string | null
                   }
                   ComputedFields: never
                   Insert: {
-                    "active"?: boolean,"cost": number,"created_at"?: string,"created_by"?: string | null,"description"?: string,"id"?: string,"kind": string,"name": string,"per_student_limit"?: number,"school_id": string,"stock"?: number | null,"unlock_key"?: string | null
+                    "active"?: boolean,"cost": number,"created_at"?: string,"created_by"?: string | null,"description"?: string,"id"?: string,"image_path"?: string | null,"kind": string,"name": string,"per_student_limit"?: number,"school_id": string,"stock"?: number | null,"unlock_key"?: string | null
                   }
                   Update: {
-                    "active"?: boolean,"cost"?: number,"created_at"?: string,"created_by"?: string | null,"description"?: string,"id"?: string,"kind"?: string,"name"?: string,"per_student_limit"?: number,"school_id"?: string,"stock"?: number | null,"unlock_key"?: string | null
+                    "active"?: boolean,"cost"?: number,"created_at"?: string,"created_by"?: string | null,"description"?: string,"id"?: string,"image_path"?: string | null,"kind"?: string,"name"?: string,"per_student_limit"?: number,"school_id"?: string,"stock"?: number | null,"unlock_key"?: string | null
                   }
                   Relationships: [
                     {
@@ -2521,6 +2521,84 @@ isOneToOne: false
       referencedColumns: ["id"]
     },{
       foreignKeyName: "study_buddy_posts_school_id_fkey"
+      columns: ["school_id"]
+isOneToOne: false
+      referencedRelation: "schools"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"study_categories": {
+                  Row: {
+                    "created_at": string,"emoji": string,"id": string,"name": string,"school_id": string,"slug": string,"sort": number
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"emoji"?: string,"id"?: string,"name": string,"school_id": string,"slug": string,"sort"?: number
+                  }
+                  Update: {
+                    "created_at"?: string,"emoji"?: string,"id"?: string,"name"?: string,"school_id"?: string,"slug"?: string,"sort"?: number
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "study_categories_school_id_fkey"
+      columns: ["school_id"]
+isOneToOne: false
+      referencedRelation: "schools"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"study_opportunities": {
+                  Row: {
+                    "category": string,"created_at": string,"created_by": string | null,"deadline": string | null,"description": string,"documents": NonNullable<Json>,"eligibility": string,"extra_info": string,"id": string,"instructions": string,"is_sample": boolean,"link": string | null,"organization": string,"school_id": string,"status": string,"title": string,"updated_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "category": string,"created_at"?: string,"created_by"?: string | null,"deadline"?: string | null,"description"?: string,"documents"?: NonNullable<Json>,"eligibility"?: string,"extra_info"?: string,"id"?: string,"instructions"?: string,"is_sample"?: boolean,"link"?: string | null,"organization"?: string,"school_id": string,"status"?: string,"title": string,"updated_at"?: string
+                  }
+                  Update: {
+                    "category"?: string,"created_at"?: string,"created_by"?: string | null,"deadline"?: string | null,"description"?: string,"documents"?: NonNullable<Json>,"eligibility"?: string,"extra_info"?: string,"id"?: string,"instructions"?: string,"is_sample"?: boolean,"link"?: string | null,"organization"?: string,"school_id"?: string,"status"?: string,"title"?: string,"updated_at"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "study_opportunities_created_by_fkey"
+      columns: ["created_by"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "study_opportunities_school_id_fkey"
+      columns: ["school_id"]
+isOneToOne: false
+      referencedRelation: "schools"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"study_resources": {
+                  Row: {
+                    "added_by": string | null,"category_id": string,"created_at": string,"description": string,"id": string,"kind": string,"school_id": string,"title": string,"url": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "added_by"?: string | null,"category_id": string,"created_at"?: string,"description"?: string,"id"?: string,"kind"?: string,"school_id": string,"title": string,"url": string
+                  }
+                  Update: {
+                    "added_by"?: string | null,"category_id"?: string,"created_at"?: string,"description"?: string,"id"?: string,"kind"?: string,"school_id"?: string,"title"?: string,"url"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "study_resources_added_by_fkey"
+      columns: ["added_by"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "study_resources_category_id_fkey"
+      columns: ["category_id"]
+isOneToOne: false
+      referencedRelation: "study_categories"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "study_resources_school_id_fkey"
       columns: ["school_id"]
 isOneToOne: false
       referencedRelation: "schools"
@@ -2687,19 +2765,161 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
-                },"tutor_profiles": {
+                },"top10_prizes": {
                   Row: {
-                    "about": string,"active": boolean,"availability": string,"created_at": string,"profile_id": string,"school_id": string,"subjects": (string)[]
+                    "description": string,"place": number,"school_id": string,"title": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "about"?: string,"active"?: boolean,"availability"?: string,"created_at"?: string,"profile_id": string,"school_id": string,"subjects": (string)[]
+                    "description"?: string,"place": number,"school_id": string,"title": string
                   }
                   Update: {
-                    "about"?: string,"active"?: boolean,"availability"?: string,"created_at"?: string,"profile_id"?: string,"school_id"?: string,"subjects"?: (string)[]
+                    "description"?: string,"place"?: number,"school_id"?: string,"title"?: string
                   }
                   Relationships: [
                     {
+      foreignKeyName: "top10_prizes_school_id_fkey"
+      columns: ["school_id"]
+isOneToOne: false
+      referencedRelation: "schools"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"top10_settings": {
+                  Row: {
+                    "period": string,"rules": string,"school_id": string,"updated_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "period"?: string,"rules"?: string,"school_id": string,"updated_at"?: string
+                  }
+                  Update: {
+                    "period"?: string,"rules"?: string,"school_id"?: string,"updated_at"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "top10_settings_school_id_fkey"
+      columns: ["school_id"]
+isOneToOne: true
+      referencedRelation: "schools"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"tutor_application_documents": {
+                  Row: {
+                    "application_id": string,"created_at": string,"id": string,"kind": string,"name": string,"path": string,"profile_id": string,"school_id": string,"size": number
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "application_id": string,"created_at"?: string,"id"?: string,"kind": string,"name": string,"path": string,"profile_id": string,"school_id": string,"size": number
+                  }
+                  Update: {
+                    "application_id"?: string,"created_at"?: string,"id"?: string,"kind"?: string,"name"?: string,"path"?: string,"profile_id"?: string,"school_id"?: string,"size"?: number
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "tutor_application_documents_application_id_fkey"
+      columns: ["application_id"]
+isOneToOne: false
+      referencedRelation: "tutor_applications"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "tutor_application_documents_profile_id_fkey"
+      columns: ["profile_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "tutor_application_documents_school_id_fkey"
+      columns: ["school_id"]
+isOneToOne: false
+      referencedRelation: "schools"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"tutor_application_events": {
+                  Row: {
+                    "action": string,"actor_id": string | null,"application_id": string,"created_at": string,"from_status": string | null,"id": number,"note": string,"school_id": string,"to_status": string | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "action": string,"actor_id"?: string | null,"application_id": string,"created_at"?: string,"from_status"?: string | null,"id"?: never,"note"?: string,"school_id": string,"to_status"?: string | null
+                  }
+                  Update: {
+                    "action"?: string,"actor_id"?: string | null,"application_id"?: string,"created_at"?: string,"from_status"?: string | null,"id"?: never,"note"?: string,"school_id"?: string,"to_status"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "tutor_application_events_actor_id_fkey"
+      columns: ["actor_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "tutor_application_events_application_id_fkey"
+      columns: ["application_id"]
+isOneToOne: false
+      referencedRelation: "tutor_applications"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "tutor_application_events_school_id_fkey"
+      columns: ["school_id"]
+isOneToOne: false
+      referencedRelation: "schools"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"tutor_applications": {
+                  Row: {
+                    "achievements": string,"availability_notes": string,"created_at": string,"days": (string)[],"experience": string,"format": string,"grade": string,"hours": string,"id": string,"intro": string,"motivation": string,"other_subjects": string,"photo_path": string | null,"preferred_times": string,"profile_id": string,"qualifications": string,"review_note": string | null,"reviewed_at": string | null,"reviewed_by": string | null,"school_id": string,"status": string,"subjects": (string)[],"submitted_at": string | null,"topics": string,"updated_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "achievements"?: string,"availability_notes"?: string,"created_at"?: string,"days"?: (string)[],"experience"?: string,"format"?: string,"grade"?: string,"hours"?: string,"id"?: string,"intro"?: string,"motivation"?: string,"other_subjects"?: string,"photo_path"?: string | null,"preferred_times"?: string,"profile_id": string,"qualifications"?: string,"review_note"?: string | null,"reviewed_at"?: string | null,"reviewed_by"?: string | null,"school_id": string,"status"?: string,"subjects"?: (string)[],"submitted_at"?: string | null,"topics"?: string,"updated_at"?: string
+                  }
+                  Update: {
+                    "achievements"?: string,"availability_notes"?: string,"created_at"?: string,"days"?: (string)[],"experience"?: string,"format"?: string,"grade"?: string,"hours"?: string,"id"?: string,"intro"?: string,"motivation"?: string,"other_subjects"?: string,"photo_path"?: string | null,"preferred_times"?: string,"profile_id"?: string,"qualifications"?: string,"review_note"?: string | null,"reviewed_at"?: string | null,"reviewed_by"?: string | null,"school_id"?: string,"status"?: string,"subjects"?: (string)[],"submitted_at"?: string | null,"topics"?: string,"updated_at"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "tutor_applications_profile_id_fkey"
+      columns: ["profile_id"]
+isOneToOne: true
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "tutor_applications_reviewed_by_fkey"
+      columns: ["reviewed_by"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "tutor_applications_school_id_fkey"
+      columns: ["school_id"]
+isOneToOne: false
+      referencedRelation: "schools"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"tutor_profiles": {
+                  Row: {
+                    "about": string,"active": boolean,"application_id": string | null,"approved_at": string | null,"availability": string,"created_at": string,"days": (string)[],"experience": string,"format": string,"hours": string,"photo_path": string | null,"preferred_times": string,"profile_id": string,"qualifications": string,"school_id": string,"subjects": (string)[]
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "about"?: string,"active"?: boolean,"application_id"?: string | null,"approved_at"?: string | null,"availability"?: string,"created_at"?: string,"days"?: (string)[],"experience"?: string,"format"?: string,"hours"?: string,"photo_path"?: string | null,"preferred_times"?: string,"profile_id": string,"qualifications"?: string,"school_id": string,"subjects": (string)[]
+                  }
+                  Update: {
+                    "about"?: string,"active"?: boolean,"application_id"?: string | null,"approved_at"?: string | null,"availability"?: string,"created_at"?: string,"days"?: (string)[],"experience"?: string,"format"?: string,"hours"?: string,"photo_path"?: string | null,"preferred_times"?: string,"profile_id"?: string,"qualifications"?: string,"school_id"?: string,"subjects"?: (string)[]
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "tutor_profiles_application_fk"
+      columns: ["application_id"]
+isOneToOne: false
+      referencedRelation: "tutor_applications"
+      referencedColumns: ["id"]
+    },{
       foreignKeyName: "tutor_profiles_profile_id_fkey"
       columns: ["profile_id"]
 isOneToOne: true
@@ -2871,6 +3091,15 @@ isOneToOne: false
 "add_group_members":
 { Args: { "p_conversation": string,"p_members": (string)[] }; Returns: number
                            },
+"add_study_category":
+{ Args: { "p_emoji": string,"p_name": string }; Returns: string
+                           },
+"add_study_resource":
+{ Args: { "p": Json,"p_category": string }; Returns: string
+                           },
+"add_tutor_document":
+{ Args: { "p_kind": string,"p_name": string,"p_path": string,"p_size": number }; Returns: string
+                           },
 "admin_set_alumni":
 { Args: { "p_user": string,"p_year": number }; Returns: undefined
                            },
@@ -2910,6 +3139,9 @@ isOneToOne: false
 "award_points":
 { Args: { "p_at"?: string,"p_points": number,"p_profile": string,"p_reason": string,"p_source": string }; Returns: undefined
                            },
+"can_add_resources":
+{ Args: Record<PropertyKey, never>; Returns: boolean
+                           },
 "can_create_official_group":
 { Args: Record<PropertyKey, never>; Returns: boolean
                            },
@@ -2934,6 +3166,9 @@ isOneToOne: false
 "can_manage_points":
 { Args: Record<PropertyKey, never>; Returns: boolean
                            },
+"can_manage_study_opportunities":
+{ Args: Record<PropertyKey, never>; Returns: boolean
+                           },
 "can_post_council":
 { Args: Record<PropertyKey, never>; Returns: boolean
                            },
@@ -2942,6 +3177,9 @@ isOneToOne: false
                            },
 "can_review_challenge":
 { Args: { "p_challenge": string }; Returns: boolean
+                           },
+"can_review_tutors":
+{ Args: Record<PropertyKey, never>; Returns: boolean
                            },
 "can_see_group_posts":
 { Args: { "p_group": string }; Returns: boolean
@@ -3044,6 +3282,9 @@ isOneToOne: false
                            },
 "delete_my_account":
 { Args: { "p_confirm": string }; Returns: undefined
+                           },
+"delete_study_opportunity":
+{ Args: { "p_id": string }; Returns: undefined
                            },
 "election_summary":
 { Args: { "p_election": string }; Returns: Json
@@ -3293,6 +3534,12 @@ isOneToOne: false
 "remove_leadership_role":
 { Args: { "p_role": string }; Returns: undefined
                            },
+"remove_study_resource":
+{ Args: { "p_id": string }; Returns: undefined
+                           },
+"remove_tutor_document":
+{ Args: { "p_id": string }; Returns: undefined
+                           },
 "reply_council_message":
 { Args: { "p_close"?: boolean,"p_id": string,"p_reply": string }; Returns: undefined
                            },
@@ -3350,6 +3597,9 @@ isOneToOne: false
 "review_point_claim":
 { Args: { "p_approve": boolean,"p_claim": string,"p_note": string,"p_points": number }; Returns: undefined
                            },
+"review_tutor_application":
+{ Args: { "p_app": string,"p_approve": boolean,"p_note": string }; Returns: undefined
+                           },
 "review_volunteer":
 { Args: { "p_approve": boolean,"p_entry": string,"p_note": string }; Returns: undefined
                            },
@@ -3361,6 +3611,12 @@ isOneToOne: false
                            },
 "save_challenge":
 { Args: { "p": Json,"p_id": string,"p_submit": boolean }; Returns: string
+                           },
+"save_study_opportunity":
+{ Args: { "p": Json,"p_id": string }; Returns: string
+                           },
+"save_tutor_application":
+{ Args: { "p": Json,"p_submit": boolean }; Returns: string
                            },
 "school_has_counselor":
 { Args: Record<PropertyKey, never>; Returns: boolean
@@ -3410,6 +3666,15 @@ isOneToOne: false
 "set_task_status":
 { Args: { "p_status": string,"p_task": string }; Returns: undefined
                            },
+"set_top10_prize":
+{ Args: { "p_description": string,"p_place": number,"p_title": string }; Returns: undefined
+                           },
+"set_top10_settings":
+{ Args: { "p_period": string,"p_rules": string }; Returns: undefined
+                           },
+"split_subjects":
+{ Args: { "p": string }; Returns: (string)[]
+                           },
 "start_counselor_request":
 { Args: { "p_message": string,"p_topic": string,"p_urgent": boolean }; Returns: string
                            },
@@ -3430,6 +3695,12 @@ isOneToOne: false
               "posts": number,"tag": string
             }[]
                            },
+"tutor_doc_uploader":
+{ Args: { "p_name": string }; Returns: boolean
+                           },
+"tutor_doc_viewer":
+{ Args: { "p_name": string }; Returns: boolean
+                           },
 "unfriend":
 { Args: { "p_other": string }; Returns: undefined
                            },
@@ -3444,6 +3715,9 @@ isOneToOne: false
                            },
 "update_group":
 { Args: { "p_description": string,"p_emoji": string,"p_group": string,"p_name": string,"p_privacy": string }; Returns: undefined
+                           },
+"update_tutor_profile":
+{ Args: { "p": Json }; Returns: undefined
                            },
 "volunteer_history":
 { Args: { "p_profile": string }; Returns: {
@@ -3467,6 +3741,9 @@ isOneToOne: false
                            },
 "withdraw_club_application":
 { Args: { "p_application": string }; Returns: undefined
+                           },
+"withdraw_tutor_application":
+{ Args: Record<PropertyKey, never>; Returns: undefined
                            },
 "xp_for_level":
 { Args: { "p_level": number }; Returns: number
