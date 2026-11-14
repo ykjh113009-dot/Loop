@@ -39,3 +39,7 @@ All pass: 274 database checks and 244 browser checks.
 Bugs found and fixed while testing:
 - **Club pages showed "No posts yet"** since Phase 2. Adding reactions made the club's post query ambiguous, so it returned nothing. Fixed.
 - A database job could not change a class letter because the new class-lock rule also applied to it. Fixed.
+
+## Challenges
+
+`supabase/tests/challenges.sql` (run by `npm run db:test`) checks permissions, the review workflow, audience and limits, proof privacy, duplicate points, reversals, ranked prizes, reports and the audit trail. `tests/e2e/challenges.js` walks the whole flow in a browser: create, review, join, send a photo, check, points, phone widths. It needs `tests/e2e/proof.png` next to it and the local school set to Google-only for the login suite.

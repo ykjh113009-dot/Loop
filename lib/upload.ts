@@ -15,3 +15,32 @@ export async function uploadPhoto(file: File, schoolId: string, userId: string):
     return { error: "That photo can't be used. Try a different one." };
   }
 }
+
+// Proof for a challenge goes into a private folder: "<school>/<challenge>/<student>/<file>".
+const VIDEO_TYPES = ["video/mp4", "video/webm", "video/quicktime"];
+export const MAX_VIDEO_MB = 25;
+
+export async function uploadProof(
+  file: File,
+  kind: "photo" | "video",
+  ids: { schoolId: string; challengeId: string; userId: string },
+): Promise<{ path?: string; error?: string }> {
+  try {
+    let blob: Blob = file;
+    let ext = "jpg";
+    if (kind === "photo") {
+      blob = await compressImage(file);
+      ext = blob.type === "image/webp" ? "webp" : "jpg";
+    } else {
+      if (!VIDEO_TYPES.includes(file.type)) return { error: "Use an MP4, WebM or MOV video." };
+      if (file.size > MAX_VIDEO_MB * 1024 * 1024) return { error: `Keep the video under ${MAX_VIDEO_MB} MB.` };
+      ext = file.type === "video/webm" ? "webm" : file.type === "video/quicktime" ? "mov" : "mp4";
+    }
+    const path = `${ids.schoolId}/${ids.challengeId}/${ids.userId}/${crypto.randomUUID()}.${ext}`;
+    const { error } = await createClient().storage.from("challenge-proof").upload(path, blob, { contentType: blob.type });
+    if (error) return { error: "The file didn't upload. Check your connection and try again." };
+    return { path };
+  } catch {
+    return { error: "That file can't be used. Try a different one." };
+  }
+}

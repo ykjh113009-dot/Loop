@@ -91,7 +91,7 @@ async function Points() {
       <section>
         <h2 className="section-title">{t("How to earn points")}</h2>
         <ul className="card divide-y divide-black/5 text-sm">
-          {[["Weekly challenge", "15–30"], ["Tutor a classmate", "15"], ["Volunteering", "10 per hour"]].map(([what, pts]) => (
+          {[["Challenges", "set by each challenge"], ["Tutor a classmate", "15"], ["Volunteering", "10 per hour"]].map(([what, pts]) => (
             <li key={what} className="flex justify-between px-4 py-2"><span>{t(what)}</span><span className="font-semibold tabular-nums text-brand-700">+{pts}</span></li>
           ))}
           {auto.map((r) => (

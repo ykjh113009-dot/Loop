@@ -3,8 +3,7 @@ import Link from "next/link";
 import { requireMe } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { formatDateTime, formatShortDate, timeAgo } from "@/lib/time";
-import { moderateReport, reviewChallenge, reviewClub, reviewEvent, reviewHours, suspendStudent } from "@/app/actions/moderation";
-import { signImages } from "@/lib/images";
+import { moderateReport, reviewClub, reviewEvent, reviewHours, suspendStudent } from "@/app/actions/moderation";
 import { ActionForm } from "@/components/action-form";
 import { Avatar } from "@/components/avatar";
 import { Empty } from "@/components/empty";
@@ -184,8 +183,8 @@ async function Approvals() {
       .order("starts_at"),
     supabase
       .from("challenge_submissions")
-      .select("id, note, image_path, created_at, challenge:challenges(title, emoji, points), student:profiles!challenge_submissions_profile_id_fkey(id, full_name, grade)")
-      .eq("status", "pending")
+      .select("id, created_at, challenge:challenges(id, title, emoji), student:profiles!challenge_submissions_profile_id_fkey(id, full_name, grade)")
+      .in("status", ["submitted", "pending"])
       .order("created_at"),
     supabase
       .from("volunteer_entries")
@@ -196,7 +195,6 @@ async function Approvals() {
   if (!clubs?.length && !events?.length && !submissions?.length && !hours?.length) {
     return <Empty emoji="✅" title="Nothing waiting for approval" />;
   }
-  const photos = await signImages(supabase, (submissions ?? []).map((x) => x.image_path));
 
   return (
     <div className="space-y-6">
@@ -234,19 +232,17 @@ async function Approvals() {
       {!!submissions?.length && (
         <section className="space-y-3">
           <h2 className="section-title">Challenge entries</h2>
-          {submissions.map((x) => (
-            <article key={x.id} className="card space-y-2 p-4">
-              <p className="text-sm">
-                <strong>{x.student?.full_name}</strong> <span className="text-black/45">(grade {x.student?.grade}) · {x.challenge?.emoji} {x.challenge?.title} · +{x.challenge?.points}</span>
-              </p>
-              <p className="text-sm whitespace-pre-wrap text-black/75">{x.note}</p>
-              {x.image_path && photos.get(x.image_path) && (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={photos.get(x.image_path)!} alt="" loading="lazy" className="max-h-56 rounded-xl object-cover" />
-              )}
-              <ReviewButtons action={reviewChallenge} idName="id" id={x.id} />
-            </article>
-          ))}
+          <ul className="card divide-y divide-black/5 text-sm">
+            {submissions.map((x) => (
+              <li key={x.id}>
+                <Link href={`/challenges/${x.challenge?.id}/manage`} className="flex items-center gap-2 px-4 py-3 hover:bg-black/[0.02]">
+                  <span>{x.challenge?.emoji}</span>
+                  <span className="min-w-0 flex-1"><strong>{x.student?.full_name}</strong> <span className="text-black/45">(grade {x.student?.grade}) · {x.challenge?.title}</span></span>
+                  <span className="text-xs text-black/45">{timeAgo(x.created_at)}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
         </section>
       )}
       {!!hours?.length && (

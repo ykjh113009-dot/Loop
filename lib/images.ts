@@ -10,3 +10,12 @@ export async function signImages(supabase: Supabase, paths: (string | null)[]) {
   const { data } = await supabase.storage.from("post-images").createSignedUrls(unique, 3600);
   return new Map((data ?? []).filter((d) => d.signedUrl && d.path).map((d) => [d.path!, d.signedUrl]));
 }
+
+// Challenge proof is private: only the student and the people who check the challenge can open it.
+// The database decides who gets a link, so this only returns links for files the signed-in person may read.
+export async function signProof(supabase: Supabase, paths: (string | null)[]) {
+  const unique = [...new Set(paths.filter((p): p is string => !!p))];
+  if (unique.length === 0) return new Map<string, string>();
+  const { data } = await supabase.storage.from("challenge-proof").createSignedUrls(unique, 3600);
+  return new Map((data ?? []).filter((d) => d.signedUrl && d.path).map((d) => [d.path!, d.signedUrl]));
+}

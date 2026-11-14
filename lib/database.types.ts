@@ -175,16 +175,150 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
-                },"challenge_submissions": {
+                },"challenge_participants": {
                   Row: {
-                    "challenge_id": string,"created_at": string,"id": string,"image_path": string | null,"note": string,"profile_id": string,"review_note": string | null,"reviewed_at": string | null,"reviewed_by": string | null,"school_id": string,"status": string
+                    "challenge_id": string,"joined_at": string,"profile_id": string,"school_id": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "challenge_id": string,"created_at"?: string,"id"?: string,"image_path"?: string | null,"note": string,"profile_id": string,"review_note"?: string | null,"reviewed_at"?: string | null,"reviewed_by"?: string | null,"school_id": string,"status"?: string
+                    "challenge_id": string,"joined_at"?: string,"profile_id": string,"school_id": string
                   }
                   Update: {
-                    "challenge_id"?: string,"created_at"?: string,"id"?: string,"image_path"?: string | null,"note"?: string,"profile_id"?: string,"review_note"?: string | null,"reviewed_at"?: string | null,"reviewed_by"?: string | null,"school_id"?: string,"status"?: string
+                    "challenge_id"?: string,"joined_at"?: string,"profile_id"?: string,"school_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "challenge_participants_challenge_id_fkey"
+      columns: ["challenge_id"]
+isOneToOne: false
+      referencedRelation: "challenges"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "challenge_participants_profile_id_fkey"
+      columns: ["profile_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "challenge_participants_school_id_fkey"
+      columns: ["school_id"]
+isOneToOne: false
+      referencedRelation: "schools"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"challenge_point_log": {
+                  Row: {
+                    "by_id": string | null,"challenge_id": string,"created_at": string,"id": number,"kind": string,"points": number,"profile_id": string,"school_id": string,"submission_id": string | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "by_id"?: string | null,"challenge_id": string,"created_at"?: string,"id"?: never,"kind": string,"points": number,"profile_id": string,"school_id": string,"submission_id"?: string | null
+                  }
+                  Update: {
+                    "by_id"?: string | null,"challenge_id"?: string,"created_at"?: string,"id"?: never,"kind"?: string,"points"?: number,"profile_id"?: string,"school_id"?: string,"submission_id"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "challenge_point_log_by_id_fkey"
+      columns: ["by_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "challenge_point_log_challenge_id_fkey"
+      columns: ["challenge_id"]
+isOneToOne: false
+      referencedRelation: "challenges"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "challenge_point_log_profile_id_fkey"
+      columns: ["profile_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "challenge_point_log_school_id_fkey"
+      columns: ["school_id"]
+isOneToOne: false
+      referencedRelation: "schools"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "challenge_point_log_submission_id_fkey"
+      columns: ["submission_id"]
+isOneToOne: false
+      referencedRelation: "challenge_submissions"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"challenge_prizes": {
+                  Row: {
+                    "challenge_id": string,"place": number,"points": number
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "challenge_id": string,"place": number,"points": number
+                  }
+                  Update: {
+                    "challenge_id"?: string,"place"?: number,"points"?: number
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "challenge_prizes_challenge_id_fkey"
+      columns: ["challenge_id"]
+isOneToOne: false
+      referencedRelation: "challenges"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"challenge_reviews": {
+                  Row: {
+                    "action": string,"actor_id": string | null,"challenge_id": string,"created_at": string,"id": number,"note": string,"school_id": string,"subject": string,"submission_id": string | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "action": string,"actor_id"?: string | null,"challenge_id": string,"created_at"?: string,"id"?: never,"note"?: string,"school_id": string,"subject": string,"submission_id"?: string | null
+                  }
+                  Update: {
+                    "action"?: string,"actor_id"?: string | null,"challenge_id"?: string,"created_at"?: string,"id"?: never,"note"?: string,"school_id"?: string,"subject"?: string,"submission_id"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "challenge_reviews_actor_id_fkey"
+      columns: ["actor_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "challenge_reviews_challenge_id_fkey"
+      columns: ["challenge_id"]
+isOneToOne: false
+      referencedRelation: "challenges"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "challenge_reviews_school_id_fkey"
+      columns: ["school_id"]
+isOneToOne: false
+      referencedRelation: "schools"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "challenge_reviews_submission_id_fkey"
+      columns: ["submission_id"]
+isOneToOne: false
+      referencedRelation: "challenge_submissions"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"challenge_submissions": {
+                  Row: {
+                    "answers": (string)[],"attempt": number,"challenge_id": string,"claimed_by": string | null,"created_at": string,"id": string,"image_path": string | null,"ledger_source": string | null,"note": string,"overridden": boolean,"placement": number | null,"points_awarded": number | null,"profile_id": string,"review_note": string | null,"reviewed_at": string | null,"reviewed_by": string | null,"school_id": string,"status": string,"video_path": string | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "answers"?: (string)[],"attempt"?: number,"challenge_id": string,"claimed_by"?: string | null,"created_at"?: string,"id"?: string,"image_path"?: string | null,"ledger_source"?: string | null,"note"?: string,"overridden"?: boolean,"placement"?: number | null,"points_awarded"?: number | null,"profile_id": string,"review_note"?: string | null,"reviewed_at"?: string | null,"reviewed_by"?: string | null,"school_id": string,"status"?: string,"video_path"?: string | null
+                  }
+                  Update: {
+                    "answers"?: (string)[],"attempt"?: number,"challenge_id"?: string,"claimed_by"?: string | null,"created_at"?: string,"id"?: string,"image_path"?: string | null,"ledger_source"?: string | null,"note"?: string,"overridden"?: boolean,"placement"?: number | null,"points_awarded"?: number | null,"profile_id"?: string,"review_note"?: string | null,"reviewed_at"?: string | null,"reviewed_by"?: string | null,"school_id"?: string,"status"?: string,"video_path"?: string | null
                   }
                   Relationships: [
                     {
@@ -192,6 +326,12 @@ isOneToOne: false
       columns: ["challenge_id"]
 isOneToOne: false
       referencedRelation: "challenges"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "challenge_submissions_claimed_by_fkey"
+      columns: ["claimed_by"]
+isOneToOne: false
+      referencedRelation: "profiles"
       referencedColumns: ["id"]
     },{
       foreignKeyName: "challenge_submissions_profile_id_fkey"
@@ -215,19 +355,25 @@ isOneToOne: false
                   ]
                 },"challenges": {
                   Row: {
-                    "created_at": string,"created_by": string | null,"description": string,"emoji": string,"ends_at": string,"id": string,"points": number,"school_id": string,"starts_at": string,"title": string
+                    "attempts_per_student": number,"audience": string,"audience_grade": number | null,"audience_section": string | null,"category": string,"cover_path": string | null,"created_at": string,"created_by": string | null,"description": string,"emoji": string,"ends_at": string,"id": string,"instructions": string,"kind": string,"max_participants": number | null,"points": number,"proof_kinds": (string)[],"questions": (string)[],"ranked_at": string | null,"review_note": string | null,"reviewed_at": string | null,"reviewed_by": string | null,"reward_mode": string,"rewards_per_student": number,"rules": string,"safety_confirmed": boolean,"school_id": string,"starts_at": string,"status": string,"submitted_at": string | null,"title": string,"updated_at": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "created_at"?: string,"created_by"?: string | null,"description"?: string,"emoji"?: string,"ends_at": string,"id"?: string,"points"?: number,"school_id": string,"starts_at": string,"title": string
+                    "attempts_per_student"?: number,"audience"?: string,"audience_grade"?: number | null,"audience_section"?: string | null,"category"?: string,"cover_path"?: string | null,"created_at"?: string,"created_by"?: string | null,"description"?: string,"emoji"?: string,"ends_at": string,"id"?: string,"instructions"?: string,"kind"?: string,"max_participants"?: number | null,"points"?: number,"proof_kinds"?: (string)[],"questions"?: (string)[],"ranked_at"?: string | null,"review_note"?: string | null,"reviewed_at"?: string | null,"reviewed_by"?: string | null,"reward_mode"?: string,"rewards_per_student"?: number,"rules"?: string,"safety_confirmed"?: boolean,"school_id": string,"starts_at": string,"status"?: string,"submitted_at"?: string | null,"title": string,"updated_at"?: string
                   }
                   Update: {
-                    "created_at"?: string,"created_by"?: string | null,"description"?: string,"emoji"?: string,"ends_at"?: string,"id"?: string,"points"?: number,"school_id"?: string,"starts_at"?: string,"title"?: string
+                    "attempts_per_student"?: number,"audience"?: string,"audience_grade"?: number | null,"audience_section"?: string | null,"category"?: string,"cover_path"?: string | null,"created_at"?: string,"created_by"?: string | null,"description"?: string,"emoji"?: string,"ends_at"?: string,"id"?: string,"instructions"?: string,"kind"?: string,"max_participants"?: number | null,"points"?: number,"proof_kinds"?: (string)[],"questions"?: (string)[],"ranked_at"?: string | null,"review_note"?: string | null,"reviewed_at"?: string | null,"reviewed_by"?: string | null,"reward_mode"?: string,"rewards_per_student"?: number,"rules"?: string,"safety_confirmed"?: boolean,"school_id"?: string,"starts_at"?: string,"status"?: string,"submitted_at"?: string | null,"title"?: string,"updated_at"?: string
                   }
                   Relationships: [
                     {
       foreignKeyName: "challenges_created_by_fkey"
       columns: ["created_by"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "challenges_reviewed_by_fkey"
+      columns: ["reviewed_by"]
 isOneToOne: false
       referencedRelation: "profiles"
       referencedColumns: ["id"]
@@ -2481,6 +2627,9 @@ isOneToOne: false
 "can_create_official_group":
 { Args: Record<PropertyKey, never>; Returns: boolean
                            },
+"can_govern_challenges":
+{ Args: Record<PropertyKey, never>; Returns: boolean
+                           },
 "can_manage_account":
 { Args: { "p_user": string }; Returns: boolean
                            },
@@ -2493,8 +2642,14 @@ isOneToOne: false
 "can_manage_points":
 { Args: Record<PropertyKey, never>; Returns: boolean
                            },
+"can_review_challenge":
+{ Args: { "p_challenge": string }; Returns: boolean
+                           },
 "can_see_group_posts":
 { Args: { "p_group": string }; Returns: boolean
+                           },
+"cancel_challenge":
+{ Args: { "p_challenge": string,"p_note": string }; Returns: undefined
                            },
 "cancel_event":
 { Args: { "p_event": string,"p_reason": string }; Returns: undefined
@@ -2505,8 +2660,33 @@ isOneToOne: false
 "challenge_completions":
 { Args: { "p_challenge": string }; Returns: number
                            },
+"challenge_counts":
+{ Args: { "p_ids": (string)[] }; Returns: {
+              "approved": number,"challenge_id": string,"participants": number
+            }[]
+                           },
+"challenge_flags":
+{ Args: Record<PropertyKey, never>; Returns: {
+              "detail": string,"full_name": string,"kind": string,"n": number,"profile_id": string
+            }[]
+                           },
+"challenge_in_audience":
+{ Args: { "p_audience": string,"p_grade": number,"p_section": string }; Returns: boolean
+                           },
+"challenge_proof_uploader":
+{ Args: { "p_name": string }; Returns: boolean
+                           },
+"challenge_proof_viewer":
+{ Args: { "p_name": string }; Returns: boolean
+                           },
+"challenge_stats":
+{ Args: { "p_challenge": string }; Returns: Json
+                           },
 "check_rate":
 { Args: { "p_action": string,"p_max": number,"p_seconds": number }; Returns: undefined
+                           },
+"claim_challenge_submission":
+{ Args: { "p_id": string }; Returns: undefined
                            },
 "claim_points":
 { Args: { "p_description": string,"p_reason": string }; Returns: string
@@ -2548,6 +2728,9 @@ isOneToOne: false
                            },
 "deactivate_my_account":
 { Args: Record<PropertyKey, never>; Returns: undefined
+                           },
+"delete_challenge_draft":
+{ Args: { "p_id": string }; Returns: undefined
                            },
 "delete_my_account":
 { Args: { "p_confirm": string }; Returns: undefined
@@ -2655,6 +2838,9 @@ isOneToOne: false
 "is_super_admin":
 { Args: Record<PropertyKey, never>; Returns: boolean
                            },
+"join_challenge":
+{ Args: { "p_challenge": string }; Returns: undefined
+                           },
 "join_group":
 { Args: { "p_group": string }; Returns: string
                            },
@@ -2735,6 +2921,9 @@ isOneToOne: false
 "propose_club_achievement":
 { Args: { "p_club": string,"p_date": string,"p_description": string,"p_title": string }; Returns: string
                            },
+"rank_challenge":
+{ Args: { "p_challenge": string,"p_order": (string)[] }; Returns: undefined
+                           },
 "reactivate_my_account":
 { Args: Record<PropertyKey, never>; Returns: undefined
                            },
@@ -2786,6 +2975,9 @@ isOneToOne: false
 "review_admin_application":
 { Args: { "p_application": string,"p_approve": boolean,"p_note": string,"p_role": string }; Returns: undefined
                            },
+"review_challenge_idea":
+{ Args: { "p_approve": boolean,"p_challenge": string,"p_note": string,"p_safe"?: boolean }; Returns: undefined
+                           },
 "review_challenge_submission":
 { Args: { "p_approve": boolean,"p_note": string,"p_submission": string }; Returns: undefined
                            },
@@ -2812,6 +3004,9 @@ isOneToOne: false
                            },
 "role_rank":
 { Args: { "p_role": string }; Returns: number
+                           },
+"save_challenge":
+{ Args: { "p": Json,"p_id": string,"p_submit": boolean }; Returns: string
                            },
 "school_has_counselor":
 { Args: Record<PropertyKey, never>; Returns: boolean
@@ -2858,6 +3053,9 @@ isOneToOne: false
 "submit_admin_application":
 { Args: { "p_contribution": string,"p_experience": string,"p_motivation": string,"p_position": string,"p_role": string }; Returns: string
                            },
+"submit_challenge":
+{ Args: { "p_answers": (string)[],"p_challenge": string,"p_note": string,"p_photo": string,"p_video": string }; Returns: string
+                           },
 "suspend_user":
 { Args: { "p_days": number,"p_reason": string,"p_user": string }; Returns: undefined
                            },
@@ -2883,6 +3081,12 @@ isOneToOne: false
                            },
 "week_start":
 { Args: Record<PropertyKey, never>; Returns: string
+                           },
+"withdraw_challenge":
+{ Args: { "p_id": string }; Returns: undefined
+                           },
+"withdraw_challenge_submission":
+{ Args: { "p_id": string }; Returns: undefined
                            },
 "withdraw_club_application":
 { Args: { "p_application": string }; Returns: undefined
