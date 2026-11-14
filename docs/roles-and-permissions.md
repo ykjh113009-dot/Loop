@@ -59,3 +59,11 @@ These are extra roles on a student account, and one student can hold several.
 Students ask at `/leadership`; Admins approve or reject; only Super Admins remove a role once given.
 Club leaders and council members are kept in step with the club and council lists automatically.
 The shared Leadership Dashboard is built in Phase 3.
+
+## Phase 3 additions
+
+- **School staff** (leadership role `school_staff`) can check point requests and club achievements, hand over prizes, run competitions and make official groups. They cannot manage accounts.
+- **Student council members** can make official groups and answer suggestions.
+- **Club leaders** manage their own club (applications, team roles, meetings, tasks, budget, resources, achievements). They cannot make other leaders or remove leaders.
+- **Class representatives** announce to their own class and see its summary.
+- Full table: `docs/phase3.md`.

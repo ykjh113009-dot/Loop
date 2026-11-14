@@ -10,7 +10,7 @@ import type { ActionResult } from "@/lib/errors";
 // Photo, cover, class letter, skills, favourite subjects and accent colour.
 export function ExtrasForm(props: {
   schoolId: string; userId: string; locale: Locale;
-  section: string; skills: string[]; subjects: string[]; accent: string;
+  section: string; sectionLocked?: boolean; skills: string[]; subjects: string[]; accent: string;
   hasPhoto: boolean; hasCover: boolean;
 }) {
   const t = makeT(props.locale);
@@ -38,7 +38,7 @@ export function ExtrasForm(props: {
       }
       if (removePhoto && !photo) photoPath = null;
       if (removeCover && !cover) coverPath = null;
-      setResult(await updateProfileExtras({ skills, subjects, section, accent, photoPath, coverPath }));
+      setResult(await updateProfileExtras({ skills, subjects, section: props.sectionLocked ? props.section : section, accent, photoPath, coverPath }));
     });
   }
 
@@ -67,7 +67,8 @@ export function ExtrasForm(props: {
       </div>
       <label className="block">
         <span className="label">{t("Class letter (for example A)")}</span>
-        <input value={section} onChange={(e) => setSection(e.target.value)} maxLength={1} className="input w-24 uppercase" aria-label={t("Class letter (for example A)")} />
+        <input value={section} onChange={(e) => setSection(e.target.value)} maxLength={1} disabled={props.sectionLocked} className="input w-24 uppercase" aria-label={t("Class letter (for example A)")} />
+        {props.sectionLocked && <span className="mt-1 block text-xs text-black/50">{t("Your class decides your house, so only an admin can change it.")}</span>}
       </label>
       <label className="block">
         <span className="label">{t("Skills and talents (separate with commas)")}</span>

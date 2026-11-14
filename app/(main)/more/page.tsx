@@ -20,10 +20,12 @@ const SECTIONS: { title: string; tiles: Tile[] }[] = [
     title: "Get involved",
     tiles: [
       { href: "/challenges", emoji: "🏁", title: "Weekly challenge", text: "Earn points for your grade", studentsOnly: true },
-      { href: "/leaderboard", emoji: "🏆", title: "Grade leaderboard", text: "Which grade is on top?" },
+      { href: "/leaderboard", emoji: "🏆", title: "Leaderboards", text: "Houses, grades and students" },
       { href: "/polls", emoji: "📊", title: "Polls", text: "Have your say" },
       { href: "/volunteering", emoji: "💚", title: "Volunteering hours", text: "Log hours, get a certificate", studentsOnly: true },
       { href: "/market", emoji: "🛍️", title: "Buy, sell & swap", text: "Meet at school, no online payments" },
+      { href: "/groups", emoji: "👥", title: "Groups", text: "Interests, official groups and chats" },
+      { href: "/competitions", emoji: "🏁", title: "Competitions", text: "Teams and houses" },
     ],
   },
   {
@@ -31,8 +33,9 @@ const SECTIONS: { title: string; tiles: Tile[] }[] = [
     tiles: [
       { href: "/council", emoji: "🗳️", title: "Student council", text: "Members and elections" },
       { href: "/suggestions", emoji: "💡", title: "Suggestion box", text: "Ideas to make school better" },
-      { href: "/leadership", emoji: "🎖️", title: "Leadership roles", text: "Class rep, club leader, council" },
-      { href: "/points", emoji: "⭐", title: "My points & badges", text: "Only you can see your points", studentsOnly: true },
+      { href: "/leadership/dashboard", emoji: "🎖️", title: "Leadership", text: "Your roles and tools" },
+      { href: "/points", emoji: "⭐", title: "My points & badges", text: "Level, XP and requests", studentsOnly: true },
+      { href: "/shop", emoji: "🎁", title: "Rewards shop", text: "Spend your points", studentsOnly: true },
     ],
   },
 ];

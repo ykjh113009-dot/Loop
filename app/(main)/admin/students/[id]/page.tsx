@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { requireMe } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { formatDateTime } from "@/lib/time";
+import { setStudentSection } from "@/app/actions/community";
 import { setAlumni, resetAccountMfa, setDeactivated, setRestriction, unsuspendMember, updateMember } from "@/app/actions/admin";
 import { suspendStudent } from "@/app/actions/moderation";
 import { ActionForm } from "@/components/action-form";
@@ -28,7 +29,7 @@ async function Student({ params }: { params: PageProps<"/admin/students/[id]">["
   const [{ data: s }, { data: history }, { data: restrictions }] = await Promise.all([
     supabase
       .from("profiles")
-      .select("id, full_name, avatar, grade, role, is_owner, alumni_year, suspended_until, suspension_reason, deactivated_at, created_at, private:private_profiles(email)")
+      .select("id, full_name, avatar, grade, section, role, is_owner, alumni_year, suspended_until, suspension_reason, deactivated_at, created_at, private:private_profiles(email)")
       .eq("id", id)
       .maybeSingle(),
     supabase.from("moderation_log").select("id, action, details, created_at").eq("target_id", id).order("created_at", { ascending: false }).limit(20),
@@ -86,6 +87,18 @@ async function Student({ params }: { params: PageProps<"/admin/students/[id]">["
           <SubmitButton className="btn-primary w-full">Save</SubmitButton>
         </ActionForm>
       </section>
+
+      {canManage && s.role !== "counselor" && !s.alumni_year && (
+        <section className="card space-y-3 p-4">
+          <h2 className="font-semibold">Class and house</h2>
+          <p className="text-sm text-black/55">The class letter (for example the A in 11A) decides the student&apos;s house. Students cannot change it themselves.</p>
+          <ActionForm action={setStudentSection} className="flex gap-2">
+            <input type="hidden" name="profileId" value={s.id} />
+            <input name="section" defaultValue={s.section ?? ""} maxLength={1} placeholder="A" aria-label="Class letter" className="input w-24 uppercase" />
+            <SubmitButton className="btn-secondary">Save</SubmitButton>
+          </ActionForm>
+        </section>
+      )}
 
       {canManage && s.role !== "counselor" && (
         <section className="card space-y-3 p-4">

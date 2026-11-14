@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import Link from "next/link";
 import { requireMe } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { formatDateTime } from "@/lib/time";
@@ -102,7 +103,7 @@ async function Leadership() {
 export default function LeadershipPage() {
   return (
     <>
-      <PageHeader title="Leadership roles" back="/more" />
+      <PageHeader title="Leadership roles" back="/more" action={<Link href="/leadership/dashboard" className="btn-primary px-3 py-2">Dashboard</Link>} />
       <Suspense fallback={<PageSkeleton />}>
         <Leadership />
       </Suspense>

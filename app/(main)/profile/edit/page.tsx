@@ -38,6 +38,7 @@ async function Edit() {
           userId={me.id}
           locale={locale}
           section={me.section ?? ""}
+          sectionLocked={!!me.section}
           skills={me.skills}
           subjects={me.favorite_subjects}
           accent={me.accent}

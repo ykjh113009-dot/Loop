@@ -23,7 +23,7 @@ async function Settings() {
     supabase.from("blocks").select("blocked:profiles!blocks_blocked_id_fkey(id, full_name, avatar)").eq("blocker_id", me.id),
     supabase.from("private_profiles").select("email").eq("id", me.id).maybeSingle(),
   ]);
-  const s = saved ?? { who_can_message: "everyone", notifications_enabled: true, reduce_motion: false, large_text: false };
+  const s = saved ?? { who_can_message: "everyone", notifications_enabled: true, reduce_motion: false, large_text: false, show_on_leaderboard: true };
   const check = "mt-0.5 size-5 accent-brand-700";
 
   return (
@@ -56,6 +56,10 @@ async function Settings() {
               <option value="friends">{t("Friends only (others send a request first)")}</option>
               <option value="nobody">{t("Nobody new")}</option>
             </select>
+          </label>
+          <label className="flex items-start gap-3 text-sm">
+            <input type="checkbox" name="show_on_leaderboard" defaultChecked={s.show_on_leaderboard} className={check} />
+            <span><strong>{t("Show me on the student leaderboard")}</strong><span className="block text-black/55">{t("Your points always count for your grade and house. This only decides whether your name is listed.")}</span></span>
           </label>
           <p className="text-xs text-black/50">{t("Every student at your school can see your profile. Your email is only visible to you and admins.")}</p>
         </section>

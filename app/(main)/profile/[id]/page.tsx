@@ -33,7 +33,7 @@ async function Profile({ params, searchParams }: { params: PageProps<"/profile/[
   const [
     { data: profile }, { data: interests }, { data: clubs }, { data: block }, { data: badges }, { data: tutor },
     { data: roles }, { count: followers }, { count: following }, { count: friendsA }, { count: friendsB },
-    { data: iFollow }, { data: friendship }, { data: request },
+    { data: iFollow }, { data: friendship }, { data: request }, { data: house }, { data: lvl },
   ] = await Promise.all([
     supabase
       .from("profiles")
@@ -53,6 +53,10 @@ async function Profile({ params, searchParams }: { params: PageProps<"/profile/[
     supabase.from("follows").select("followed_id").eq("follower_id", me.id).eq("followed_id", id).maybeSingle(),
     supabase.from("friendships").select("a_id").eq("a_id", pair[0]).eq("b_id", pair[1]).maybeSingle(),
     supabase.from("friend_requests").select("id, from_id").eq("status", "pending").or(`and(from_id.eq.${me.id},to_id.eq.${id}),and(from_id.eq.${id},to_id.eq.${me.id})`).maybeSingle(),
+    supabase.from("profiles").select("grade, section").eq("id", id).maybeSingle().then(async ({ data: p }) => p?.grade && p.section
+      ? supabase.from("house_classes").select("house:houses(name, emoji)").eq("grade", p.grade).eq("section", p.section).maybeSingle()
+      : { data: null }),
+    id === me.id ? supabase.rpc("my_points") : Promise.resolve({ data: null }),
   ]);
   if (!profile || profile.deactivated_at || !profile.onboarded_at) notFound();
   const isMe = profile.id === me.id;
@@ -93,6 +97,8 @@ async function Profile({ params, searchParams }: { params: PageProps<"/profile/[
           )}
           <div className="mt-2 flex flex-wrap justify-center gap-1.5">
             {ROLE_BADGE[profile.role] && <span className="chip bg-brand-50 text-brand-800">{ROLE_BADGE[profile.role]}</span>}
+            {house?.house && <span className="chip bg-brand-50 text-brand-800" data-testid="house-chip">{house.house.emoji} {house.house.name}</span>}
+            {lvl && <span className="chip bg-amber-50 text-amber-900">⭐ {t("Level {n}", { n: (lvl as unknown as { level: number }).level })}</span>}
             {(roles ?? []).map((r) => (
               <span key={r.id} className="chip bg-brand-50 text-brand-800">{leadershipLabel(r.kind, r.scope, r.club?.name)}</span>
             ))}

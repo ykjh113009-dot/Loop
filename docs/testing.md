@@ -5,8 +5,9 @@
 | `npm run lint` | Code style and common mistakes |
 | `npm run typecheck` | TypeScript types |
 | `npm run build` | Production build |
-| `npm run db:test` | 151 database checks in `supabase/tests/` (roles, 2FA, rate limits, school isolation, feed, friends, chats, accounts). Prints only failures. Runs in transactions that are rolled back. |
+| `npm run db:test` | 274 database checks in `supabase/tests/` (roles, 2FA, rate limits, school isolation, feed, friends, chats, accounts). Prints only failures. Runs in transactions that are rolled back. |
 | `node tests/e2e/phase1.js` | 40 browser checks: admin application, leadership, roles, restrictions, two-step sign-in, phone layout |
+| `node tests/e2e/phase3.js` | 62 browser checks: points, shop, houses, competitions, groups, club management, leadership dashboard, phone and Arabic layouts |
 | `node tests/e2e/phase2.js` | 44 browser checks: feed, polls, comments, friends, settings, message requests, group chat, Arabic, account deletion |
 | `node tests/e2e/login.js` | 39 browser checks: sign-in page, redirects, refused accounts (needs `google_only = true`) |
 | `node tests/e2e/dashboard.js` | 59 browser checks: Home dashboard on desktop and phones |
@@ -30,3 +31,11 @@ Bugs found and fixed while testing:
 - Saving a post failed because the save used an "update" the database does not allow. Now a plain insert.
 - After sending a message request the message box stayed open until the page was refreshed.
 - A deactivated or removed account was bounced to the sign-in page with an error instead of seeing the "account paused" page (this bug existed before Phase 2).
+
+## Phase 3 results (15 Nov 2026)
+
+All pass: 274 database checks and 244 browser checks.
+
+Bugs found and fixed while testing:
+- **Club pages showed "No posts yet"** since Phase 2. Adding reactions made the club's post query ambiguous, so it returned nothing. Fixed.
+- A database job could not change a class letter because the new class-lock rule also applied to it. Fixed.

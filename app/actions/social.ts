@@ -106,6 +106,7 @@ export async function saveSettings(_: ActionResult, formData: FormData): Promise
     locale,
     reduce_motion: reduceMotion,
     large_text: largeText,
+    show_on_leaderboard: formData.get("show_on_leaderboard") === "on",
     updated_at: new Date().toISOString(),
   });
   if (error) return { error: friendlyError(error) };

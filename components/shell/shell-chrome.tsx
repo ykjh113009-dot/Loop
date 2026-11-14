@@ -9,10 +9,10 @@ type NavItem = { href: string; label: string; icon: LineIconName; also?: string[
 
 const SIDEBAR: NavItem[] = [
   { href: "/home", label: "Home", icon: "home" },
-  { href: "/community", label: "Community", icon: "community", also: ["/clubs"] },
+  { href: "/community", label: "Community", icon: "community", also: ["/clubs", "/groups", "/saved", "/friends"] },
   { href: "/messages", label: "Chats", icon: "chat", badge: "messages" },
   { href: "/events", label: "Calendar", icon: "calendar" },
-  { href: "/challenges", label: "Activities", icon: "trophy", also: ["/polls", "/leaderboard"] },
+  { href: "/challenges", label: "Activities", icon: "trophy", also: ["/polls", "/leaderboard", "/competitions", "/points", "/shop"] },
   { href: "/market", label: "Marketplace", icon: "store" },
   { href: "/more", label: "More", icon: "dots", also: ["/tutors", "/tawjihi", "/volunteering", "/council", "/suggestions", "/points", "/counselor", "/people", "/announcements", "/search"] },
 ];
