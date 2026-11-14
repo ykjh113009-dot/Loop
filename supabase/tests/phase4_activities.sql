@@ -70,6 +70,7 @@ select id as football from public.clubs where name = 'Football Team' \gset
 select id as robotics from public.clubs where name = 'Robotics Club' \gset
 
 -- ==== Events: proposing and publishing =====================================================
+select tests.notes('00000000-0000-0000-0000-0000000000a1', 'event_proposal') as proposals_before \gset
 select tests.login(:maya);
 select tests.refused($$insert into public.events (school_id, title, starts_at, created_by) values (public.my_school_id(), 'Direct', now() + interval '1 day', auth.uid())$$,
   'permission denied', 'events cannot be inserted directly');
@@ -82,7 +83,7 @@ select public.create_event(tests.ev('{"title": "Students charity day"}')) as e_p
 select tests.ok((select status from public.events where id = :'e_prop') = 'pending', 'a student proposal waits for approval');
 select tests.ok(tests.chat_members(:'e_prop') = 0, 'a proposal has no chat yet');
 reset role;
-select tests.ok(tests.notes('00000000-0000-0000-0000-0000000000a1', 'event_proposal') = 1, 'admins are told about a proposal');
+select tests.ok(tests.notes('00000000-0000-0000-0000-0000000000a1', 'event_proposal') = :proposals_before + 1, 'admins are told about a proposal');
 select tests.login(:ahmad);
 select tests.ok((select count(*) from public.events where id = :'e_prop') = 0, 'other students cannot see a proposal');
 select tests.refused($$select public.join_event('$$ || :'e_prop' || $$')$$, 'not available', 'nobody can join an unapproved event');

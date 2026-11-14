@@ -2,7 +2,8 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { requireMe } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { formatDateTime, toLocalInput } from "@/lib/time";
+import { formatDateTime, timeAgo, toLocalInput } from "@/lib/time";
+import { getT } from "@/lib/i18n-server";
 import { addCouncilMember, createElection, removeCouncilMember } from "@/app/actions/council";
 import { ActionForm } from "@/components/action-form";
 import { Avatar } from "@/components/avatar";
@@ -11,12 +12,24 @@ import { PageHeader } from "@/components/page-header";
 import { PageSkeleton } from "@/components/skeleton";
 import { StudentPicker } from "@/components/student-picker";
 import { SubmitButton } from "@/components/submit-button";
+import { ContactForm, DeletePost, InfoForm, PostForm, ReplyForm } from "./council-forms";
 
 export const metadata = { title: "Student council" };
 
 async function Council() {
   const me = await requireMe();
   const supabase = await createClient();
+  const { t, locale } = await getT();
+  const [{ data: canPost }, { data: info }, { data: posts }, { data: messages }] = await Promise.all([
+    supabase.rpc("can_post_council"),
+    supabase.from("council_info").select("about, contact_email, office, meeting_info").maybeSingle(),
+    supabase.from("council_posts").select("id, kind, title, body, status, pinned, created_at, author:profiles!council_posts_created_by_fkey(full_name)").order("pinned", { ascending: false }).order("created_at", { ascending: false }).limit(40),
+    supabase.from("council_messages").select("id, subject, body, status, reply, replied_at, created_at, sender_id, sender:profiles!council_messages_sender_id_fkey(full_name, grade)").order("created_at", { ascending: false }).limit(40),
+  ]);
+  const myMessages = (messages ?? []).filter((m) => m.sender_id === me.id);
+  const inbox = canPost ? (messages ?? []).filter((m) => m.sender_id !== me.id) : [];
+  const KIND = { announcement: ["📢", "Announcement"], update: ["📰", "Update"], initiative: ["🌱", "Initiative"], activity: ["🎈", "Activity"] } as const;
+  const STATUS = { planned: "Planned", in_progress: "In progress", done: "Done" } as const;
   const [{ data: members }, { data: elections }] = await Promise.all([
     supabase.from("council_members").select("position, sort, profile:profiles(id, full_name, avatar, grade)").order("sort"),
     supabase.from("elections").select("id, title, opens_at, closes_at, eligible_grades").order("closes_at", { ascending: false }).limit(20),
@@ -28,6 +41,65 @@ async function Council() {
 
   return (
     <div className="space-y-5">
+      {(info?.about || info?.contact_email || info?.office || info?.meeting_info) && (
+        <section className="card space-y-1.5 p-4 text-sm">
+          {info.about && <p className="whitespace-pre-wrap">{info.about}</p>}
+          {info.office && <p className="text-black/65">📍 {info.office}</p>}
+          {info.meeting_info && <p className="text-black/65">🕒 {info.meeting_info}</p>}
+          {info.contact_email && <p><a href={`mailto:${info.contact_email}`} className="text-brand-700 underline">✉️ {info.contact_email}</a></p>}
+        </section>
+      )}
+
+      <section className="space-y-2">
+        <h2 className="section-title">{t("News from the council")}</h2>
+        {(posts ?? []).length === 0 ? <Empty emoji="🗳️" title={t("Nothing posted yet")} /> : (posts ?? []).map((p) => (
+          <article key={p.id} className="card space-y-1.5 p-4 text-sm">
+            <div className="flex items-start gap-2">
+              <p className="min-w-0 flex-1 font-semibold">{KIND[p.kind as keyof typeof KIND][0]} {p.title}{p.pinned && <span className="chip ms-2 bg-amber-50 text-amber-800">📌</span>}</p>
+              {p.status && <span className={`chip shrink-0 ${p.status === "done" ? "bg-brand-50 text-brand-800" : "bg-sky-50 text-sky-800"}`}>{t(STATUS[p.status as keyof typeof STATUS])}</span>}
+            </div>
+            {p.body && <p className="whitespace-pre-wrap text-black/75">{p.body}</p>}
+            <p className="flex items-center gap-2 text-xs text-black/45">{t(KIND[p.kind as keyof typeof KIND][1])} · {p.author?.full_name} · {timeAgo(p.created_at)}
+              {canPost && <span className="ms-auto"><DeletePost id={p.id} locale={locale} /></span>}</p>
+          </article>
+        ))}
+      </section>
+
+      {me.isStudent && !me.isSuspended && (
+        <section className="space-y-2">
+          <h2 className="section-title">{t("Talk to the council")}</h2>
+          <div className="card p-4"><ContactForm locale={locale} /></div>
+          {myMessages.map((m) => (
+            <article key={m.id} className="card space-y-1 p-4 text-sm">
+              <p className="font-semibold">{m.subject} <span className="text-xs font-normal text-black/45">· {timeAgo(m.created_at)}</span></p>
+              <p className="whitespace-pre-wrap text-black/70">{m.body}</p>
+              {m.reply ? <p className="rounded-xl bg-brand-50 p-3 text-brand-900"><strong>{t("Council")}:</strong> {m.reply}</p> : <p className="text-xs text-black/45">{m.status === "closed" ? t("Closed") : t("Waiting for a reply")}</p>}
+            </article>
+          ))}
+        </section>
+      )}
+
+      {canPost && (
+        <section className="space-y-3">
+          <h2 className="section-title">{t("Council tools")}</h2>
+          <details className="card p-4"><summary className="cursor-pointer font-semibold">{t("Post news")}</summary><div className="mt-3"><PostForm locale={locale} /></div></details>
+          <details className="card p-4"><summary className="cursor-pointer font-semibold">{t("Contact details")}</summary><div className="mt-3"><InfoForm locale={locale} info={info ?? { about: "", contact_email: "", office: "", meeting_info: "" }} /></div></details>
+          <details className="card p-4" open={inbox.some((m) => m.status === "new")}>
+            <summary className="cursor-pointer font-semibold">{t("Messages from students")} ({inbox.filter((m) => m.status === "new").length} {t("new")})</summary>
+            <div className="mt-3 space-y-3">
+              {inbox.length === 0 && <p className="text-sm text-black/50">{t("No messages.")}</p>}
+              {inbox.map((m) => (
+                <article key={m.id} className="space-y-1 rounded-xl border border-black/10 p-3 text-sm">
+                  <p className="font-semibold">{m.subject} <span className="text-xs font-normal text-black/45">· {m.sender?.full_name} · {timeAgo(m.created_at)}</span></p>
+                  <p className="whitespace-pre-wrap text-black/70">{m.body}</p>
+                  {m.reply ? <p className="rounded-lg bg-brand-50 p-2 text-brand-900">{m.reply}</p> : m.status === "closed" ? <p className="text-xs text-black/45">{t("Closed")}</p> : <ReplyForm id={m.id} locale={locale} />}
+                </article>
+              ))}
+            </div>
+          </details>
+        </section>
+      )}
+
       <section>
         <h2 className="section-title">Council members</h2>
         {(members ?? []).length === 0 ? <Empty emoji="🗳️" title="No council members yet" /> : (

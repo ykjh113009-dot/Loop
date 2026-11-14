@@ -43,3 +43,7 @@ Bugs found and fixed while testing:
 ## Challenges
 
 `supabase/tests/challenges.sql` (run by `npm run db:test`) checks permissions, the review workflow, audience and limits, proof privacy, duplicate points, reversals, ranked prizes, reports and the audit trail. `tests/e2e/challenges.js` walks the whole flow in a browser: create, review, join, send a photo, check, points, phone widths. It needs `tests/e2e/proof.png` next to it and the local school set to Google-only for the login suite.
+
+## Phase 4
+
+`supabase/tests/phase4_activities.sql` covers proposals and approval, direct publishing, capacity and the waiting list, chat membership, reminders, editing and announcements, files, volunteering (apply, accept, spots, hours, points once, history) and the council hub (posts, contact info, messages and replies, privacy). `tests/e2e/phase4.js` walks the same flow in a browser, including the calendar views, filters and phone widths. The database tests need a freshly reset database; the browser suites leave data behind, and the local sign-in limit (about 30 per 5 minutes) means running all browser suites back to back can fail on sign-in. Run them in two batches.

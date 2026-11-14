@@ -65,6 +65,8 @@ async function Profile({ params, searchParams }: { params: PageProps<"/profile/[
   const theyAreStudent = profile.role !== "counselor" && !profile.alumni_year;
   const canMessage = me.isStudent && theyAreStudent && !blocked && !me.isSuspended;
   const canConnect = !isMe && !blocked && !me.isSuspended;
+  const { data: volunteering } = await supabase.rpc("volunteer_history", { p_profile: id });
+  const volunteerHours = (volunteering ?? []).reduce((a, v) => a + Number(v.hours), 0);
   const earned = (badges ?? []).map((b) => b.badge).filter((b) => !!b).sort((a, b) => a!.sort - b!.sort);
   const accent = ACCENTS[profile.accent] ?? ACCENTS.olive;
   const [urls, posts] = await Promise.all([
@@ -246,6 +248,18 @@ async function Profile({ params, searchParams }: { params: PageProps<"/profile/[
           <p className="text-sm text-black/50">{t("Not in any clubs yet.")}</p>
         )}
       </section>
+
+      {(volunteering ?? []).length > 0 && (
+        <section>
+          <h2 className="section-title">💚 {t("Volunteering")}</h2>
+          <div className="card divide-y divide-black/5 text-sm">
+            <p className="px-4 py-2.5 font-semibold text-brand-800">{t("{n} verified hours", { n: volunteerHours })}</p>
+            {(volunteering ?? []).slice(0, 5).map((v, i) => (
+              <p key={i} className="flex justify-between px-4 py-2"><span>{v.organization}</span><span className="text-black/50">{Number(v.hours)} h</span></p>
+            ))}
+          </div>
+        </section>
+      )}
 
       <section>
         <h2 className="section-title">{t("Posts")}</h2>

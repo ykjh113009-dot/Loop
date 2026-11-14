@@ -111,3 +111,34 @@ export async function castVote(_: ActionResult, formData: FormData): Promise<Act
   refresh();
   return { message: "Thank you for voting! 🗳️ Your vote is secret." };
 }
+
+// ---- Council hub: posts, contact info, messages from students ------------------------
+const str = (fd: FormData, k: string) => String(fd.get(k) ?? "").trim();
+
+async function rpc(fn: string, args: Record<string, unknown>, message?: string): Promise<ActionResult> {
+  await requireMe();
+  const supabase = await createClient();
+  const { error } = await supabase.rpc(fn as "my_points", args as never);
+  if (error) return { error: friendlyError(error) };
+  refresh();
+  return { ok: true, message };
+}
+
+export async function postCouncil(_: ActionResult, fd: FormData) {
+  return rpc("post_council", {
+    p_id: (str(fd, "id") || null) as string,
+    p: { kind: str(fd, "kind"), title: str(fd, "title"), body: str(fd, "body"), status: str(fd, "status"), pinned: fd.get("pinned") === "on", event_id: str(fd, "event_id") },
+  }, "Posted.");
+}
+export async function deleteCouncilPost(_: ActionResult, fd: FormData) {
+  return rpc("delete_council_post", { p_id: str(fd, "id") });
+}
+export async function setCouncilInfo(_: ActionResult, fd: FormData) {
+  return rpc("set_council_info", { p: { about: str(fd, "about"), contact_email: str(fd, "contact_email"), office: str(fd, "office"), meeting_info: str(fd, "meeting_info") } }, "Saved.");
+}
+export async function contactCouncil(_: ActionResult, fd: FormData) {
+  return rpc("contact_council", { p_subject: str(fd, "subject"), p_body: str(fd, "body") }, "Sent! The council will reply here.");
+}
+export async function replyCouncilMessage(_: ActionResult, fd: FormData) {
+  return rpc("reply_council_message", { p_id: str(fd, "id"), p_reply: str(fd, "reply"), p_close: fd.get("close") === "1" }, "Sent.");
+}
