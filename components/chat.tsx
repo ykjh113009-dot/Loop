@@ -44,6 +44,7 @@ export function Chat({
   showNames,
   initialReactions = [],
   locale = "en",
+  requestPending = false,
 }: {
   conversationId: string;
   meId: string;
@@ -55,7 +56,10 @@ export function Chat({
   showNames: boolean;
   initialReactions?: ChatReaction[];
   locale?: Locale;
+  /** The other person has not accepted this chat yet: one message, then wait. */
+  requestPending?: boolean;
 }) {
+  const [locked, setLocked] = useState(false);
   const t = makeT(locale);
   const [reactions, setReactions] = useState(initialReactions);
   const [recording, setRecording] = useState(false);
@@ -147,6 +151,7 @@ export function Chat({
       return false;
     }
     add(data as ChatMessage);
+    if (requestPending) setLocked(true);
     return true;
   }
 
@@ -283,7 +288,9 @@ export function Chat({
       </div>
 
       <div className="sticky bottom-[calc(4rem+env(safe-area-inset-bottom))] -mx-4 border-t border-black/5 bg-[#f5f6f4] px-4 py-2">
-        {canSend ? (
+        {locked ? (
+          <p className="py-2 text-center text-sm text-black/50">{t("Your message request was sent. You can write again once it is accepted.")}</p>
+        ) : canSend ? (
           <form onSubmit={send} className="flex gap-2">
             <input ref={fileInput} type="file" hidden accept="image/*,video/mp4,video/webm,audio/*,application/pdf,.docx,.pptx,.xlsx,.txt"
               onChange={(e) => { const f = e.target.files?.[0]; if (f) sendFile(f, f.name); e.target.value = ""; }} />

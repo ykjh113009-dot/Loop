@@ -62,9 +62,10 @@ export async function toggleSave(postId: string, save: boolean): Promise<ActionR
   const me = await requireMe();
   const supabase = await createClient();
   const { error } = save
-    ? await supabase.from("post_saves").upsert({ post_id: postId, profile_id: me.id })
+    ? await supabase.from("post_saves").insert({ post_id: postId, profile_id: me.id })
     : await supabase.from("post_saves").delete().eq("post_id", postId).eq("profile_id", me.id);
-  return error ? { error: friendlyError(error) } : { ok: true };
+  // Saving twice is fine.
+  return error && error.code !== "23505" ? { error: friendlyError(error) } : { ok: true };
 }
 
 export async function votePoll(postId: string, idx: number): Promise<ActionResult> {

@@ -83,6 +83,7 @@ async function DirectChat({ params }: { params: PageProps<"/messages/[id]">["par
         initialPeople={people}
         initialReactions={reactions}
         locale={locale}
+        requestPending={theirRequest}
         canSend={!me.isSuspended && !iBlocked && !myRequest && !waiting}
         cannotSendReason={
           iBlocked ? t("You blocked this student. Unblock them from their profile to chat.")

@@ -36,7 +36,13 @@ export const getMe = cache(async (): Promise<Me | null> => {
     .select("*, school:schools!profiles_school_id_fkey(id, name, grades, admin_mfa_required)")
     .eq("id", userId)
     .single();
-  if (!profile || !profile.school) return null;
+  if (!profile) return null;
+  // A deactivated account cannot read its school any more; it still needs to
+  // reach the "account paused" page, so it gets an empty placeholder.
+  if (!profile.school && profile.deactivated_at) {
+    profile.school = { id: profile.school_id, name: "", grades: [], admin_mfa_required: true };
+  }
+  if (!profile.school) return null;
 
   const isSuspended = !!profile.suspended_until && new Date(profile.suspended_until) > new Date();
   const adminRole = profile.role === "admin" || profile.role === "super_admin";

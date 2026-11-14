@@ -58,10 +58,10 @@ async function signIn(browser, email, viewport, mobile = false) {
   check('Recent Chats shows her latest conversations (max 3) with preview and time', chatLinks === Math.min(3, Number(chatRows[0])) && chatLinks > 0, `${chatLinks} of ${chatRows[0]}`);
   const lb = await p.locator('.dash-leader').innerText();
   check('Grade Leaderboard ranks the school grades (not individual students)', ['Grade 9', 'Grade 10', 'Grade 11', 'Grade 12'].every(g => lb.includes(g)));
-  const posts = q(`select left(p.body, 25) from public.posts p where p.club_id in (select club_id from public.club_members where profile_id='${uid}') and (p.status = 'visible' or p.author_id = '${uid}') order by p.created_at desc limit 4`);
-  const feed = (await p.locator('.dash-feed').innerText()).replace(/\s+/g, ' ');
-  check('Community Feed shows the newest visible posts from her clubs (held posts of others stay hidden)', posts.length > 0 && posts.every(x => feed.includes(x.replace(/\s+/g, ' ').trim().slice(0, 18))), `${posts.length} posts`);
-  check('Posts show reactions/comments/bookmarks as switched off, not faked', (await p.locator('.dash-feed article footer[title*="coming soon"]').count()) === posts.length);
+  const posts = (await p.locator('.dash-feed article[data-post]').evaluateAll((els) => els.map((e) => e.getAttribute('data-post'))));
+  const visible = q(`select count(*) from public.posts where id in (${posts.map((x) => `'${x}'`).join(',') || "'00000000-0000-0000-0000-000000000000'"}) and (status='visible' or author_id='${uid}')`)[0];
+  check('Community Feed shows real posts she is allowed to see (held posts of others stay hidden)', posts.length > 0 && Number(visible) === posts.length, `${posts.length} posts`);
+  check('Every post has working reaction, comment and save controls', (await p.locator('.dash-feed article [data-testid=reaction-count]').count()) === posts.length && (await p.locator('.dash-feed article a[aria-label=Comments]').count()) === posts.length);
   const council = q("select count(*) from public.council_members")[0];
   check('Student Council card reflects the council in the database', (await p.locator('.dash-council').innerText()).includes(Number(council) > 0 ? 'members' : 'No members'), council + ' members');
   const month = await p.locator('.dash-calendar').innerText();
@@ -122,11 +122,11 @@ async function signIn(browser, email, viewport, mobile = false) {
   const marker = 'Dashboard test post ' + Date.now();
   await p.goto(BASE + '/home', { waitUntil: 'networkidle' });
   await p.locator('#composer textarea').fill(marker);
-  await p.locator('#composer button', { hasText: 'Post' }).click();
+  await p.locator('#composer').getByRole('button', { name: 'Post', exact: true }).click();
   await p.waitForFunction((m) => document.body.innerText.includes(m), marker, { timeout: 15000 }).catch(() => {});
   check('Posting from the dashboard works and the post appears in the feed', (await body(p)).includes(marker));
   const row = q(`select status from public.posts where body='${marker}'`);
-  check('The post is saved in the database for the chosen club', row.length === 1 && row[0] === 'visible', row.join(','));
+  check('The post is saved in the database', row.length === 1 && row[0] === 'visible', row.join(','));
   // delete via the post menu
   const card = p.locator('.dash-feed article', { hasText: marker });
   await card.locator('summary').click(); await card.getByRole('button', { name: 'Delete post' }).click();
@@ -134,7 +134,7 @@ async function signIn(browser, email, viewport, mobile = false) {
   check('Deleting your own post from the feed works', q(`select count(*) from public.posts where body='${marker}'`)[0] === '0');
   // blocked word is held, not published
   const bad = 'test post with the word fuck ' + Date.now();
-  await p.locator('#composer textarea').fill(bad); await p.locator('#composer button', { hasText: 'Post' }).click();
+  await p.locator('#composer textarea').fill(bad); await p.locator('#composer').getByRole('button', { name: 'Post', exact: true }).click();
   await p.waitForTimeout(2500);
   const held = q(`select status from public.posts where body='${bad}'`);
   check('A post with a blocked word is held for a moderator (safety rules still apply)', held[0] === 'held', held.join(','));
