@@ -9,7 +9,8 @@ import type { FeedPost } from "@/lib/queries";
 export function PostCard({ post, meId, showClub = true }: { post: FeedPost; meId: string; showClub?: boolean }) {
   const mine = post.author_id === meId;
   return (
-    <article className="card p-4">
+    <article className={`card p-4 ${post.kind === "announcement" ? "border-brand-600/40 bg-brand-50/50" : ""}`}>
+      {post.kind === "announcement" && <p className="mb-2 text-xs font-semibold text-brand-800">📣 Announcement</p>}
       <header className="flex items-start gap-3">
         <Link href={`/profile/${post.author_id}`}>
           <Avatar avatar={post.author?.avatar ?? "a01"} />

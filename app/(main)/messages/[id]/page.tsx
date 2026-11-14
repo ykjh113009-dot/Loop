@@ -25,7 +25,7 @@ async function DirectChat({ params }: { params: PageProps<"/messages/[id]">["par
     supabase.from("blocks").select("blocked_id").eq("blocker_id", me.id),
     supabase.from("conversation_members").select("profile_id, accepted_at").eq("conversation_id", conversation.id),
   ]);
-  const group = conversation.kind === "group";
+  const group = conversation.kind === "group" || conversation.kind === "groupchat";
   const other = group ? undefined : Object.values(people).find((p) => p.id !== me.id);
   const iBlocked = !!other && (blocks ?? []).some((b) => b.blocked_id === other.id);
   const myRequest = (members ?? []).some((m) => m.profile_id === me.id && !m.accepted_at);
@@ -45,10 +45,12 @@ async function DirectChat({ params }: { params: PageProps<"/messages/[id]">["par
               <span className="block truncate font-semibold">{conversation.title}</span>
               <span className="block truncate text-xs text-black/45">{Object.values(people).map((p) => p.full_name.split(" ")[0]).join(", ")}</span>
             </span>
-            <form action={leaveGroup}>
-              <input type="hidden" name="conversationId" value={conversation.id} />
-              <button className="btn-ghost px-2 py-1 text-xs">{t("Leave")}</button>
-            </form>
+            {conversation.kind === "group" && (
+              <form action={leaveGroup}>
+                <input type="hidden" name="conversationId" value={conversation.id} />
+                <button className="btn-ghost px-2 py-1 text-xs">{t("Leave")}</button>
+              </form>
+            )}
           </>
         ) : other && (
           <Link href={`/profile/${other.id}`} className="flex min-w-0 items-center gap-2">

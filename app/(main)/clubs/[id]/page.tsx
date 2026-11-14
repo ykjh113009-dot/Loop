@@ -8,6 +8,8 @@ import { PostComposer } from "@/components/post-composer";
 import { EventCard } from "@/components/event-card";
 import { Empty } from "@/components/empty";
 import { PageSkeleton } from "@/components/skeleton";
+import { SpaceComposer } from "@/components/space-composer";
+import { getLocale } from "@/lib/i18n-server";
 
 async function Feed({ params }: { params: PageProps<"/clubs/[id]">["params"] }) {
   const { id } = await params;
@@ -15,7 +17,8 @@ async function Feed({ params }: { params: PageProps<"/clubs/[id]">["params"] }) 
   if (club.status !== "approved") return null;
 
   const supabase = await createClient();
-  const [posts, { data: events }] = await Promise.all([
+  const locale = await getLocale();
+  const [allPosts, { data: events }] = await Promise.all([
     loadPosts(supabase, [club.id], 40),
     supabase
       .from("events")
@@ -26,6 +29,9 @@ async function Feed({ params }: { params: PageProps<"/clubs/[id]">["params"] }) 
       .order("starts_at")
       .limit(3),
   ]);
+
+  // Announcements stay on top.
+  const posts = [...allPosts].sort((a, b) => Number(b.kind === "announcement") - Number(a.kind === "announcement"));
 
   return (
     <div className="space-y-4">
@@ -43,6 +49,12 @@ async function Feed({ params }: { params: PageProps<"/clubs/[id]">["params"] }) 
         </section>
       )}
 
+      {isLeader && !me.isSuspended && (
+        <details className="card p-3">
+          <summary className="cursor-pointer text-sm font-semibold text-brand-700">📣 Send an announcement to every member</summary>
+          <div className="mt-3"><SpaceComposer type="club" spaceId={club.id} canAnnounce locale={locale} /></div>
+        </details>
+      )}
       {isMember && !me.isSuspended && <PostComposer clubId={club.id} schoolId={me.school_id} userId={me.id} />}
 
       {posts.length === 0 ? (

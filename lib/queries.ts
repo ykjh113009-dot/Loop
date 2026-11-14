@@ -5,13 +5,14 @@ import { signImages } from "@/lib/images";
 type Supabase = Awaited<ReturnType<typeof createClient>>;
 
 export const POST_FIELDS =
-  "id, body, image_path, status, created_at, author_id, author:profiles(id, full_name, avatar, grade, role, alumni_year), club:clubs(id, name, emoji)" as const;
+  "id, body, image_path, status, kind, created_at, author_id, author:profiles(id, full_name, avatar, grade, role, alumni_year), club:clubs(id, name, emoji)" as const;
 
 export type FeedPost = {
   id: string;
   body: string;
   image_path: string | null;
   status: string;
+  kind?: string;
   created_at: string;
   author_id: string;
   author: { id: string; full_name: string; avatar: string; grade: number | null; role: string; alumni_year: number | null } | null;

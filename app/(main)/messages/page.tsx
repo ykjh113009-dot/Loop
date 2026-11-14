@@ -63,13 +63,13 @@ async function Conversations() {
           <li key={c.id}>
             <Link href={href} className="flex items-center gap-3 px-4 py-3 hover:bg-black/[0.02]">
               {c.kind !== "direct" ? (
-                <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-brand-50 text-xl">{c.kind === "group" ? "👥" : c.club?.emoji}</div>
+                <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-brand-50 text-xl">{c.kind === "group" || c.kind === "groupchat" ? "👥" : c.club?.emoji}</div>
               ) : (
                 <Avatar avatar={other?.avatar ?? "a01"} />
               )}
               <div className="min-w-0 flex-1">
                 <p className={`truncate ${unread ? "font-bold" : "font-medium"}`}>
-                  {c.kind === "club" ? c.club?.name : c.kind === "group" ? c.title : other?.full_name}
+                  {c.kind === "club" ? c.club?.name : c.kind === "group" || c.kind === "groupchat" ? c.title : other?.full_name}
                   {c.request && <span className="chip ms-2 bg-amber-50 text-amber-900">{t("Message request")}</span>}
                 </p>
                 <p className={`truncate text-sm ${unread ? "text-black/80" : "text-black/50"}`}>

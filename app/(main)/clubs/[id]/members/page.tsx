@@ -12,7 +12,7 @@ async function Members({ params }: { params: PageProps<"/clubs/[id]/members">["p
   const supabase = await createClient();
   const { data } = await supabase
     .from("club_members")
-    .select("role, joined_at, profile:profiles(id, full_name, avatar, grade, role, alumni_year)")
+    .select("role, title, joined_at, profile:profiles(id, full_name, avatar, grade, role, alumni_year)")
     .eq("club_id", club.id)
     .order("joined_at");
   // Leaders first, then everyone else alphabetically.
@@ -33,6 +33,7 @@ async function Members({ params }: { params: PageProps<"/clubs/[id]/members">["p
                 <p className="truncate font-medium">{m.profile.full_name}</p>
                 <p className="text-xs text-black/50">{personLabel(m.profile)}</p>
               </div>
+              {m.title && <span className="chip">{m.title}</span>}
               {m.role === "leader" && <span className="chip bg-brand-50 text-brand-800">Leader</span>}
             </Link>
           </li>

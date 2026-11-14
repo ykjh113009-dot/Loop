@@ -38,7 +38,7 @@ export async function deletePost(formData: FormData) {
 }
 
 const REASONS = ["bullying", "harassment", "inappropriate", "spam", "self_harm", "other"] as const;
-const TARGETS = ["post", "message", "profile", "club", "event", "listing", "question", "answer", "comment"] as const;
+const TARGETS = ["post", "message", "profile", "club", "event", "listing", "question", "answer", "comment", "group"] as const;
 
 export async function sendReport(input: {
   targetType: string;

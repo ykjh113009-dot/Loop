@@ -14,7 +14,7 @@ const REASONS = [
   { value: "other", label: "Something else" },
 ];
 
-const NAMES = { post: "post", message: "message", profile: "student", club: "club", event: "event", listing: "listing", question: "question", answer: "answer", comment: "comment" };
+const NAMES = { post: "post", message: "message", profile: "student", club: "club", event: "event", listing: "listing", question: "question", answer: "answer", comment: "comment", group: "group" };
 
 // The "Report" button that appears on every post, message, profile, club and event.
 export function ReportButton({

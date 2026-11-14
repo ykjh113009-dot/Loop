@@ -9,6 +9,7 @@ export function ClubTabs({ clubId }: { clubId: string }) {
     { href: `/clubs/${clubId}`, label: "Feed" },
     { href: `/clubs/${clubId}/chat`, label: "Chat" },
     { href: `/clubs/${clubId}/members`, label: "Members" },
+    { href: `/clubs/${clubId}/about`, label: "About" },
   ];
   return (
     <div className="mt-4 flex gap-1 rounded-xl bg-black/5 p-1">

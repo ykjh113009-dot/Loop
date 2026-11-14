@@ -2,6 +2,9 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { getClub } from "@/lib/clubs";
 import { joinClub, leaveClub } from "@/app/actions/clubs";
+import { applyToClub, withdrawApplication } from "@/app/actions/community";
+import { createClient } from "@/lib/supabase/server";
+import { ActionForm } from "@/components/action-form";
 import { Icon } from "@/components/icons";
 import { ReportButton } from "@/components/report-button";
 import { SubmitButton } from "@/components/submit-button";
@@ -11,6 +14,8 @@ async function ClubHeader({ params }: { params: LayoutProps<"/clubs/[id]">["para
   const { id } = await params;
   const { me, club, memberCount, isMember, isLeader } = await getClub(id);
   const closed = club.status !== "approved";
+  const supabase = await createClient();
+  const { data: application } = isMember ? { data: null } : await supabase.from("club_applications").select("id").eq("club_id", club.id).eq("profile_id", me.id).eq("status", "pending").maybeSingle();
 
   return (
     <div className="mb-4">
@@ -25,6 +30,8 @@ async function ClubHeader({ params }: { params: LayoutProps<"/clubs/[id]">["para
             <p className="text-sm text-black/55">
               {memberCount} {memberCount === 1 ? "member" : "members"}
               {isLeader && " · You lead this club"}
+              {club.recruiting === "application" && " · By application"}
+              {club.recruiting === "closed" && " · Not taking members"}
             </p>
           </div>
           <ReportButton targetType="club" targetId={club.id} compact />
@@ -36,14 +43,40 @@ async function ClubHeader({ params }: { params: LayoutProps<"/clubs/[id]">["para
           </p>
         ) : (
           !me.isSuspended && (
-            <form action={isMember ? leaveClub : joinClub} className="mt-3">
-              <input type="hidden" name="clubId" value={club.id} />
-              {isMember ? (
-                <SubmitButton className="btn-secondary w-full" pendingText="Leaving…">✓ Joined · Leave club</SubmitButton>
-              ) : (
-                <SubmitButton className="btn-primary w-full" pendingText="Joining…">Join club</SubmitButton>
+            <div className="mt-3 space-y-2">
+              {(isLeader || me.isAdmin) && (
+                <Link href={`/clubs/${club.id}/manage`} className="btn-secondary w-full">⚙️ Manage club</Link>
               )}
-            </form>
+              {isMember ? (
+                <form action={leaveClub}>
+                  <input type="hidden" name="clubId" value={club.id} />
+                  <SubmitButton className="btn-secondary w-full" pendingText="Leaving…">✓ Joined · Leave club</SubmitButton>
+                </form>
+              ) : club.recruiting === "open" ? (
+                <form action={joinClub}>
+                  <input type="hidden" name="clubId" value={club.id} />
+                  <SubmitButton className="btn-primary w-full" pendingText="Joining…">Join club</SubmitButton>
+                </form>
+              ) : club.recruiting === "application" && me.isStudent ? (
+                application ? (
+                  <ActionForm action={withdrawApplication} className="flex items-center gap-2">
+                    <input type="hidden" name="applicationId" value={application.id} />
+                    <span className="chip flex-1 justify-center bg-amber-50 py-2 text-amber-900">Application sent</span>
+                    <SubmitButton className="btn-ghost" pendingText="…">Withdraw</SubmitButton>
+                  </ActionForm>
+                ) : (
+                  <details className="rounded-xl border border-brand-700/10 p-3">
+                    <summary className="cursor-pointer text-center font-semibold text-brand-700">Apply to join</summary>
+                    <ActionForm action={applyToClub} className="mt-3 space-y-2">
+                      <input type="hidden" name="clubId" value={club.id} />
+                      <label className="block text-sm"><span className="label">{club.application_question || "Why do you want to join?"}</span>
+                        <textarea name="message" maxLength={800} rows={3} className="input resize-none" /></label>
+                      <SubmitButton className="btn-primary w-full" pendingText="Sending…">Send application</SubmitButton>
+                    </ActionForm>
+                  </details>
+                )
+              ) : null}
+            </div>
           )
         )}
         {!closed && <ClubTabs clubId={club.id} />}
