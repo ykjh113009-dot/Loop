@@ -35,7 +35,7 @@ async function Community({ searchParams }: { searchParams: PageProps<"/community
       <PageHeader
         title={tag ? `#${tag}` : t("Community")}
         back={tag ? "/community" : undefined}
-        action={<Link href="/saved" className="btn-secondary px-3 py-2">{t("Saved")}</Link>}
+        action={<div className="flex gap-2"><Link href="/clubs" className="btn-secondary px-3 py-2">{t("Clubs")}</Link><Link href="/groups" className="btn-secondary px-3 py-2">{t("Groups")}</Link><Link href="/saved" className="btn-secondary px-3 py-2">{t("Saved")}</Link></div>}
       />
       {!tag && !me.isSuspended && (
         <div className="card p-4">

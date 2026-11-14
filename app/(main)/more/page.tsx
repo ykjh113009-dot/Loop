@@ -19,6 +19,7 @@ const SECTIONS: { title: string; tiles: Tile[] }[] = [
   {
     title: "Get involved",
     tiles: [
+      { href: "/clubs", emoji: "🎯", title: "Clubs", text: "Find a club, join, or start one" },
       { href: "/challenges", emoji: "🏁", title: "Challenges", text: "Join challenges and earn points", studentsOnly: true },
       { href: "/leaderboard", emoji: "🏆", title: "Leaderboards", text: "Houses, grades and students" },
       { href: "/polls", emoji: "📊", title: "Polls", text: "Have your say" },
