@@ -168,9 +168,9 @@ function ReviewButtons({ action, idName, id }: { action: typeof reviewClub; idNa
 }
 
 async function Approvals() {
-  await requireMe("staff");
+  const me = await requireMe("staff");
   const supabase = await createClient();
-  const [{ data: clubs }, { data: events }, { data: submissions }, { data: hours }] = await Promise.all([
+  const [{ data: clubs }, { data: allEvents }, { data: submissions }, { data: hours }] = await Promise.all([
     supabase
       .from("clubs")
       .select("id, name, emoji, description, created_at, requester:profiles!clubs_requested_by_fkey(id, full_name, grade)")
@@ -192,6 +192,8 @@ async function Approvals() {
       .eq("status", "pending")
       .order("created_at"),
   ]);
+  // Only admins approve what students propose.
+  const events = me.isAdmin ? allEvents : [];
   if (!clubs?.length && !events?.length && !submissions?.length && !hours?.length) {
     return <Empty emoji="✅" title="Nothing waiting for approval" />;
   }

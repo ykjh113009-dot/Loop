@@ -9,71 +9,103 @@ import { fromLocalInput } from "@/lib/time";
 import { friendlyError, type ActionResult } from "@/lib/errors";
 import { dispatchPush } from "@/lib/push";
 
-function readTimes(formData: FormData) {
-  const starts = fromLocalInput(String(formData.get("starts_at") ?? ""));
-  const endsRaw = String(formData.get("ends_at") ?? "");
-  const ends = endsRaw ? fromLocalInput(endsRaw) : null;
+const s = (fd: FormData, k: string) => String(fd.get(k) ?? "").trim();
+
+function eventBody(fd: FormData) {
+  const starts = fromLocalInput(s(fd, "starts_at"));
+  const ends = s(fd, "ends_at") ? fromLocalInput(s(fd, "ends_at")) : null;
   if (!starts) return { error: "Please choose when the event starts." } as const;
-  if (starts.getTime() < Date.now()) return { error: "The start time must be in the future." } as const;
-  if (ends && ends <= starts) return { error: "The end time must be after the start time." } as const;
-  return { starts, ends } as const;
+  return {
+    body: {
+      title: s(fd, "title"),
+      description: s(fd, "description"),
+      location: s(fd, "location"),
+      category: s(fd, "category"),
+      club_id: s(fd, "club_id"),
+      capacity: s(fd, "capacity"),
+      starts_at: starts.toISOString(),
+      ends_at: ends?.toISOString() ?? "",
+      cover_path: s(fd, "image_path") || s(fd, "keep_cover"),
+      organizers: fd.getAll("organizers").map(String),
+    },
+  } as const;
 }
 
-export async function createEvent(_: ActionResult, formData: FormData): Promise<ActionResult> {
+// Calls a database function. The database checks who may do it, again, inside.
+async function call(fn: string, args: Record<string, unknown>, message?: string): Promise<ActionResult> {
+  await requireMe();
+  const supabase = await createClient();
+  const { error } = await supabase.rpc(fn as "my_points", args as never);
+  if (error) return { error: friendlyError(error) };
+  after(dispatchPush);
+  refresh();
+  return { ok: true, message };
+}
+
+// Admins, the Student Council and club leaders publish at once; any other student sends a proposal.
+export async function createEvent(_: ActionResult, fd: FormData): Promise<ActionResult> {
   const me = await requireMe();
   if (me.isSuspended) return { error: "You can't create events while suspended." };
-  const title = String(formData.get("title") ?? "").trim();
-  if (title.length < 3) return { error: "Give the event a title." };
-  const times = readTimes(formData);
-  if ("error" in times) return { error: times.error };
-  const clubId = String(formData.get("club_id") ?? "") || null;
-
+  const parsed = eventBody(fd);
+  if ("error" in parsed) return { error: parsed.error };
   const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("events")
-    .insert({
-      title: title.slice(0, 100),
-      description: String(formData.get("description") ?? "").trim().slice(0, 1500),
-      location: String(formData.get("location") ?? "").trim().slice(0, 100),
-      starts_at: times.starts.toISOString(),
-      ends_at: times.ends?.toISOString() ?? null,
-      club_id: clubId,
-      school_id: me.school_id,
-      created_by: me.id,
-    })
-    .select("id")
-    .single();
+  const { data, error } = await supabase.rpc("create_event", { p: parsed.body });
   if (error) return { error: friendlyError(error) };
   after(dispatchPush);
-  redirect(`/events/${data.id}`);
+  redirect(`/events/${data}`);
 }
 
-export async function cancelEvent(_: ActionResult, formData: FormData): Promise<ActionResult> {
+export async function updateEvent(_: ActionResult, fd: FormData): Promise<ActionResult> {
   await requireMe();
+  const parsed = eventBody(fd);
+  if ("error" in parsed) return { error: parsed.error };
   const supabase = await createClient();
-  const { error } = await supabase.rpc("cancel_event", {
-    p_event: String(formData.get("eventId")),
-    p_reason: String(formData.get("reason") ?? "").trim().slice(0, 300),
-  });
+  const { error } = await supabase.rpc("update_event", { p_event: s(fd, "id"), p: parsed.body });
   if (error) return { error: friendlyError(error) };
+  if (fd.has("organizers_present")) {
+    const { error: teamError } = await supabase.rpc("set_event_organizers", { p_event: s(fd, "id"), p_ids: fd.getAll("organizers").map(String) });
+    if (teamError && teamError.code !== "P0001") return { error: friendlyError(teamError) };
+  }
   after(dispatchPush);
-  refresh();
-  return { message: "The event was cancelled and everyone going was told." };
+  redirect(`/events/${s(fd, "id")}`);
 }
 
-export async function rescheduleEvent(_: ActionResult, formData: FormData): Promise<ActionResult> {
+export async function cancelEvent(_: ActionResult, fd: FormData): Promise<ActionResult> {
+  return call("cancel_event", { p_event: s(fd, "eventId"), p_reason: s(fd, "reason").slice(0, 300) }, "The event was cancelled and everyone involved was told.");
+}
+
+export async function rescheduleEvent(_: ActionResult, fd: FormData): Promise<ActionResult> {
   await requireMe();
-  const times = readTimes(formData);
-  if ("error" in times) return { error: times.error };
+  const starts = fromLocalInput(s(fd, "starts_at"));
+  const ends = s(fd, "ends_at") ? fromLocalInput(s(fd, "ends_at")) : null;
+  if (!starts) return { error: "Please choose when the event starts." };
+  return call("reschedule_event", { p_event: s(fd, "eventId"), p_starts: starts.toISOString(), p_ends: (ends?.toISOString() ?? null) as string }, "New time saved. Everyone going was told.");
+}
+
+export async function joinEvent(_: ActionResult, fd: FormData): Promise<ActionResult> {
+  await requireMe();
   const supabase = await createClient();
-  const { error } = await supabase.rpc("reschedule_event", {
-    p_event: String(formData.get("eventId")),
-    p_starts: times.starts.toISOString(),
-    // Passing null keeps the event without an end time.
-    p_ends: (times.ends?.toISOString() ?? null) as string,
-  });
+  const { data, error } = await supabase.rpc("join_event", { p_event: s(fd, "id") });
   if (error) return { error: friendlyError(error) };
-  after(dispatchPush);
   refresh();
-  return { message: "New time saved. Everyone going was told." };
+  return { ok: true, message: data === "waitlist" ? "The event is full, so you are on the waiting list. We will tell you if a spot opens." : "You're going!" };
+}
+export async function leaveEvent(_: ActionResult, fd: FormData): Promise<ActionResult> {
+  return call("leave_event", { p_event: s(fd, "id") });
+}
+export async function manageAttendee(_: ActionResult, fd: FormData): Promise<ActionResult> {
+  return call("manage_attendee", { p_event: s(fd, "id"), p_profile: s(fd, "profile"), p_action: s(fd, "action") });
+}
+export async function postEventUpdate(_: ActionResult, fd: FormData): Promise<ActionResult> {
+  return call("post_event_update", { p_event: s(fd, "id"), p_title: s(fd, "title"), p_body: s(fd, "body") }, "Posted. Everyone involved was told.");
+}
+export async function addEventAttachment(path: string, name: string, eventId: string): Promise<ActionResult> {
+  return call("add_event_attachment", { p_event: eventId, p_path: path, p_name: name });
+}
+export async function removeEventAttachment(_: ActionResult, fd: FormData): Promise<ActionResult> {
+  return call("remove_event_attachment", { p_id: s(fd, "id") });
+}
+export async function reviewEventProposal(_: ActionResult, fd: FormData): Promise<ActionResult> {
+  const approve = fd.get("decision") === "approve";
+  return call("review_event", { p_event: s(fd, "id"), p_approve: approve, p_note: s(fd, "note") }, approve ? "Approved and published." : "Sent back to the student.");
 }

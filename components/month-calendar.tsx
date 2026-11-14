@@ -13,11 +13,14 @@ export function MonthCalendar({
   month,
   todayKey,
   eventDays,
+  extra = "",
 }: {
   year: number;
   month: number;
   todayKey: string;
   eventDays: Map<string, number>;
+  /** Extra query text kept on the arrows, e.g. "&category=sports". */
+  extra?: string;
 }) {
   const firstWeekday = new Date(Date.UTC(year, month - 1, 1)).getUTCDay();
   const daysInMonth = new Date(Date.UTC(year, month, 0)).getUTCDate();
@@ -29,9 +32,9 @@ export function MonthCalendar({
   return (
     <div className="card p-3">
       <div className="mb-2 flex items-center justify-between">
-        <Link href={`/events?month=${prev}`} className="btn-ghost px-3 py-1.5" aria-label="Previous month">‹</Link>
+        <Link href={`/events?month=${prev}${extra}`} className="btn-ghost px-3 py-1.5" aria-label="Previous month">‹</Link>
         <p className="font-semibold">{MONTH_NAMES[month - 1]} {year}</p>
-        <Link href={`/events?month=${next}`} className="btn-ghost px-3 py-1.5" aria-label="Next month">›</Link>
+        <Link href={`/events?month=${next}${extra}`} className="btn-ghost px-3 py-1.5" aria-label="Next month">›</Link>
       </div>
       <div className="grid grid-cols-7 text-center text-[11px] font-medium text-black/40">
         {WEEKDAYS.map((d) => <div key={d} className="py-1">{d}</div>)}

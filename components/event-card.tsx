@@ -1,12 +1,15 @@
 import Link from "next/link";
 import { formatTime, localParts } from "@/lib/time";
 import type { EventSummary } from "@/lib/queries";
+import { eventCategory } from "@/lib/events";
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 export function EventCard({ event, going = false }: { event: EventSummary; going?: boolean }) {
   const p = localParts(event.starts_at);
-  const count = event.event_rsvps?.[0]?.count ?? 0;
+  const total = event.event_rsvps?.[0]?.count ?? 0;
+  const full = !!event.capacity && total >= event.capacity;
+  const count = event.capacity ? Math.min(total, event.capacity) : total;
   const cancelled = event.status === "cancelled";
   return (
     <Link href={`/events/${event.id}`} className="card flex items-center gap-3 p-3 hover:bg-black/[0.02]">
@@ -20,6 +23,7 @@ export function EventCard({ event, going = false }: { event: EventSummary; going
           {formatTime(event.starts_at)}
           {event.location && ` · ${event.location}`}
           {event.club && ` · ${event.club.emoji} ${event.club.name}`}
+          {event.category && event.category !== "other" && ` · ${eventCategory(event.category).emoji}`}
         </p>
       </div>
       <div className="shrink-0 text-end text-xs">
@@ -29,7 +33,7 @@ export function EventCard({ event, going = false }: { event: EventSummary; going
           <span className="chip bg-amber-50 text-amber-800">Waiting for approval</span>
         ) : (
           <>
-            <span className="font-semibold text-black/70">{count}</span> <span className="text-black/45">going</span>
+            <span className="font-semibold text-black/70">{count}</span> <span className="text-black/45">{full ? "· full" : "going"}</span>
             {going && <span className="mt-0.5 block font-semibold text-brand-700">✓ You</span>}
           </>
         )}

@@ -25,7 +25,7 @@ async function DirectChat({ params }: { params: PageProps<"/messages/[id]">["par
     supabase.from("blocks").select("blocked_id").eq("blocker_id", me.id),
     supabase.from("conversation_members").select("profile_id, accepted_at").eq("conversation_id", conversation.id),
   ]);
-  const group = conversation.kind === "group" || conversation.kind === "groupchat";
+  const group = conversation.kind === "group" || conversation.kind === "groupchat" || conversation.kind === "eventchat";
   const other = group ? undefined : Object.values(people).find((p) => p.id !== me.id);
   const iBlocked = !!other && (blocks ?? []).some((b) => b.blocked_id === other.id);
   const myRequest = (members ?? []).some((m) => m.profile_id === me.id && !m.accepted_at);

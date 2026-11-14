@@ -36,7 +36,7 @@ export async function loadPosts(supabase: Supabase, clubIds: string[], limit = 3
 }
 
 export const EVENT_FIELDS =
-  "id, title, location, starts_at, ends_at, status, club_id, club:clubs(id, name, emoji), event_rsvps(count)" as const;
+  "id, title, location, starts_at, ends_at, status, category, capacity, club_id, club:clubs(id, name, emoji), event_rsvps(count)" as const;
 
 export type EventSummary = {
   id: string;
@@ -45,6 +45,8 @@ export type EventSummary = {
   starts_at: string;
   ends_at: string | null;
   status: string;
+  category?: string;
+  capacity?: number | null;
   club_id: string | null;
   club: { id: string; name: string; emoji: string } | null;
   event_rsvps: { count: number }[];
