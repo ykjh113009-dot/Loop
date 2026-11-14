@@ -390,16 +390,16 @@ update public.listings set status = 'sold' where id = '00000000-0000-0000-0000-0
 -- ---------------------------------------------------------------------------
 -- Weekly challenges (this week's and last week's)
 -- ---------------------------------------------------------------------------
-insert into public.challenges (id, school_id, title, description, emoji, points, starts_at, ends_at, created_by, created_at) values
+insert into public.challenges (id, school_id, title, description, emoji, points, starts_at, ends_at, created_by, created_at, status) values
   ('00000000-0000-0000-0000-000000000c01', '00000000-0000-0000-0000-00000000a001', 'Read for 20 minutes a day',
    'Any book, any language. Tell us what you read and one thing you liked about it.', '📚', 20,
-   public.week_start(), public.week_start() + interval '7 days', '00000000-0000-0000-0000-0000000000a2', now() - interval '1 hour'),
+   public.week_start(), public.week_start() + interval '7 days', '00000000-0000-0000-0000-0000000000a2', now() - interval '1 hour', 'approved'),
   ('00000000-0000-0000-0000-000000000c02', '00000000-0000-0000-0000-00000000a001', 'Plastic-free lunch',
    'Bring your lunch without any plastic for 3 days. Share a photo of your lunch box!', '🌱', 15,
-   public.week_start(), public.week_start() + interval '7 days', '00000000-0000-0000-0000-0000000000a1', now() - interval '1 hour'),
+   public.week_start(), public.week_start() + interval '7 days', '00000000-0000-0000-0000-0000000000a1', now() - interval '1 hour', 'approved'),
   ('00000000-0000-0000-0000-000000000c03', '00000000-0000-0000-0000-00000000a001', 'Thank a school worker',
    'Write a thank-you card for a cleaner, guard or canteen worker.', '💐', 15,
-   public.week_start() - interval '7 days', public.week_start(), '00000000-0000-0000-0000-0000000000a1', now() - interval '8 days');
+   public.week_start() - interval '7 days', public.week_start(), '00000000-0000-0000-0000-0000000000a1', now() - interval '8 days', 'approved');
 
 -- Last week's challenge: many approved entries (points dated last week).
 insert into public.challenge_submissions (school_id, challenge_id, profile_id, note, status, reviewed_by, reviewed_at, created_at)
@@ -415,7 +415,7 @@ from public.challenge_submissions where challenge_id = '00000000-0000-0000-0000-
 insert into public.challenge_submissions (school_id, challenge_id, profile_id, note, status, reviewed_by, reviewed_at, created_at)
 select '00000000-0000-0000-0000-00000000a001', '00000000-0000-0000-0000-000000000c01', p.id,
        'I read two chapters of "Men in the Sun" every evening.',
-       case when abs(hashtext(p.id::text)) % 3 = 0 then 'pending' else 'approved' end,
+       case when abs(hashtext(p.id::text)) % 3 = 0 then 'submitted' else 'approved' end,
        case when abs(hashtext(p.id::text)) % 3 = 0 then null else '00000000-0000-0000-0000-0000000000a2'::uuid end,
        case when abs(hashtext(p.id::text)) % 3 = 0 then null else now() - interval '20 minutes' end,
        now() - interval '40 minutes'
@@ -423,6 +423,12 @@ from public.profiles p
 where p.grade is not null and p.id <> '00000000-0000-0000-0000-0000000000a5' and abs(hashtext(p.id::text || 'c01')) % 10 < 4;
 select public.award_points(profile_id, 20, 'challenge', challenge_id, reviewed_at)
 from public.challenge_submissions where challenge_id = '00000000-0000-0000-0000-000000000c01' and status = 'approved';
+
+-- Entries were paid against the challenge; everyone who entered also joined it.
+update public.challenge_submissions s set ledger_source = s.challenge_id, points_awarded = c.points
+from public.challenges c where c.id = s.challenge_id and s.status = 'approved';
+insert into public.challenge_participants (challenge_id, profile_id, school_id)
+select distinct challenge_id, profile_id, school_id from public.challenge_submissions;
 
 -- ---------------------------------------------------------------------------
 -- Polls
