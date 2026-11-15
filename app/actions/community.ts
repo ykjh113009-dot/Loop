@@ -80,7 +80,7 @@ export async function saveReward(_: ActionResult, fd: FormData): Promise<ActionR
   return insert("rewards", {
     school_id: me.school_id, name: s(fd, "name"), description: s(fd, "description"), cost: Math.round(n(fd, "cost")),
     kind: "prize", stock: stock === "" ? null : Math.round(Number(stock)), per_student_limit: Math.round(n(fd, "limit")) || 1,
-    created_by: me.id,
+    created_by: me.id, image_path: s(fd, "image_path") || null,
   }, "Reward added.");
 }
 export async function setRewardActive(_: ActionResult, fd: FormData): Promise<ActionResult> {

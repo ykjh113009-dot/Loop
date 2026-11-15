@@ -7,6 +7,8 @@ import { AdminNav } from "@/components/admin-nav";
 import { PageHeader } from "@/components/page-header";
 import { SubmitButton } from "@/components/submit-button";
 import { PageSkeleton } from "@/components/skeleton";
+import { PhotoField } from "@/components/photo-field";
+import { Top10Forms } from "./top10-forms";
 import { timeAgo } from "@/lib/time";
 
 export const metadata = { title: "Rewards" };
@@ -16,6 +18,10 @@ async function Rewards() {
   const supabase = await createClient();
   const { data: roles } = await supabase.from("leadership_roles").select("kind").eq("profile_id", me.id).eq("kind", "school_staff");
   if (!me.isAdmin && (roles ?? []).length === 0) return <p className="card p-4 text-sm text-black/60">Only admins and school staff can open this page.</p>;
+  const [{ data: t10settings }, { data: t10prizes }] = await Promise.all([
+    supabase.from("top10_settings").select("period, rules").maybeSingle(),
+    supabase.from("top10_prizes").select("place, title, description").order("place"),
+  ]);
   const [{ data: rewards }, { data: waiting }] = await Promise.all([
     supabase.from("rewards").select("id, name, description, cost, kind, stock, active, per_student_limit").order("kind").order("cost"),
     supabase.from("reward_redemptions").select("id, cost, created_at, reward:rewards(name), profile:profiles!reward_redemptions_profile_id_fkey(full_name, grade)").eq("status", "pending").order("created_at"),
@@ -47,8 +53,11 @@ async function Rewards() {
           <label className="text-sm"><span className="label">How many (empty = no limit)</span><input name="stock" type="number" min={0} className="input" /></label>
           <label className="text-sm"><span className="label">Per student</span><input name="limit" type="number" min={1} max={10} defaultValue={1} className="input" /></label>
         </div>
+        <PhotoField schoolId={me.school_id} userId={me.id} label="Add a picture (optional)" />
         <SubmitButton className="btn-primary w-full">Add prize</SubmitButton>
       </ActionForm>
+
+      <Top10Forms settings={t10settings} prizes={t10prizes ?? []} />
 
       <section className="card p-4">
         <h2 className="font-semibold">All rewards</h2>

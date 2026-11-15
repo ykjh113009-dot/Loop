@@ -4,60 +4,114 @@ import { redirect } from "next/navigation";
 import { requireMe } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { timeAgo } from "@/lib/time";
-import { SUBJECTS } from "@/lib/subjects";
-import { closeStudyBuddy, finishTutoring, respondTutoring, stopTutoring } from "@/app/actions/tutoring";
+import { TUTOR_SUBJECTS, DAYS, formatLabel } from "@/lib/tutor";
+import { getT } from "@/lib/i18n-server";
+import { signImages } from "@/lib/images";
+import { closeStudyBuddy, finishTutoring, respondTutoring } from "@/app/actions/tutoring";
 import { startChat } from "@/app/actions/messages";
 import { Avatar } from "@/components/avatar";
 import { Empty } from "@/components/empty";
 import { PageHeader } from "@/components/page-header";
 import { PageSkeleton } from "@/components/skeleton";
 import { SubmitButton } from "@/components/submit-button";
-import { AskTutorForm, StudyBuddyForm, TutorProfileForm } from "./forms";
+import { StudyBuddyForm } from "./forms";
 
-export const metadata = { title: "Tutors & study buddies" };
+export const metadata = { title: "Tutors Directory" };
 
 const TABS = [
-  { id: "find", label: "Tutors" },
+  { id: "find", label: "Directory" },
   { id: "buddies", label: "Study buddies" },
   { id: "requests", label: "Requests" },
-  { id: "me", label: "I can help" },
 ];
 
-async function Find({ subject, meId, canAct }: { subject: string; meId: string; canAct: boolean }) {
+async function Find({ subject, format, q, meId }: { subject: string; format: string; q: string; meId: string }) {
   const supabase = await createClient();
-  let query = supabase
-    .from("tutor_profiles")
-    .select("profile_id, subjects, about, availability, profile:profiles(id, full_name, avatar, grade)")
-    .eq("active", true)
-    .neq("profile_id", meId);
-  if (subject) query = query.contains("subjects", [subject]);
-  const { data } = await query;
-  const tutors = data ?? [];
+  const { t } = await getT();
+  const [{ data }, { data: mine }, { data: app }, { data: reviewer }] = await Promise.all([
+    supabase
+      .from("tutor_profiles")
+      .select("profile_id, subjects, about, qualifications, availability, format, days, hours, photo_path, profile:profiles(id, full_name, avatar, grade)")
+      .eq("active", true)
+      .not("approved_at", "is", null)
+      .neq("profile_id", meId),
+    supabase.from("tutor_profiles").select("profile_id, active, approved_at").eq("profile_id", meId).maybeSingle(),
+    supabase.from("tutor_applications").select("status, review_note").eq("profile_id", meId).maybeSingle(),
+    supabase.rpc("can_review_tutors"),
+  ]);
+  const all = (data ?? []).filter((x) => x.profile);
+  const needle = q.toLowerCase();
+  const tutors = all.filter((x) =>
+    (!subject || x.subjects.includes(subject)) && (!format || x.format === format || x.format === "both") &&
+    (!needle || x.profile!.full_name.toLowerCase().includes(needle) || x.about.toLowerCase().includes(needle) || x.subjects.some((s) => s.toLowerCase().includes(needle))));
+  const photos = await signImages(supabase, tutors.map((x) => x.photo_path));
+  const link = (o: Record<string, string>) => `/tutors?${new URLSearchParams({ ...(subject ? { subject } : {}), ...(format ? { format } : {}), ...(q ? { q } : {}), ...o })}`;
+  const STATUS_TEXT: Record<string, string> = {
+    draft: t("You started a tutor application. Finish it when you are ready."),
+    pending: t("Your tutor application is waiting for review."),
+    rejected: t("Your tutor application needs changes."),
+  };
   return (
     <div className="space-y-3">
+      <div className="card flex flex-wrap items-center justify-between gap-3 p-4">
+        {mine?.approved_at ? (
+          <>
+            <p className="text-sm">{t("You are an approved tutor.")} {!mine.active && <strong>{t("Your profile is paused.")}</strong>}</p>
+            <Link href="/tutors/me" className="btn-secondary">{t("My tutor profile")}</Link>
+          </>
+        ) : app && app.status !== "approved" ? (
+          <>
+            <p className="min-w-0 flex-1 text-sm">{STATUS_TEXT[app.status]}</p>
+            <Link href="/tutors/apply" className="btn-primary">{app.status === "pending" ? t("See my application") : t("Continue")}</Link>
+          </>
+        ) : (
+          <>
+            <p className="min-w-0 flex-1 text-sm text-black/65">{t("Good at a subject? Apply to become an approved tutor.")}</p>
+            <Link href="/tutors/apply" className="btn-primary">{t("Become a Tutor")}</Link>
+          </>
+        )}
+      </div>
+      {reviewer && <Link href="/tutors/review" className="card block p-3 text-sm text-brand-700 underline">{t("Review tutor applications")}</Link>}
+      <form action="/tutors" className="flex gap-2">
+        {subject && <input type="hidden" name="subject" value={subject} />}
+        {format && <input type="hidden" name="format" value={format} />}
+        <input name="q" defaultValue={q} className="input" placeholder={t("Search by name or subject")} aria-label={t("Search tutors")} />
+        <button className="btn-secondary shrink-0 px-3">{t("Search")}</button>
+      </form>
       <div className="flex gap-1.5 overflow-x-auto pb-1">
-        <Link href="/tutors" className={`chip shrink-0 ${!subject ? "bg-brand-700 text-white" : ""}`}>All</Link>
-        {SUBJECTS.filter((s) => s !== "Other").map((s) => (
-          <Link key={s} href={`/tutors?subject=${encodeURIComponent(s)}`} className={`chip shrink-0 ${subject === s ? "bg-brand-700 text-white" : ""}`}>{s}</Link>
+        <Link href={link({ subject: "" })} className={`chip shrink-0 ${!subject ? "bg-brand-700 text-white" : ""}`}>{t("All")}</Link>
+        {TUTOR_SUBJECTS.map((s) => (
+          <Link key={s} href={link({ subject: s })} className={`chip shrink-0 ${subject === s ? "bg-brand-700 text-white" : ""}`}>{s}</Link>
+        ))}
+      </div>
+      <div className="flex gap-1.5">
+        {[["", t("Any format")], ["online", t("Online")], ["in_person", t("In person")]].map(([id, label]) => (
+          <Link key={id} href={link({ format: id })} className={`chip ${format === id ? "bg-brand-700 text-white" : ""}`}>{label}</Link>
         ))}
       </div>
       {tutors.length === 0 ? (
-        <Empty emoji="📚" title="No tutors for this subject yet">Good at it? Tap “I can help”.</Empty>
+        <Empty emoji="📚" title={t("No approved tutors match yet")}>{t("Try another subject, or apply to become a tutor yourself.")}</Empty>
       ) : (
-        tutors.map((t) => t.profile && (
-          <article key={t.profile_id} className="card space-y-2 p-4">
-            <Link href={`/profile/${t.profile.id}`} className="flex items-center gap-3">
-              <Avatar avatar={t.profile.avatar} />
-              <div>
-                <p className="font-semibold">{t.profile.full_name}</p>
-                <p className="text-xs text-black/50">Grade {t.profile.grade}{t.availability && ` · ${t.availability}`}</p>
+        <div className="grid gap-3 sm:grid-cols-2">
+          {tutors.map((x) => (
+            <article key={x.profile_id} className="card flex flex-col gap-2 p-4" data-tutor={x.profile_id}>
+              <div className="flex items-center gap-3">
+                {x.photo_path && photos.get(x.photo_path) ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={photos.get(x.photo_path)!} alt="" className="size-12 rounded-full object-cover" />
+                ) : <Avatar avatar={x.profile!.avatar} />}
+                <div className="min-w-0">
+                  <p className="truncate font-semibold">{x.profile!.full_name}</p>
+                  <p className="text-xs text-black/50">{t("Grade")} {x.profile!.grade} · {t(formatLabel(x.format))}</p>
+                </div>
               </div>
-            </Link>
-            <div className="flex flex-wrap gap-1">{t.subjects.map((s) => <span key={s} className="chip bg-brand-50 text-brand-800">{s}</span>)}</div>
-            {t.about && <p className="text-sm text-black/70">{t.about}</p>}
-            {canAct && <AskTutorForm tutorId={t.profile.id} subjects={t.subjects} />}
-          </article>
-        ))
+              <div className="flex flex-wrap gap-1">{x.subjects.slice(0, 5).map((s) => <span key={s} className="chip bg-brand-50 text-brand-800">{s}</span>)}{x.subjects.length > 5 && <span className="chip">+{x.subjects.length - 5}</span>}</div>
+              {x.about && <p className="line-clamp-3 text-sm text-black/70">{x.about}</p>}
+              {x.qualifications && <p className="line-clamp-2 text-xs text-black/55">🎓 {x.qualifications}</p>}
+              <p className="text-xs text-black/55">🕒 {x.days.length ? x.days.map((d) => DAYS.find((y) => y.id === d)?.label).join(", ") + (x.hours ? ` · ${x.hours}` : "") : x.availability || t("Ask for times")}</p>
+              <Link href={`/tutors/${x.profile_id}`} className="btn-secondary mt-auto w-full">{t("View profile")}</Link>
+            </article>
+          ))}
+        </div>
       )}
     </div>
   );
@@ -174,27 +228,15 @@ async function Requests({ meId }: { meId: string }) {
   );
 }
 
-async function Me({ meId }: { meId: string }) {
-  const supabase = await createClient();
-  const { data } = await supabase.from("tutor_profiles").select("subjects, about, availability, active").eq("profile_id", meId).maybeSingle();
-  return (
-    <div className="space-y-3">
-      <TutorProfileForm current={data} />
-      {data && (
-        <form action={stopTutoring}>
-          <SubmitButton className="btn-ghost w-full text-sm text-black/50" pendingText="…">Stop being a tutor</SubmitButton>
-        </form>
-      )}
-    </div>
-  );
-}
-
 async function Tutors({ searchParams }: { searchParams: PageProps<"/tutors">["searchParams"] }) {
   const me = await requireMe();
   if (!me.isStudent) redirect("/tawjihi");
   const sp = await searchParams;
   const tab = TABS.some((t) => t.id === sp.tab) ? (sp.tab as string) : "find";
-  const subject = typeof sp.subject === "string" && SUBJECTS.includes(sp.subject) ? sp.subject : "";
+  if (sp.tab === "me") redirect("/tutors/me");
+  const subject = typeof sp.subject === "string" && TUTOR_SUBJECTS.includes(sp.subject) ? sp.subject : "";
+  const format = sp.format === "online" || sp.format === "in_person" ? sp.format : "";
+  const q = typeof sp.q === "string" ? sp.q.slice(0, 50) : "";
   const canAct = !me.isSuspended;
   return (
     <>
@@ -205,10 +247,9 @@ async function Tutors({ searchParams }: { searchParams: PageProps<"/tutors">["se
           </Link>
         ))}
       </div>
-      {tab === "find" && <Find subject={subject} meId={me.id} canAct={canAct} />}
+      {tab === "find" && <Find subject={subject} format={format} q={q} meId={me.id} />}
       {tab === "buddies" && <Buddies meId={me.id} canAct={canAct} />}
       {tab === "requests" && <Requests meId={me.id} />}
-      {tab === "me" && <Me meId={me.id} />}
     </>
   );
 }
@@ -216,7 +257,7 @@ async function Tutors({ searchParams }: { searchParams: PageProps<"/tutors">["se
 export default function TutorsPage(props: PageProps<"/tutors">) {
   return (
     <>
-      <PageHeader title="Tutors & study buddies" back="/more" />
+      <PageHeader title="Tutors Directory" back="/more" />
       <Suspense fallback={<PageSkeleton />}>
         <Tutors searchParams={props.searchParams} />
       </Suspense>

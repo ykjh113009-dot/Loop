@@ -1,0 +1,247 @@
+const { chromium } = require('playwright');
+const { execSync } = require('child_process');
+const path = require('path');
+const BASE = 'http://localhost:3000';
+const check = (name, ok, info = '') => console.log((ok ? 'PASS' : 'FAIL') + '  ' + name + (info ? '  — ' + info : ''));
+const text = async (p) => (await p.locator('body').innerText()).replace(/\s+/g, ' ');
+const sql = (q) => execSync(`docker exec -i supabase_db_pbs-go psql -U postgres -d postgres -Atq`, { input: q }).toString().trim();
+const ID = { rania: '00000000-0000-0000-0000-0000000000a1', layla: '00000000-0000-0000-0000-0000000000a3', maya: '00000000-0000-0000-0000-0000000000a5' };
+const go = (p, u) => p.goto(BASE + u, { waitUntil: 'networkidle' });
+const waitText = (p, re, t = 20000) => p.waitForFunction((s) => new RegExp(s, 'i').test(document.body.innerText), re.source, { timeout: t });
+const noSideScroll = (p) => p.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1);
+const PDF = path.join(__dirname, 'sample.pdf');
+
+async function login(browser, name, viewport = { width: 1280, height: 850 }) {
+  const ctx = await browser.newContext({ viewport });
+  const p = await ctx.newPage();
+  await go(p, '/login');
+  await p.locator('.lp-demo button', { hasText: name }).click();
+  await p.waitForURL('**/home', { timeout: 20000 });
+  return { ctx, p };
+}
+
+(async () => {
+  const browser = await chromium.launch();
+  sql(`delete from public.tutor_applications where profile_id='${ID.maya}'; delete from public.tutor_profiles where profile_id='${ID.maya}'; delete from public.study_resources where title like 'E2E %'; delete from public.study_opportunities where title like 'E2E %'; delete from public.top10_prizes; delete from public.top10_settings; delete from public.study_categories where slug='ap-statistics'; delete from public.rate_events where profile_id in ('${ID.maya}','${ID.rania}','${ID.layla}');`);
+  const rania = await login(browser, 'Rania Haddad');
+  const maya = await login(browser, 'Maya Odeh');
+  const layla = await login(browser, 'Layla Nasser');
+  const mobile = await login(browser, 'Maya Odeh', { width: 390, height: 800 });
+
+  // 1. The sidebar
+  {
+    const p = maya.p;
+    await go(p, '/home');
+    const labels = await p.locator('aside nav[aria-label=Main] a').allInnerTexts();
+    const want = ['Home', 'Community', 'Chats', 'Calendar', 'Activities', 'Academic Resources', 'Tutors Directory', 'University & Opportunities', 'Rewards Shop'];
+    check('The sidebar has exactly the nine items in order', JSON.stringify(labels.map((l) => l.trim().replace(/\s+\d+$/, ''))) === JSON.stringify(want), labels.join(' | '));
+    const icons = await p.locator('aside nav[aria-label=Main] a').evaluateAll((as) => as.map((a) => a.firstElementChild && a.firstElementChild.tagName.toLowerCase() === 'svg'));
+    check('Every item has an icon on the left', icons.every(Boolean));
+    const iconSides = await p.locator('aside nav[aria-label=Main] a').evaluateAll((as) => as.every((a) => { const svg = a.querySelector('svg').getBoundingClientRect(); const range = document.createRange(); range.selectNodeContents(a); const t = [...a.childNodes].find((n) => n.nodeType === 3); if (!t) return true; const r = document.createRange(); r.selectNodeContents(t); return svg.right <= r.getBoundingClientRect().left + 1; }));
+    check('The icons sit left of the labels', iconSides);
+    const dividerBefore = await p.locator('aside nav[aria-label=Main] li').evaluateAll((lis) => lis.findIndex((li) => getComputedStyle(li).borderTopWidth !== '0px'));
+    check('A divider sits between Activities and Academic Resources', dividerBefore === 5, 'index ' + dividerBefore);
+    const hrefs = await p.locator('aside nav[aria-label=Main] a').evaluateAll((as) => as.map((a) => a.getAttribute('href')));
+    check('The four Study Hub items are separate destinations', ['/academic-resources', '/tutors', '/opportunities', '/shop'].every((h, i) => hrefs[5 + i] === h));
+    for (const [h, re] of [['/academic-resources', /Academic Resources/], ['/tutors', /Tutors Directory/], ['/opportunities', /University & Opportunities/], ['/shop', /Rewards Shop/]]) {
+      await go(p, h);
+      const active = await p.locator(`aside nav a[href="${h}"]`).getAttribute('aria-current');
+      check(`${h} opens its own page and is highlighted`, active === 'page' && re.test(await text(p)));
+    }
+    await go(p, '/shop');
+    check('Rewards Shop is not also highlighting Activities', (await p.locator('aside nav a[href="/challenges"]').getAttribute('aria-current')) === null);
+  }
+
+  // 2. Academic resources
+  {
+    const p = maya.p;
+    await go(p, '/academic-resources');
+    const slugs = await p.locator('[data-category]').evaluateAll((els) => els.map((e) => e.getAttribute('data-category')));
+    check('Academic Resources has separate category pages', ['sat', 'ap-chemistry', 'ap-biology', 'ap-physics', 'ap-calculus', 'other'].every((s) => slugs.includes(s)), slugs.join(','));
+    await go(p, '/academic-resources/ap-chemistry');
+    check('A category page has its own empty state', /No resources here yet/.test(await text(p)));
+    check('An ordinary student cannot add resources', (await p.locator('input[name=url]').count()) === 0);
+  }
+  {
+    const p = layla.p; // an approved tutor
+    await go(p, '/academic-resources/sat');
+    await p.fill('input[name=title]', 'E2E SAT practice');
+    await p.fill('input[name=url]', 'https://example.org/sat');
+    await p.getByRole('button', { name: 'Add resource' }).click();
+    await waitText(p, /Added|E2E SAT practice/);
+    await go(maya.p, '/academic-resources/sat');
+    check('An approved tutor adds a resource and students see it', /E2E SAT practice/.test(await text(maya.p)));
+  }
+  {
+    const p = rania.p;
+    await go(p, '/academic-resources');
+    await p.getByText('Add a subject').click();
+    await p.fill('input[name=name]', 'AP Statistics');
+    await p.getByRole('button', { name: 'Add', exact: true }).click();
+    await waitText(p, /Subject added|AP Statistics/);
+    await go(p, '/academic-resources');
+    check('Admins can add a subject', /AP Statistics/.test(await text(p)));
+  }
+
+  // 3. Tutors Directory and the application
+  {
+    const p = maya.p;
+    await go(p, '/tutors');
+    check('The directory lists approved tutors with a profile button', (await p.locator('[data-tutor]').count()) >= 5 && (await p.getByRole('link', { name: 'View profile' }).count()) >= 5);
+    check('Become a Tutor is visible', (await p.getByRole('link', { name: 'Become a Tutor' }).count()) === 1);
+    check('Maya is not listed before approval', (await p.locator(`[data-tutor="${ID.maya}"]`).count()) === 0);
+    await p.getByRole('link', { name: 'Become a Tutor' }).click();
+    await p.waitForURL('**/tutors/apply');
+    await waitText(p, /A\. Personal information/);
+    check('The application takes name and email from the account', /Maya Odeh/.test(await text(p)) && /@pioneers\.edu\.ps/.test(await text(p)));
+    // B
+    await p.getByRole('button', { name: /2\. Academic/ }).click();
+    await p.fill('input[name=grade]', 'Grade 9');
+    await p.locator('label', { hasText: /^\s*SAT\s*$/ }).click();
+    await p.locator('label', { hasText: 'AP Chemistry' }).click();
+    await p.fill('input[name=other_subjects]', 'Latin');
+    await p.fill('textarea[name=achievements]', 'Chemistry 96');
+    // C
+    await p.getByRole('button', { name: /3\. About/ }).click();
+    await p.fill('textarea[name=intro]', 'I explain chemistry step by step.');
+    await p.fill('textarea[name=motivation]', 'I want to help classmates feel ready for exams.');
+    // draft
+    await p.getByRole('button', { name: 'Save draft' }).click();
+    await waitText(p, /Draft saved/);
+    check('A draft can be saved', sql(`select status from public.tutor_applications where profile_id='${ID.maya}'`) === 'draft');
+    await go(p, '/tutors/apply');
+    check('The draft comes back filled in', (await p.inputValue('input[name=grade]')) === 'Grade 9');
+    // D, E
+    await p.getByRole('button', { name: /4\. Avail/ }).click();
+    await p.locator('label', { hasText: 'Mon' }).click();
+    await p.fill('input[name=hours]', '15:00-17:00');
+    await p.getByRole('button', { name: /5\. Doc/ }).click();
+    await p.setInputFiles('input[type=file][accept*=docx]', PDF);
+    await waitText(p, /sample\.pdf/).catch(async () => { console.log('UPLOAD PAGE:', (await text(p)).slice(-500)); throw new Error('upload failed'); });
+    check('A document uploads into the private bucket', sql(`select count(*) from public.tutor_application_documents where size > 0`) >= '1' && sql(`select public from storage.buckets where id='tutor-docs'`) === 'f');
+    // review
+    await p.getByRole('button', { name: /6\. Review/ }).click();
+    { const b = await text(p); check('A summary is shown before submitting', /review your application/i.test(b) && /Latin/.test(b) && /sample\.pdf/.test(b), b.slice(-350)); }
+    await p.getByRole('button', { name: 'Submit application' }).click();
+    await waitText(p, /Your application is with the reviewers/);
+    check('Submitting sets Pending Review', sql(`select status from public.tutor_applications where profile_id='${ID.maya}'`) === 'pending');
+    await go(p, '/tutors');
+    check('A pending applicant is still not in the directory', (await p.locator(`[data-tutor="${ID.maya}"]`).count()) === 0 && /waiting for review/.test(await text(p)));
+  }
+
+  // privacy and permissions
+  {
+    const ahmad = await login(browser, 'Yousef Saleh');
+    const p = ahmad.p;
+    await go(p, '/tutors/review');
+    check('An ordinary student cannot open the review queue', !/Pending Review/.test(await text(p)) && p.url().endsWith('/tutors'));
+    const docPath = sql(`select path from public.tutor_application_documents limit 1`);
+    const r = await p.request.get(`http://127.0.0.1:54321/storage/v1/object/public/tutor-docs/${docPath}`);
+    check('Documents are not available through a public address', r.status() >= 400, 'status ' + r.status());
+    await ahmad.ctx.close();
+  }
+
+  // review
+  let appId;
+  {
+    const p = rania.p;
+    await go(p, '/tutors/review');
+    appId = await p.locator('[data-application]').first().getAttribute('data-application');
+    check('Reviewers see the pending application', /Maya Odeh/.test(await text(p)));
+    await go(p, `/tutors/review/${appId}`);
+    check('The review page shows the details and documents', /Chemistry 96/.test(await text(p)) && /sample\.pdf/.test(await text(p)) && (await p.locator('a[href*="token="]').count()) >= 1);
+    await p.getByRole('button', { name: 'Reject' }).click();
+    await waitText(p, /Tell the student/);
+    await p.fill('textarea[name=note]', 'Please add your latest chemistry grade.');
+    await p.getByRole('button', { name: 'Reject' }).click();
+    await waitText(p, /Sent back|Rejected/);
+    check('A rejection needs and stores feedback', sql(`select status from public.tutor_applications where profile_id='${ID.maya}'`) === 'rejected');
+  }
+  {
+    const p = maya.p;
+    await go(p, '/tutors/apply');
+    check('The applicant sees the feedback and can edit', /Please add your latest chemistry grade/.test(await text(p)) && (await p.locator('input[name=grade]').count()) === 1);
+    await p.getByRole('button', { name: /6\. Review/ }).click();
+    await p.getByRole('button', { name: 'Submit application' }).click();
+    await waitText(p, /Your application is with the reviewers/);
+    check('A rejected application can be resubmitted', sql(`select count(*) from public.tutor_application_events where action='resubmit'`) >= '1');
+  }
+  {
+    const p = rania.p;
+    await go(p, `/tutors/review/${appId}`);
+    check('The history keeps the earlier rejection', /Needs changes/.test(await text(p)) && /Submitted again/.test(await text(p)));
+    await p.getByRole('button', { name: 'Approve' }).click();
+    await waitText(p, /Approved/);
+    check('Approval creates the public tutor profile', sql(`select count(*) from public.tutor_profiles where profile_id='${ID.maya}' and approved_at is not null and active`) === '1');
+  }
+  {
+    const p = maya.p;
+    await go(p, '/tutors');
+    check('The approved tutor appears in the directory', (await p.locator(`[data-tutor="${ID.maya}"]`).count()) === 0 && /You are an approved tutor/.test(await text(p)));
+    await go(layla.p, '/tutors');
+    check('Other students see the approved tutor', (await layla.p.locator(`[data-tutor="${ID.maya}"]`).count()) === 1);
+    await go(layla.p, `/tutors/${ID.maya}`);
+    const body = await text(layla.p);
+    check('The public profile shows subjects and availability but not private details', /Latin/.test(body) && /Mon/.test(body) && !/Chemistry 96/.test(body) && !/sample\.pdf/.test(body));
+    check('The full profile has a booking option', /Book a session/.test(body));
+    await go(p, '/tutors/me');
+    check('The approved tutor can update their profile', (await p.locator('textarea[name=intro]').count()) === 1);
+    check('An approved tutor cannot open the application again', (await go(p, '/tutors/apply'), p.url().endsWith('/tutors/me')));
+  }
+
+  // 4. Opportunities
+  {
+    const p = rania.p;
+    await go(p, '/opportunities/new');
+    await p.selectOption('select[name=category]', 'scholarships');
+    await p.fill('input[name=title]', 'E2E Sample scholarship');
+    await p.fill('input[name=organization]', 'Sample Foundation');
+    await p.fill('textarea[name=description]', 'A clearly labelled sample.');
+    await p.fill('input[name=link]', 'https://example.org/apply');
+    await p.check('input[name=is_sample]');
+    await p.getByRole('button', { name: 'Publish' }).click();
+    await p.waitForURL(/\/opportunities\/[0-9a-f-]{36}$/, { timeout: 20000 });
+    const q = maya.p;
+    await go(q, '/opportunities?category=scholarships');
+    check('Students can browse and filter opportunities', /E2E Sample scholarship/.test(await text(q)) && /Sample/.test(await text(q)));
+    await go(q, '/opportunities?category=summer');
+    check('The category filter hides other categories', !/E2E Sample scholarship/.test(await text(q)));
+    await go(q, '/opportunities?q=Sample+Foundation');
+    await q.getByText('E2E Sample scholarship').click();
+    await q.waitForURL(/\/opportunities\/[0-9a-f-]{36}$/);
+    await waitText(q, /Open the application page/);
+    check('An opportunity has its own listing with an application link', /Open the application page/.test(await text(q)) && (await q.locator('a[href="https://example.org/apply"]').count()) === 1);
+    await go(q, '/opportunities');
+    check('Students do not see the add button', (await q.getByRole('link', { name: /\+ Add/ }).count()) === 0);
+  }
+
+  // 5. Rewards Shop
+  {
+    const p = rania.p;
+    await go(p, '/admin/rewards');
+    await p.locator('form[data-place="1"] input[name=title]').fill('Pizza party');
+    await p.locator('form[data-place="1"]').getByRole('button', { name: 'Save' }).click();
+    await waitText(p, /Saved/);
+    const q = maya.p;
+    await go(q, '/shop');
+    check('The shop shows the balance and redeemable rewards', (await q.locator('[data-testid=balance]').count()) === 1 && (await q.locator('[data-reward]').count()) >= 1);
+    check('Students cannot redeem without enough points', await q.locator('[data-reward] button').first().isDisabled().catch(() => true));
+    await q.getByRole('tab', { name: 'Top 10 prizes' }).click();
+    await q.waitForURL('**/shop?tab=top10');
+    check('Top 10 prizes live inside the Rewards Shop', /Top 10 student prizes/.test(await text(q)) && /Pizza party/.test(await text(q)) && /Ranking period/.test(await text(q)));
+    check('There is no separate Top 10 item in the sidebar', (await q.locator('aside nav a', { hasText: /top 10/i }).count()) === 0);
+  }
+
+  // 6. Phones
+  {
+    const p = mobile.p;
+    for (const u of ['/academic-resources', '/academic-resources/sat', '/tutors', `/tutors/${ID.layla}`, '/tutors/apply', '/opportunities', '/shop', '/shop?tab=top10', '/more']) {
+      await go(p, u);
+      check(`No sideways scrolling on a phone: ${u}`, await noSideScroll(p));
+    }
+    await go(p, '/more');
+    check('On a phone, the Study Hub is reachable from More', /study hub/i.test(await text(p)) && /Tutors Directory/i.test(await text(p)));
+  }
+  sql(`delete from public.tutor_applications where profile_id='${ID.maya}'; delete from public.tutor_profiles where profile_id='${ID.maya}'; delete from public.study_resources where title like 'E2E %'; delete from public.study_opportunities where title like 'E2E %'; delete from public.top10_prizes; delete from public.study_categories where slug='ap-statistics';`);
+  await browser.close();
+})().catch((e) => { console.error('ERROR', e); process.exit(1); });

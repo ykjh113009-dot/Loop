@@ -47,3 +47,7 @@ Bugs found and fixed while testing:
 ## Phase 4
 
 `supabase/tests/phase4_activities.sql` covers proposals and approval, direct publishing, capacity and the waiting list, chat membership, reminders, editing and announcements, files, volunteering (apply, accept, spots, hours, points once, history) and the council hub (posts, contact info, messages and replies, privacy). `tests/e2e/phase4.js` walks the same flow in a browser, including the calendar views, filters and phone widths. The database tests need a freshly reset database; the browser suites leave data behind, and the local sign-in limit (about 30 per 5 minutes) means running all browser suites back to back can fail on sign-in. Run them in two batches.
+
+## Study Hub
+
+`supabase/tests/study_hub.sql` checks the tutor workflow (drafts, submit rules, review permissions, privacy of applications and documents, approval, resubmission history, directory visibility, requests to approved tutors), resources, opportunities and the Top 10 prizes. `tests/e2e/studyhub.js` checks the exact sidebar (order, icons on the left, divider, destinations), each section, the whole application journey including a real document upload, and phone widths. It needs `tests/e2e/sample.pdf`. The dashboard test now expects the nine-item sidebar.
