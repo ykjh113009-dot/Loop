@@ -133,8 +133,9 @@ const text = async (p) => (await p.locator('body').innerText()).replace(/\s+/g, 
     // Google button when Google is not switched on for this Supabase project
     await p.goto(BASE + '/login', { waitUntil: 'networkidle' });
     await p.getByRole('button', { name: /Continue with Google/ }).click();
-    await p.locator('[role=alert]').first().waitFor({ timeout: 8000 }).catch(() => {});
-    const msg = await p.locator('[role=alert]').first().innerText().catch(() => '');
+    const real = p.locator('[role=alert]', { hasText: /\S/ }).first();
+    await real.waitFor({ timeout: 8000 }).catch(() => {});
+    const msg = await real.innerText().catch(() => '');
     const enabled = await p.getByRole('button', { name: /Continue with Google/ }).isEnabled().catch(() => false);
     check('Google button with Google switched off: clear message, no raw error page, button usable again', /isn.t switched on/i.test(msg) && p.url().includes('/login') && enabled, msg.slice(0, 90));
     await ctx.close();
