@@ -39,14 +39,14 @@ isOneToOne: false
                   ]
                 },"admin_applications": {
                   Row: {
-                    "applicant_id": string,"assigned_role": string | null,"contribution": string,"created_at": string,"experience": string,"id": string,"motivation": string,"position": string,"requested_role": string,"review_note": string | null,"reviewed_at": string | null,"reviewed_by": string | null,"school_id": string,"status": string
+                    "applicant_id": string,"assigned_role": string | null,"contribution": string,"created_at": string,"decision_seen_at": string | null,"experience": string,"id": string,"motivation": string,"position": string,"requested_role": string,"review_note": string | null,"reviewed_at": string | null,"reviewed_by": string | null,"school_id": string,"status": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "applicant_id": string,"assigned_role"?: string | null,"contribution": string,"created_at"?: string,"experience"?: string,"id"?: string,"motivation": string,"position"?: string,"requested_role": string,"review_note"?: string | null,"reviewed_at"?: string | null,"reviewed_by"?: string | null,"school_id": string,"status"?: string
+                    "applicant_id": string,"assigned_role"?: string | null,"contribution": string,"created_at"?: string,"decision_seen_at"?: string | null,"experience"?: string,"id"?: string,"motivation": string,"position"?: string,"requested_role": string,"review_note"?: string | null,"reviewed_at"?: string | null,"reviewed_by"?: string | null,"school_id": string,"status"?: string
                   }
                   Update: {
-                    "applicant_id"?: string,"assigned_role"?: string | null,"contribution"?: string,"created_at"?: string,"experience"?: string,"id"?: string,"motivation"?: string,"position"?: string,"requested_role"?: string,"review_note"?: string | null,"reviewed_at"?: string | null,"reviewed_by"?: string | null,"school_id"?: string,"status"?: string
+                    "applicant_id"?: string,"assigned_role"?: string | null,"contribution"?: string,"created_at"?: string,"decision_seen_at"?: string | null,"experience"?: string,"id"?: string,"motivation"?: string,"position"?: string,"requested_role"?: string,"review_note"?: string | null,"reviewed_at"?: string | null,"reviewed_by"?: string | null,"school_id"?: string,"status"?: string
                   }
                   Relationships: [
                     {
@@ -1547,14 +1547,14 @@ isOneToOne: false
                   ]
                 },"leadership_requests": {
                   Row: {
-                    "club_id": string | null,"created_at": string,"id": string,"kind": string,"profile_id": string,"reason": string,"review_note": string | null,"reviewed_at": string | null,"reviewed_by": string | null,"school_id": string,"scope": string,"status": string
+                    "club_id": string | null,"created_at": string,"decision_seen_at": string | null,"id": string,"kind": string,"profile_id": string,"reason": string,"review_note": string | null,"reviewed_at": string | null,"reviewed_by": string | null,"school_id": string,"scope": string,"status": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "club_id"?: string | null,"created_at"?: string,"id"?: string,"kind": string,"profile_id": string,"reason": string,"review_note"?: string | null,"reviewed_at"?: string | null,"reviewed_by"?: string | null,"school_id": string,"scope"?: string,"status"?: string
+                    "club_id"?: string | null,"created_at"?: string,"decision_seen_at"?: string | null,"id"?: string,"kind": string,"profile_id": string,"reason": string,"review_note"?: string | null,"reviewed_at"?: string | null,"reviewed_by"?: string | null,"school_id": string,"scope"?: string,"status"?: string
                   }
                   Update: {
-                    "club_id"?: string | null,"created_at"?: string,"id"?: string,"kind"?: string,"profile_id"?: string,"reason"?: string,"review_note"?: string | null,"reviewed_at"?: string | null,"reviewed_by"?: string | null,"school_id"?: string,"scope"?: string,"status"?: string
+                    "club_id"?: string | null,"created_at"?: string,"decision_seen_at"?: string | null,"id"?: string,"kind"?: string,"profile_id"?: string,"reason"?: string,"review_note"?: string | null,"reviewed_at"?: string | null,"reviewed_by"?: string | null,"school_id"?: string,"scope"?: string,"status"?: string
                   }
                   Relationships: [
                     {
@@ -3373,7 +3373,10 @@ isOneToOne: false
             [_ in never]: never
           }
           Functions: {
-            "add_event_attachment":
+            "ack_application_decision":
+{ Args: { "p_id": string,"p_kind": string }; Returns: undefined
+                           },
+"add_event_attachment":
 { Args: { "p_event": string,"p_name": string,"p_path": string }; Returns: string
                            },
 "add_group_members":

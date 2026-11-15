@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
         .then(() => null, () => null);
       // People who chose "Admin" on the sign-in page continue to the application form.
       const wantsAdmin = request.cookies.get(NEXT_COOKIE)?.value === "apply-admin";
-      const response = go(wantsAdmin ? "/apply-admin" : "/home");
+      const response = go(wantsAdmin ? "/auth/continue?to=apply-admin" : "/auth/continue");
       response.cookies.delete(NEXT_COOKIE);
       return response;
     }

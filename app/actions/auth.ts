@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { DEMO_ACCOUNTS, isDemoMode } from "@/lib/demo";
+import { afterSignInPath } from "@/lib/applications";
 
 export async function demoSignIn(formData: FormData) {
   const email = String(formData.get("email"));
@@ -11,12 +12,12 @@ export async function demoSignIn(formData: FormData) {
     redirect("/login?error=demo");
   }
   const supabase = await createClient();
-  const { error } = await supabase.auth.signInWithPassword({
+  const { data, error } = await supabase.auth.signInWithPassword({
     email,
     password: process.env.DEMO_PASSWORD ?? "pbsgo-demo",
   });
   if (error) redirect("/login?error=demo");
-  redirect("/home");
+  redirect(await afterSignInPath(supabase, data.user.id));
 }
 
 export async function signOut() {
