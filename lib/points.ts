@@ -8,6 +8,7 @@ export const POINT_REASONS: Record<string, string> = {
   election_vote: "Voted in an election",
   challenge: "Challenge",
   challenge_rank: "Challenge prize",
+  library_resource: "Shared a study resource",
   volunteer: "Volunteering hours",
   tutoring: "Tutored a classmate",
   tawjihi_answer: "Answered a Tawjihi question",

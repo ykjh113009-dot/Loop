@@ -51,3 +51,8 @@ Bugs found and fixed while testing:
 ## Study Hub
 
 `supabase/tests/study_hub.sql` checks the tutor workflow (drafts, submit rules, review permissions, privacy of applications and documents, approval, resubmission history, directory visibility, requests to approved tutors), resources, opportunities and the Top 10 prizes. `tests/e2e/studyhub.js` checks the exact sidebar (order, icons on the left, divider, destinations), each section, the whole application journey including a real document upload, and phone widths. It needs `tests/e2e/sample.pdf`. The dashboard test now expects the nine-item sidebar.
+
+
+## Academic Resources Library
+- `supabase/tests/library.sql` (run by `npm run db:test`): submissions, link/file safety, privacy before approval, review and history, versions, points once, ratings, Top rated, saving, statistics, Official, internal flags, other school.
+- `tests/e2e/library.js`: the whole flow in a browser (Maya suggests with a PDF, Omar reviews, Yousef reads/rates/saves, Rania adds Official), plus phone widths. Reviewer = Omar Khalil (seeded Council member).

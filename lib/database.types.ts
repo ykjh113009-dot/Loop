@@ -1621,6 +1621,294 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"library_actions": {
+                  Row: {
+                    "action": string,"actor_id": string | null,"created_at": string,"id": number,"note": string,"resource_id": string | null,"school_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "action": string,"actor_id"?: string | null,"created_at"?: string,"id"?: never,"note"?: string,"resource_id"?: string | null,"school_id": string
+                  }
+                  Update: {
+                    "action"?: string,"actor_id"?: string | null,"created_at"?: string,"id"?: never,"note"?: string,"resource_id"?: string | null,"school_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "library_actions_actor_id_fkey"
+      columns: ["actor_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "library_actions_resource_id_fkey"
+      columns: ["resource_id"]
+isOneToOne: false
+      referencedRelation: "library_resources"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "library_actions_school_id_fkey"
+      columns: ["school_id"]
+isOneToOne: false
+      referencedRelation: "schools"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"library_decisions": {
+                  Row: {
+                    "created_at": string,"decision": string,"id": number,"note": string,"resource_id": string,"reviewer_id": string | null,"revision_id": string,"school_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"decision": string,"id"?: never,"note"?: string,"resource_id": string,"reviewer_id"?: string | null,"revision_id": string,"school_id": string
+                  }
+                  Update: {
+                    "created_at"?: string,"decision"?: string,"id"?: never,"note"?: string,"resource_id"?: string,"reviewer_id"?: string | null,"revision_id"?: string,"school_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "library_decisions_resource_id_fkey"
+      columns: ["resource_id"]
+isOneToOne: false
+      referencedRelation: "library_resources"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "library_decisions_reviewer_id_fkey"
+      columns: ["reviewer_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "library_decisions_revision_id_fkey"
+      columns: ["revision_id"]
+isOneToOne: false
+      referencedRelation: "library_revisions"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "library_decisions_school_id_fkey"
+      columns: ["school_id"]
+isOneToOne: false
+      referencedRelation: "schools"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"library_events": {
+                  Row: {
+                    "created_at": string,"id": number,"kind": string,"profile_id": string,"resource_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"id"?: never,"kind": string,"profile_id": string,"resource_id": string
+                  }
+                  Update: {
+                    "created_at"?: string,"id"?: never,"kind"?: string,"profile_id"?: string,"resource_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "library_events_profile_id_fkey"
+      columns: ["profile_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "library_events_resource_id_fkey"
+      columns: ["resource_id"]
+isOneToOne: false
+      referencedRelation: "library_resources"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"library_flags": {
+                  Row: {
+                    "created_at": string,"flagged_by": string | null,"id": string,"reason": string,"resolution_note": string | null,"resolved_at": string | null,"resolved_by": string | null,"resource_id": string,"school_id": string,"status": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"flagged_by"?: string | null,"id"?: string,"reason": string,"resolution_note"?: string | null,"resolved_at"?: string | null,"resolved_by"?: string | null,"resource_id": string,"school_id": string,"status"?: string
+                  }
+                  Update: {
+                    "created_at"?: string,"flagged_by"?: string | null,"id"?: string,"reason"?: string,"resolution_note"?: string | null,"resolved_at"?: string | null,"resolved_by"?: string | null,"resource_id"?: string,"school_id"?: string,"status"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "library_flags_flagged_by_fkey"
+      columns: ["flagged_by"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "library_flags_resolved_by_fkey"
+      columns: ["resolved_by"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "library_flags_resource_id_fkey"
+      columns: ["resource_id"]
+isOneToOne: false
+      referencedRelation: "library_resources"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "library_flags_school_id_fkey"
+      columns: ["school_id"]
+isOneToOne: false
+      referencedRelation: "schools"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"library_ratings": {
+                  Row: {
+                    "created_at": string,"profile_id": string,"resource_id": string,"review": string | null,"school_id": string,"stars": number,"updated_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"profile_id": string,"resource_id": string,"review"?: string | null,"school_id": string,"stars": number,"updated_at"?: string
+                  }
+                  Update: {
+                    "created_at"?: string,"profile_id"?: string,"resource_id"?: string,"review"?: string | null,"school_id"?: string,"stars"?: number,"updated_at"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "library_ratings_profile_id_fkey"
+      columns: ["profile_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "library_ratings_resource_id_fkey"
+      columns: ["resource_id"]
+isOneToOne: false
+      referencedRelation: "library_resources"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "library_ratings_school_id_fkey"
+      columns: ["school_id"]
+isOneToOne: false
+      referencedRelation: "schools"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"library_resources": {
+                  Row: {
+                    "author": string,"content_key": string | null,"cover_path": string | null,"created_at": string,"deleted_at": string | null,"description": string,"downloadable": boolean,"downloads_count": number,"file_hash": string | null,"file_mime": string | null,"file_name": string | null,"file_path": string | null,"file_size": number | null,"id": string,"latest_revision_id": string | null,"link_url": string | null,"live_revision_id": string | null,"points_awarded": boolean,"published_at": string | null,"rating_avg": number,"rating_count": number,"review_count": number,"school_id": string,"source": string,"subject_id": string,"submitter_id": string | null,"title": string,"type": string,"updated_at": string,"views_count": number,"visibility": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "author"?: string,"content_key"?: string | null,"cover_path"?: string | null,"created_at"?: string,"deleted_at"?: string | null,"description"?: string,"downloadable"?: boolean,"downloads_count"?: number,"file_hash"?: string | null,"file_mime"?: string | null,"file_name"?: string | null,"file_path"?: string | null,"file_size"?: number | null,"id"?: string,"latest_revision_id"?: string | null,"link_url"?: string | null,"live_revision_id"?: string | null,"points_awarded"?: boolean,"published_at"?: string | null,"rating_avg"?: number,"rating_count"?: number,"review_count"?: number,"school_id": string,"source": string,"subject_id": string,"submitter_id"?: string | null,"title": string,"type": string,"updated_at"?: string,"views_count"?: number,"visibility"?: string
+                  }
+                  Update: {
+                    "author"?: string,"content_key"?: string | null,"cover_path"?: string | null,"created_at"?: string,"deleted_at"?: string | null,"description"?: string,"downloadable"?: boolean,"downloads_count"?: number,"file_hash"?: string | null,"file_mime"?: string | null,"file_name"?: string | null,"file_path"?: string | null,"file_size"?: number | null,"id"?: string,"latest_revision_id"?: string | null,"link_url"?: string | null,"live_revision_id"?: string | null,"points_awarded"?: boolean,"published_at"?: string | null,"rating_avg"?: number,"rating_count"?: number,"review_count"?: number,"school_id"?: string,"source"?: string,"subject_id"?: string,"submitter_id"?: string | null,"title"?: string,"type"?: string,"updated_at"?: string,"views_count"?: number,"visibility"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "library_resources_school_id_fkey"
+      columns: ["school_id"]
+isOneToOne: false
+      referencedRelation: "schools"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "library_resources_subject_id_fkey"
+      columns: ["subject_id"]
+isOneToOne: false
+      referencedRelation: "study_categories"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "library_resources_submitter_id_fkey"
+      columns: ["submitter_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"library_revisions": {
+                  Row: {
+                    "author": string,"cover_path": string | null,"created_at": string,"description": string,"downloadable": boolean,"file_hash": string | null,"file_mime": string | null,"file_name": string | null,"file_path": string | null,"file_size": number | null,"id": string,"link_url": string | null,"number": number,"resource_id": string,"review_note": string | null,"reviewed_at": string | null,"reviewed_by": string | null,"rights_confirmed": boolean,"school_id": string,"status": string,"subject_id": string,"submitted_at": string | null,"submitter_id": string | null,"title": string,"type": string,"updated_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "author"?: string,"cover_path"?: string | null,"created_at"?: string,"description"?: string,"downloadable"?: boolean,"file_hash"?: string | null,"file_mime"?: string | null,"file_name"?: string | null,"file_path"?: string | null,"file_size"?: number | null,"id"?: string,"link_url"?: string | null,"number"?: number,"resource_id": string,"review_note"?: string | null,"reviewed_at"?: string | null,"reviewed_by"?: string | null,"rights_confirmed"?: boolean,"school_id": string,"status"?: string,"subject_id": string,"submitted_at"?: string | null,"submitter_id"?: string | null,"title": string,"type": string,"updated_at"?: string
+                  }
+                  Update: {
+                    "author"?: string,"cover_path"?: string | null,"created_at"?: string,"description"?: string,"downloadable"?: boolean,"file_hash"?: string | null,"file_mime"?: string | null,"file_name"?: string | null,"file_path"?: string | null,"file_size"?: number | null,"id"?: string,"link_url"?: string | null,"number"?: number,"resource_id"?: string,"review_note"?: string | null,"reviewed_at"?: string | null,"reviewed_by"?: string | null,"rights_confirmed"?: boolean,"school_id"?: string,"status"?: string,"subject_id"?: string,"submitted_at"?: string | null,"submitter_id"?: string | null,"title"?: string,"type"?: string,"updated_at"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "library_revisions_resource_id_fkey"
+      columns: ["resource_id"]
+isOneToOne: false
+      referencedRelation: "library_resources"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "library_revisions_reviewed_by_fkey"
+      columns: ["reviewed_by"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "library_revisions_school_id_fkey"
+      columns: ["school_id"]
+isOneToOne: false
+      referencedRelation: "schools"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "library_revisions_subject_id_fkey"
+      columns: ["subject_id"]
+isOneToOne: false
+      referencedRelation: "study_categories"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "library_revisions_submitter_id_fkey"
+      columns: ["submitter_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"library_saves": {
+                  Row: {
+                    "created_at": string,"profile_id": string,"resource_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"profile_id": string,"resource_id": string
+                  }
+                  Update: {
+                    "created_at"?: string,"profile_id"?: string,"resource_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "library_saves_profile_id_fkey"
+      columns: ["profile_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "library_saves_resource_id_fkey"
+      columns: ["resource_id"]
+isOneToOne: false
+      referencedRelation: "library_resources"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"library_settings": {
+                  Row: {
+                    "points_per_approval": number,"school_id": string,"updated_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "points_per_approval"?: number,"school_id": string,"updated_at"?: string
+                  }
+                  Update: {
+                    "points_per_approval"?: number,"school_id"?: string,"updated_at"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "library_settings_school_id_fkey"
+      columns: ["school_id"]
+isOneToOne: true
+      referencedRelation: "schools"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"listings": {
                   Row: {
                     "category": string,"condition": string,"created_at": string,"description": string,"id": string,"image_path": string | null,"kind": string,"price": number | null,"school_id": string,"seller_id": string,"status": string,"title": string
@@ -3178,11 +3466,17 @@ isOneToOne: false
 "can_review_challenge":
 { Args: { "p_challenge": string }; Returns: boolean
                            },
+"can_review_library":
+{ Args: Record<PropertyKey, never>; Returns: boolean
+                           },
 "can_review_tutors":
 { Args: Record<PropertyKey, never>; Returns: boolean
                            },
 "can_see_group_posts":
 { Args: { "p_group": string }; Returns: boolean
+                           },
+"can_submit_library":
+{ Args: Record<PropertyKey, never>; Returns: boolean
                            },
 "cancel_challenge":
 { Args: { "p_challenge": string,"p_note": string }; Returns: undefined
@@ -3429,6 +3723,71 @@ isOneToOne: false
                            },
 "level_for_xp":
 { Args: { "p_xp": number }; Returns: number
+                           },
+"library_delete":
+{ Args: { "p_resource": string }; Returns: undefined
+                           },
+"library_file_info":
+{ Args: { "p_kind": string,"p_resource": string,"p_revision"?: string }; Returns: Json
+                           },
+"library_file_uploader":
+{ Args: { "p_name": string }; Returns: boolean
+                           },
+"library_file_viewer":
+{ Args: { "p_name": string }; Returns: boolean
+                           },
+"library_flag":
+{ Args: { "p_reason": string,"p_resource": string }; Returns: undefined
+                           },
+"library_note":
+{ Args: { "p_action": string,"p_note": string,"p_resource": string,"p_school": string }; Returns: undefined
+                           },
+"library_notify_reviewers":
+{ Args: { "p_body": string,"p_except": string,"p_link": string,"p_school": string,"p_title": string }; Returns: undefined
+                           },
+"library_official_save":
+{ Args: { "p": Json,"p_id": string }; Returns: string
+                           },
+"library_path_ok":
+{ Args: { "p_name": string }; Returns: boolean
+                           },
+"library_points":
+{ Args: Record<PropertyKey, never>; Returns: number
+                           },
+"library_rate":
+{ Args: { "p_resource": string,"p_review": string,"p_stars": number }; Returns: undefined
+                           },
+"library_refresh_rating":
+{ Args: { "p_resource": string }; Returns: undefined
+                           },
+"library_resolve_flag":
+{ Args: { "p_flag": string,"p_note": string,"p_outcome": string }; Returns: undefined
+                           },
+"library_restore":
+{ Args: { "p_resource": string }; Returns: undefined
+                           },
+"library_review":
+{ Args: { "p_approve": boolean,"p_downloadable"?: boolean,"p_note": string,"p_revision": string }; Returns: undefined
+                           },
+"library_save":
+{ Args: { "p_on": boolean,"p_resource": string }; Returns: undefined
+                           },
+"library_set_points":
+{ Args: { "p_points": number }; Returns: undefined
+                           },
+"library_submit":
+{ Args: { "p": Json,"p_resource": string,"p_submit": boolean }; Returns: string
+                           },
+"library_top_rated":
+{ Args: { "p_limit"?: number }; Returns: {
+              "resource_id": string,"score": number
+            }[]
+                           },
+"library_track":
+{ Args: { "p_kind": string,"p_resource": string }; Returns: undefined
+                           },
+"library_valid_link":
+{ Args: { "p": string }; Returns: boolean
                            },
 "local_time":
 { Args: { "t": string }; Returns: string

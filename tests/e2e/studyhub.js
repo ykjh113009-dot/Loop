@@ -59,18 +59,8 @@ async function login(browser, name, viewport = { width: 1280, height: 850 }) {
     const slugs = await p.locator('[data-category]').evaluateAll((els) => els.map((e) => e.getAttribute('data-category')));
     check('Academic Resources has separate category pages', ['sat', 'ap-chemistry', 'ap-biology', 'ap-physics', 'ap-calculus', 'other'].every((s) => slugs.includes(s)), slugs.join(','));
     await go(p, '/academic-resources/ap-chemistry');
-    check('A category page has its own empty state', /No resources here yet/.test(await text(p)));
+    check('A category page has its own empty state', /No resources in AP Chemistry yet/.test(await text(p)));
     check('An ordinary student cannot add resources', (await p.locator('input[name=url]').count()) === 0);
-  }
-  {
-    const p = layla.p; // an approved tutor
-    await go(p, '/academic-resources/sat');
-    await p.fill('input[name=title]', 'E2E SAT practice');
-    await p.fill('input[name=url]', 'https://example.org/sat');
-    await p.getByRole('button', { name: 'Add resource' }).click();
-    await waitText(p, /Added|E2E SAT practice/);
-    await go(maya.p, '/academic-resources/sat');
-    check('An approved tutor adds a resource and students see it', /E2E SAT practice/.test(await text(maya.p)));
   }
   {
     const p = rania.p;

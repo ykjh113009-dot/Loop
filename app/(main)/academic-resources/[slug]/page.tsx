@@ -1,58 +1,62 @@
 import { Suspense } from "react";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireMe } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { getT } from "@/lib/i18n-server";
-import { timeAgo } from "@/lib/time";
-import { Empty } from "@/components/empty";
 import { PageHeader } from "@/components/page-header";
 import { PageSkeleton } from "@/components/skeleton";
-import { AddResourceForm, RemoveResource } from "../forms";
+import { ResourceCard } from "@/components/library/resource-card";
+import { RESOURCE_COLUMNS, signCovers, type LibraryResource } from "@/lib/library";
 
-const KIND: Record<string, string> = { link: "🔗", pdf: "📄", video: "🎬", notes: "📝", practice: "✏️", other: "📎" };
+const SORTS = { new: "Newest", top: "Top rated", views: "Most viewed" } as const;
 
-async function Category({ params }: { params: PageProps<"/academic-resources/[slug]">["params"] }) {
+async function Subject({ params, searchParams }: { params: PageProps<"/academic-resources/[slug]">["params"]; searchParams: Promise<{ sort?: string }> }) {
   const { slug } = await params;
-  const me = await requireMe();
+  const { sort: sortParam } = await searchParams;
+  const sort = sortParam === "top" || sortParam === "views" ? sortParam : "new";
+  await requireMe();
   const supabase = await createClient();
-  const { t, locale } = await getT();
+  const { t } = await getT();
   const { data: cat } = await supabase.from("study_categories").select("id, name, emoji").eq("slug", slug).maybeSingle();
   if (!cat) notFound();
-  const [{ data: items }, { data: canAdd }, { data: staff }] = await Promise.all([
-    supabase.from("study_resources").select("id, title, description, url, kind, created_at, added_by, author:profiles!study_resources_added_by_fkey(full_name)").eq("category_id", cat.id).order("created_at", { ascending: false }),
-    supabase.rpc("can_add_resources"),
-    supabase.rpc("can_manage_study_opportunities"),
-  ]);
+  let q = supabase.from("library_resources").select(RESOURCE_COLUMNS).eq("subject_id", cat.id).eq("visibility", "visible").is("deleted_at", null).not("published_at", "is", null);
+  q = sort === "top" ? q.order("rating_avg", { ascending: false }).order("rating_count", { ascending: false })
+    : sort === "views" ? q.order("views_count", { ascending: false })
+    : q.order("published_at", { ascending: false });
+  const { data } = await q.limit(60);
+  const list = (data ?? []) as unknown as LibraryResource[];
+  const covers = await signCovers(supabase, list.map((r) => r.cover_path));
   return (
-    <div className="mx-auto max-w-2xl space-y-4">
-      <div className="flex items-center gap-3"><span className="flex size-12 items-center justify-center rounded-xl bg-sage-soft/60 text-3xl">{cat.emoji}</span><h2 className="text-xl font-bold">{cat.name}</h2></div>
-      {(items ?? []).length === 0 ? (
-        <Empty emoji={cat.emoji} title={t("No resources here yet")}>{canAdd ? t("Be the first to add one below.") : t("Approved tutors and staff add study materials here.")}</Empty>
-      ) : (
-        <ul className="space-y-2">
-          {(items ?? []).map((r) => (
-            <li key={r.id} className="card flex items-start gap-3 p-4">
-              <span className="text-2xl">{KIND[r.kind]}</span>
-              <div className="min-w-0 flex-1">
-                <a href={r.url} target="_blank" rel="noreferrer noopener" className="font-semibold text-brand-800 hover:underline">{r.title}</a>
-                {r.description && <p className="text-sm text-black/65">{r.description}</p>}
-                <p className="mt-0.5 truncate text-xs text-black/40">{new URL(r.url).hostname} · {r.author?.full_name ?? ""} · {timeAgo(r.created_at)}</p>
-              </div>
-              {(r.added_by === me.id || me.isAdmin || staff) && <RemoveResource id={r.id} label={t("Remove")} />}
-            </li>
+    <div className="mx-auto max-w-3xl space-y-4">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="flex gap-1.5" role="tablist" aria-label={t("Sort")}>
+          {(Object.keys(SORTS) as (keyof typeof SORTS)[]).map((k) => (
+            <Link key={k} href={`/academic-resources/${slug}?sort=${k}`} role="tab" aria-selected={sort === k}
+              className={`rounded-full px-3 py-1 text-xs font-medium ${sort === k ? "bg-brand-700 text-white" : "bg-black/5 text-black/60"}`}>{t(SORTS[k])}</Link>
           ))}
-        </ul>
-      )}
-      {canAdd && <section className="card space-y-2 p-4"><h3 className="font-semibold">{t("Add a resource")}</h3><AddResourceForm categoryId={cat.id} locale={locale} /></section>}
+        </div>
+        <Link href={`/academic-resources/suggest?subject=${cat.id}`} className="btn-secondary text-sm">＋ {t("Suggest a Resource")}</Link>
+      </div>
+      {list.length === 0
+        ? <p className="card p-5 text-center text-sm text-black/55" data-empty>{t("No resources in {s} yet. Be the first to suggest one!", { s: cat.name })}</p>
+        : <div className="space-y-3">{list.map((r) => <ResourceCard key={r.id} r={r} cover={r.cover_path ? covers.get(r.cover_path) ?? null : null} t={t} />)}</div>}
     </div>
   );
 }
 
-export default function CategoryPage(props: PageProps<"/academic-resources/[slug]">) {
+async function Title({ params }: { params: PageProps<"/academic-resources/[slug]">["params"] }) {
+  const { slug } = await params;
+  const supabase = await createClient();
+  const { data: cat } = await supabase.from("study_categories").select("name, emoji").eq("slug", slug).maybeSingle();
+  return <PageHeader title={cat ? `${cat.emoji} ${cat.name}` : "Academic Resources"} back="/academic-resources" />;
+}
+
+export default function SubjectPage(props: PageProps<"/academic-resources/[slug]">) {
   return (
     <>
-      <PageHeader title="Academic Resources" back="/academic-resources" />
-      <Suspense fallback={<PageSkeleton />}><Category params={props.params} /></Suspense>
+      <Suspense fallback={<PageHeader title="Academic Resources" back="/academic-resources" />}><Title params={props.params} /></Suspense>
+      <Suspense fallback={<PageSkeleton />}><Subject params={props.params} searchParams={props.searchParams as Promise<{ sort?: string }>} /></Suspense>
     </>
   );
 }
