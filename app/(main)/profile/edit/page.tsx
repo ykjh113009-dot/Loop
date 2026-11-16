@@ -28,7 +28,7 @@ async function Edit() {
         </p>
         <EditProfileForm
           interests={interests ?? []}
-          avatar={me.avatar}
+          avatar={me.avatar_icon}
           bio={me.bio}
           picked={(mine ?? []).map((m) => m.interest_id)}
           mentor={me.isAlumni ? { university: me.university, major: me.major } : null}
