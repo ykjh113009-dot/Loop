@@ -1,0 +1,36 @@
+const { chromium } = require('playwright');
+const { execSync } = require('child_process');
+const path = require('path');
+const BASE = 'http://localhost:3000';
+const check = (name, ok, info = '') => console.log((ok ? 'PASS' : 'FAIL') + '  ' + name + (info ? '  — ' + info : ''));
+const sql = (q) => execSync(`docker exec -i supabase_db_pbs-go psql -U postgres -d postgres -Atq`, { input: q }).toString().trim();
+const go = (p, u) => p.goto(BASE + u, { waitUntil: 'networkidle' });
+async function signIn(b, name) { const ctx = await b.newContext({ viewport: { width: 1280, height: 900 } }); const p = await ctx.newPage(); await go(p, '/login'); await p.locator('.lp-demo button', { hasText: name }).click(); await p.waitForURL('**/home'); await p.waitForLoadState('networkidle'); return { ctx, p }; }
+const loaded = (p, sel) => p.locator(sel).first().evaluate((i) => new Promise((r) => (i.complete ? r(i.naturalWidth > 0) : (i.onload = () => r(true), i.onerror = () => r(false)))));
+(async () => {
+  const b = await chromium.launch();
+  sql(`update public.study_categories set image_path = null`);
+  const maya = await signIn(b, 'Maya Odeh');
+  await go(maya.p, '/academic-resources');
+  check('A student has no picture controls', (await maya.p.locator('[data-subject-photos-panel]').count()) === 0);
+  const rania = await signIn(b, 'Rania Haddad');
+  const p = rania.p;
+  await go(p, '/academic-resources');
+  await p.locator('[data-subject-photos-panel] summary').click();
+  await p.locator('input[data-subject-file="SAT"]').setInputFiles(path.join(__dirname, 'proof.png'));
+  await p.waitForFunction(() => /Picture saved/.test(document.body.innerText), null, { timeout: 20000 });
+  check('An admin can add a picture to a subject', sql(`select count(*) from public.study_categories where slug='sat' and image_path is not null`) === '1');
+  await go(p, '/academic-resources');
+  check('The card shows the photo instead of the icon', (await p.locator('[data-category=sat] [data-subject-photo]').count()) === 1 && (await loaded(p, '[data-category=sat] [data-subject-photo]')));
+  check('Other subjects keep their icon', (await p.locator('[data-category=ap-biology] [data-subject-photo]').count()) === 0);
+  await go(maya.p, '/academic-resources');
+  check('Students see the photo too', (await maya.p.locator('[data-category=sat] [data-subject-photo]').count()) === 1 && (await loaded(maya.p, '[data-category=sat] [data-subject-photo]')));
+  await go(maya.p, '/academic-resources/sat');
+  check('The subject page shows it as a banner', (await maya.p.locator('[data-subject-banner]').count()) === 1);
+  await go(p, '/academic-resources');
+  await p.locator('[data-subject-photos-panel] summary').click();
+  await p.locator('[data-subject-photos] li', { hasText: 'SAT' }).getByRole('button', { name: 'Remove' }).click();
+  await p.waitForFunction(() => /Picture removed/.test(document.body.innerText), null, { timeout: 20000 });
+  check('The picture can be removed', sql(`select count(*) from public.study_categories where image_path is not null`) === '0');
+  await b.close();
+})();

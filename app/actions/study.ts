@@ -28,6 +28,10 @@ export async function addStudyCategory(_: ActionResult, fd: FormData) {
   return rpc("add_study_category", { p_name: s(fd, "name"), p_emoji: s(fd, "emoji") }, "Subject added.");
 }
 
+export async function setSubjectImage(id: string, path: string | null) {
+  return rpc("set_study_category_image", { p_id: id, p_path: path }, path ? "Picture saved." : "Picture removed.");
+}
+
 // ---- University and opportunities -----------------------------------------------------
 export async function saveStudyOpportunity(_: ActionResult, fd: FormData): Promise<ActionResult> {
   await requireMe();

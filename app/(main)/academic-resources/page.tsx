@@ -8,7 +8,8 @@ import { PageSkeleton } from "@/components/skeleton";
 import { LineIcon } from "@/components/line-icon";
 import { ResourceCard } from "@/components/library/resource-card";
 import { RESOURCE_COLUMNS, signCovers, type LibraryResource } from "@/lib/library";
-import { AddCategoryForm } from "./forms";
+import { signImages } from "@/lib/images";
+import { AddCategoryForm, SubjectPhotos } from "./forms";
 
 export const metadata = { title: "Academic Resources" };
 
@@ -22,8 +23,9 @@ async function Library({ q }: { q: string }) {
   const { t, locale } = await getT();
   const term = safeQuery(q);
 
-  const { data: cats } = await supabase.from("study_categories").select("id, slug, name, emoji, sort").order("sort").order("name");
+  const { data: cats } = await supabase.from("study_categories").select("id, slug, name, emoji, sort, image_path").order("sort").order("name");
   const subjects = cats ?? [];
+  const subjectImages = await signImages(supabase, subjects.map((c) => c.image_path));
 
   const live = () => supabase.from("library_resources").select(RESOURCE_COLUMNS).eq("visibility", "visible").is("deleted_at", null).not("published_at", "is", null);
   let results: LibraryResource[] = [];
@@ -58,7 +60,12 @@ async function Library({ q }: { q: string }) {
   const more = subjects.slice(6);
   const tile = (c: (typeof subjects)[number]) => (
     <Link key={c.id} href={`/academic-resources/${c.slug}`} className="card flex items-center gap-3 p-3 hover:bg-black/[0.02]" data-category={c.slug}>
-      <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-sage-soft/60 text-xl">{c.emoji}</span>
+      <span className="flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-sage-soft/60 text-2xl">
+        {c.image_path && subjectImages.get(c.image_path)
+          // eslint-disable-next-line @next/next/no-img-element -- short-lived signed URL
+          ? <img src={subjectImages.get(c.image_path)!} alt="" className="size-full object-cover" data-subject-photo />
+          : c.emoji}
+      </span>
       <span className="min-w-0 flex-1 truncate text-sm font-semibold">{c.name}</span>
       <span className="text-black/30 rtl:-scale-x-100">›</span>
     </Link>
@@ -98,6 +105,14 @@ async function Library({ q }: { q: string }) {
               <details className="group">
                 <summary className="cursor-pointer text-sm font-semibold text-brand-700">{t("Show all subjects")} ({more.length})</summary>
                 <div className="mt-2 grid gap-2 sm:grid-cols-2">{more.map(tile)}</div>
+              </details>
+            )}
+            {me.isAdmin && (
+              <details className="card p-4" data-subject-photos-panel>
+                <summary className="cursor-pointer font-semibold">{t("Subject pictures")}</summary>
+                <div className="mt-3">
+                  <SubjectPhotos schoolId={me.school_id} userId={me.id} locale={locale} subjects={subjects.map((c) => ({ id: c.id, name: c.name, url: c.image_path ? subjectImages.get(c.image_path) ?? null : null }))} />
+                </div>
               </details>
             )}
             {me.isAdmin && <details className="card p-4"><summary className="cursor-pointer font-semibold">{t("Add a subject")}</summary><div className="mt-3"><AddCategoryForm locale={locale} /></div></details>}

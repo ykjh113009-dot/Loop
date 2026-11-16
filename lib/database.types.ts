@@ -2817,14 +2817,14 @@ isOneToOne: false
                   ]
                 },"study_categories": {
                   Row: {
-                    "created_at": string,"emoji": string,"id": string,"name": string,"school_id": string,"slug": string,"sort": number
+                    "created_at": string,"emoji": string,"id": string,"image_path": string | null,"name": string,"school_id": string,"slug": string,"sort": number
                   }
                   ComputedFields: never
                   Insert: {
-                    "created_at"?: string,"emoji"?: string,"id"?: string,"name": string,"school_id": string,"slug": string,"sort"?: number
+                    "created_at"?: string,"emoji"?: string,"id"?: string,"image_path"?: string | null,"name": string,"school_id": string,"slug": string,"sort"?: number
                   }
                   Update: {
-                    "created_at"?: string,"emoji"?: string,"id"?: string,"name"?: string,"school_id"?: string,"slug"?: string,"sort"?: number
+                    "created_at"?: string,"emoji"?: string,"id"?: string,"image_path"?: string | null,"name"?: string,"school_id"?: string,"slug"?: string,"sort"?: number
                   }
                   Relationships: [
                     {
@@ -4024,6 +4024,9 @@ isOneToOne: false
                            },
 "set_restriction":
 { Args: { "p_days": number,"p_kind": string,"p_reason": string,"p_user": string }; Returns: undefined
+                           },
+"set_study_category_image":
+{ Args: { "p_id": string,"p_path": string }; Returns: undefined
                            },
 "set_task_status":
 { Args: { "p_status": string,"p_task": string }; Returns: undefined

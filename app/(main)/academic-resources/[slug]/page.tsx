@@ -8,6 +8,7 @@ import { PageHeader } from "@/components/page-header";
 import { PageSkeleton } from "@/components/skeleton";
 import { ResourceCard } from "@/components/library/resource-card";
 import { RESOURCE_COLUMNS, signCovers, type LibraryResource } from "@/lib/library";
+import { signImages } from "@/lib/images";
 
 const SORTS = { new: "Newest", top: "Top rated", views: "Most viewed" } as const;
 
@@ -18,8 +19,9 @@ async function Subject({ params, searchParams }: { params: PageProps<"/academic-
   await requireMe();
   const supabase = await createClient();
   const { t } = await getT();
-  const { data: cat } = await supabase.from("study_categories").select("id, name, emoji").eq("slug", slug).maybeSingle();
+  const { data: cat } = await supabase.from("study_categories").select("id, name, emoji, image_path").eq("slug", slug).maybeSingle();
   if (!cat) notFound();
+  const banner = cat.image_path ? (await signImages(supabase, [cat.image_path])).get(cat.image_path) : null;
   let q = supabase.from("library_resources").select(RESOURCE_COLUMNS).eq("subject_id", cat.id).eq("visibility", "visible").is("deleted_at", null).not("published_at", "is", null);
   q = sort === "top" ? q.order("rating_avg", { ascending: false }).order("rating_count", { ascending: false })
     : sort === "views" ? q.order("views_count", { ascending: false })
@@ -29,6 +31,10 @@ async function Subject({ params, searchParams }: { params: PageProps<"/academic-
   const covers = await signCovers(supabase, list.map((r) => r.cover_path));
   return (
     <div className="mx-auto max-w-3xl space-y-4">
+      {banner && (
+        // eslint-disable-next-line @next/next/no-img-element -- short-lived signed URL
+        <img src={banner} alt="" className="h-36 w-full rounded-2xl object-cover" data-subject-banner />
+      )}
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex gap-1.5" role="tablist" aria-label={t("Sort")}>
           {(Object.keys(SORTS) as (keyof typeof SORTS)[]).map((k) => (
