@@ -8,6 +8,8 @@ import { ActionForm } from "@/components/action-form";
 import { Icon } from "@/components/icons";
 import { ReportButton } from "@/components/report-button";
 import { SubmitButton } from "@/components/submit-button";
+import { Avatar } from "@/components/avatar";
+import { formatDateTime } from "@/lib/time";
 import { ClubTabs } from "./club-tabs";
 
 async function ClubHeader({ params }: { params: LayoutProps<"/clubs/[id]">["params"] }) {
@@ -15,6 +17,10 @@ async function ClubHeader({ params }: { params: LayoutProps<"/clubs/[id]">["para
   const { me, club, memberCount, isMember, isLeader } = await getClub(id);
   const closed = club.status !== "approved";
   const supabase = await createClient();
+  const [{ data: leaderRows }, { data: nextEvent }] = await Promise.all([
+    supabase.from("club_members").select("title, profile:profiles(id, full_name, avatar)").eq("club_id", club.id).eq("role", "leader"),
+    supabase.from("events").select("title, starts_at").eq("club_id", club.id).eq("status", "approved").gt("starts_at", new Date().toISOString()).order("starts_at").limit(1).maybeSingle(),
+  ]);
   const { data: application } = isMember ? { data: null } : await supabase.from("club_applications").select("id").eq("club_id", club.id).eq("profile_id", me.id).eq("status", "pending").maybeSingle();
 
   return (
@@ -37,6 +43,17 @@ async function ClubHeader({ params }: { params: LayoutProps<"/clubs/[id]">["para
           <ReportButton targetType="club" targetId={club.id} compact />
         </div>
         <p className="mt-3 text-sm whitespace-pre-wrap text-black/75">{club.description}</p>
+        {(leaderRows ?? []).length > 0 && (
+          <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-sm" data-club-runners>
+            <span className="text-black/50">Run by</span>
+            {(leaderRows ?? []).map((l) => l.profile && (
+              <Link key={l.profile.id} href={`/profile/${l.profile.id}`} className="inline-flex items-center gap-1.5 font-medium hover:underline">
+                <Avatar avatar={l.profile.avatar} size="xs" />{l.profile.full_name}{l.title ? <span className="text-xs font-normal text-black/45"> · {l.title}</span> : null}
+              </Link>
+            ))}
+          </div>
+        )}
+        {nextEvent && <p className="mt-2 rounded-lg bg-sage-soft/50 px-3 py-2 text-sm" data-club-next>📅 <strong>Next:</strong> {nextEvent.title} · {formatDateTime(nextEvent.starts_at)}</p>}
         {closed ? (
           <p className="mt-3 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-800">
             {club.status === "pending" ? "This club is waiting for a moderator's approval." : "This club is closed."}

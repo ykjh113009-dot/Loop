@@ -1,90 +1,34 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { requireMe } from "@/lib/auth";
+import { getT } from "@/lib/i18n-server";
+import { LineIcon } from "@/components/line-icon";
 import { PageHeader } from "@/components/page-header";
 import { PageSkeleton } from "@/components/skeleton";
+import { navFor } from "@/lib/nav";
 
-export const metadata = { title: "More" };
+export const metadata = { title: "Menu" };
 
-type Tile = { href: string; emoji: string; title: string; text: string; studentsOnly?: boolean };
-
-const SECTIONS: { title: string; tiles: Tile[] }[] = [
-  {
-    title: "Study Hub",
-    tiles: [
-      { href: "/academic-resources", emoji: "📚", title: "Academic Resources", text: "SAT, AP and more study materials" },
-      { href: "/tutors", emoji: "🧑‍🏫", title: "Tutors Directory", text: "Find an approved student tutor" },
-      { href: "/opportunities", emoji: "🎓", title: "University & Opportunities", text: "Scholarships, programs and deadlines" },
-      { href: "/shop", emoji: "🎁", title: "Rewards Shop", text: "Spend points, Top 10 prizes" },
-    ],
-  },
-  {
-    title: "Learn together",
-    tiles: [
-      { href: "/tawjihi", emoji: "🎓", title: "Tawjihi corner", text: "Questions answered by alumni" },
-    ],
-  },
-  {
-    title: "Get involved",
-    tiles: [
-      { href: "/clubs", emoji: "🎯", title: "Clubs", text: "Find a club, join, or start one" },
-      { href: "/challenges", emoji: "🏁", title: "Challenges", text: "Join challenges and earn points", studentsOnly: true },
-      { href: "/leaderboard", emoji: "🏆", title: "Leaderboards", text: "Houses, grades and students" },
-      { href: "/polls", emoji: "📊", title: "Polls", text: "Have your say" },
-      { href: "/volunteering", emoji: "💚", title: "Volunteering hours", text: "Log hours, get a certificate", studentsOnly: true },
-      { href: "/market", emoji: "🛍️", title: "Buy, sell & swap", text: "Meet at school, no online payments" },
-      { href: "/groups", emoji: "👥", title: "Groups", text: "Interests, official groups and chats" },
-      { href: "/competitions", emoji: "🏁", title: "Competitions", text: "Teams and houses" },
-    ],
-  },
-  {
-    title: "Your school",
-    tiles: [
-      { href: "/council", emoji: "🗳️", title: "Student council", text: "Members and elections" },
-      { href: "/suggestions", emoji: "💡", title: "Suggestion box", text: "Ideas to make school better" },
-      { href: "/leadership/dashboard", emoji: "🎖️", title: "Leadership", text: "Your roles and tools" },
-      { href: "/points", emoji: "⭐", title: "My points & badges", text: "Level, XP and requests", studentsOnly: true },
-      { href: "/shop", emoji: "🎁", title: "Rewards shop", text: "Spend your points", studentsOnly: true },
-    ],
-  },
-];
-
-async function More() {
+// The phone's menu: exactly the list the computer's sidebar shows.
+async function Menu() {
   const me = await requireMe();
+  const { t } = await getT();
   return (
-    <div className="space-y-6">
-      {/* The counselor button is always easy to find, but quiet. */}
-      {me.isStudent && (
-        <Link href="/counselor" className="card flex items-center gap-3 border-brand-200 bg-brand-50 p-4">
-          <span className="text-2xl">🫶</span>
-          <span className="flex-1">
-            <span className="block font-semibold text-brand-900">Talk to the counselor</span>
-            <span className="block text-sm text-brand-900/70">Private. Only you and the school counselor can see it.</span>
-          </span>
-          <span className="text-brand-700">→</span>
-        </Link>
-      )}
-      {me.isCounselor && (
-        <Link href="/counselor" className="card flex items-center gap-3 border-brand-200 bg-brand-50 p-4">
-          <span className="text-2xl">🔒</span>
-          <span className="flex-1 font-semibold text-brand-900">Counselor inbox</span>
-          <span className="text-brand-700">→</span>
-        </Link>
-      )}
-      {SECTIONS.map((section) => (
-        <section key={section.title}>
-          <h2 className="section-title">{section.title}</h2>
-          <div className="grid grid-cols-2 gap-2">
-            {section.tiles
-              .filter((t) => !t.studentsOnly || me.isStudent)
-              .map((t) => (
-                <Link key={t.href} href={t.href} className="card p-3 hover:bg-black/[0.02]">
-                  <span className="text-2xl">{t.emoji}</span>
-                  <span className="mt-1 block text-sm leading-tight font-semibold">{t.title}</span>
-                  <span className="mt-0.5 block text-xs text-black/50">{t.text}</span>
+    <div className="space-y-5">
+      {navFor(me).map((group) => (
+        <section key={group.title} data-nav-group={group.title}>
+          <h2 className="section-title">{t(group.title)}</h2>
+          <ul className="card divide-y divide-black/5 overflow-hidden">
+            {group.items.map((item) => (
+              <li key={item.href}>
+                <Link href={item.href} className="flex items-center gap-3.5 px-4 py-3 text-[15px] font-medium hover:bg-black/[0.02]">
+                  <LineIcon name={item.icon} className="size-5 shrink-0 text-brand-700" />
+                  <span className="flex-1">{t(item.label)}</span>
+                  <span className="text-black/30 rtl:-scale-x-100">›</span>
                 </Link>
-              ))}
-          </div>
+              </li>
+            ))}
+          </ul>
         </section>
       ))}
     </div>
@@ -94,9 +38,9 @@ async function More() {
 export default function MorePage() {
   return (
     <>
-      <PageHeader title="More" />
+      <PageHeader title="Menu" />
       <Suspense fallback={<PageSkeleton />}>
-        <More />
+        <Menu />
       </Suspense>
     </>
   );

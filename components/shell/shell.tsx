@@ -19,6 +19,7 @@ export async function Shell() {
         // Admins who still need the second sign-in step see the link and are sent to do it.
         isAdmin: me.isAdmin || me.needsMfa,
         isCounselor: me.isCounselor,
+        isStudent: me.isStudent,
       }}
       initial={badges}
       locale={locale}

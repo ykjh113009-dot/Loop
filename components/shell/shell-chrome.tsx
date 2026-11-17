@@ -1,35 +1,19 @@
 import Link from "next/link";
 import { Leaves } from "@/components/botanical";
-import { LineIcon, type LineIconName } from "@/components/line-icon";
+import { LineIcon } from "@/components/line-icon";
 import { ProfileMenu, type ShellUser } from "@/components/shell/profile-menu";
 import type { Badges } from "@/lib/badges";
 import { makeT, type Locale } from "@/lib/i18n";
 
-type NavItem = { href: string; label: string; icon: LineIconName; also?: string[]; badge?: keyof Badges; divider?: boolean };
+import { navFor, isActive, type NavItem } from "@/lib/nav";
 
-// The sidebar: the original Loop navigation, a divider, then the four Study Hub sections.
-// Marketplace and More are reached from the profile menu.
-const SIDEBAR: NavItem[] = [
-  { href: "/home", label: "Home", icon: "home" },
-  { href: "/community", label: "Community", icon: "community", also: ["/clubs", "/groups", "/saved", "/friends"] },
-  { href: "/messages", label: "Chats", icon: "chat", badge: "messages" },
-  { href: "/events", label: "Calendar", icon: "calendar" },
-  { href: "/challenges", label: "Activities", icon: "trophy", also: ["/polls", "/leaderboard", "/competitions", "/points"] },
-  { href: "/academic-resources", label: "Academic Resources", icon: "book", divider: true },
-  { href: "/tutors", label: "Tutors Directory", icon: "tutor" },
-  { href: "/opportunities", label: "University & Opportunities", icon: "graduation" },
-  { href: "/shop", label: "Rewards Shop", icon: "gift" },
-];
-
+// The sidebar shows the whole of Loop, grouped by topic (the same list the phone's More tab shows).
 const TABS: NavItem[] = [
   { href: "/home", label: "Home", icon: "home" },
   { href: "/community", label: "Community", icon: "community", also: ["/clubs"] },
   { href: "/events", label: "Calendar", icon: "calendar" },
   { href: "/more", label: "More", icon: "dots", also: ["/messages", "/challenges", "/market", "/academic-resources", "/tutors", "/opportunities", "/shop", "/tawjihi", "/volunteering", "/council", "/suggestions", "/points", "/counselor", "/people", "/polls", "/leaderboard", "/announcements", "/search"] },
 ];
-
-const isActive = (pathname: string, item: NavItem) =>
-  [item.href, ...(item.also ?? [])].some((h) => pathname === h || pathname.startsWith(h + "/"));
 
 function Count({ n }: { n: number }) {
   if (n <= 0) return null;
@@ -62,33 +46,35 @@ export function ShellChrome({ user, badges, pathname, locale = "en" }: { user: S
       {/* ---------- computer: sidebar ---------- */}
       <aside className="fixed inset-y-0 start-0 z-30 hidden w-[236px] flex-col overflow-hidden px-5 pt-6 pb-6 print:hidden lg:flex">
         <Wordmark className="h-11 w-auto" />
-        <nav aria-label="Main" className="mt-8">
-          <ul className="space-y-1">
-            {SIDEBAR.map((item) => {
-              const active = isActive(current, item);
-              return (
-                <li key={item.href} className={item.divider ? "mt-3 border-t border-brand-700/10 pt-3" : undefined}>
-                  <Link
-                    href={item.href}
-                    aria-current={active ? "page" : undefined}
-                    className={`relative flex items-center gap-3.5 rounded-xl px-3.5 py-2.5 text-[15px] font-medium transition-colors ${
-                      active ? "bg-sage-soft/80 text-brand-900" : "text-ink-2 hover:bg-brand-700/5 hover:text-ink"
-                    }`}
-                  >
-                    <LineIcon name={item.icon} className={`size-5 ${active ? "text-brand-700" : ""}`} strokeWidth={active ? 2 : 1.7} />
-                    {t(item.label)}
-                    {item.badge && badges[item.badge] ? (
-                      <span className="ms-auto min-w-5 rounded-full bg-red-600 px-1.5 text-center text-[11px] leading-5 font-bold text-white">
-                        {badges[item.badge]}
-                      </span>
-                    ) : null}
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
+        <nav aria-label="Main" className="relative z-10 mt-6 min-h-0 flex-1 overflow-y-auto pe-1 [scrollbar-width:thin]">
+          {navFor(user).map((group, gi) => (
+            <ul key={group.title} className={`space-y-0.5 ${gi > 0 ? "mt-2.5 border-t border-brand-700/10 pt-2.5" : ""}`} data-nav-group={group.title}>
+              {group.items.map((item) => {
+                const active = isActive(current, item);
+                return (
+                  <li key={item.href}>
+                    <Link
+                      href={item.href}
+                      aria-current={active ? "page" : undefined}
+                      className={`relative flex items-center gap-3.5 rounded-xl px-3.5 py-2 text-[15px] font-medium transition-colors ${
+                        active ? "bg-sage-soft/80 text-brand-900" : "text-ink-2 hover:bg-brand-700/5 hover:text-ink"
+                      }`}
+                    >
+                      <LineIcon name={item.icon} className={`size-5 shrink-0 ${active ? "text-brand-700" : ""}`} strokeWidth={active ? 2 : 1.7} />
+                      {t(item.label)}
+                      {item.badge && badges[item.badge] ? (
+                        <span className="ms-auto min-w-5 rounded-full bg-red-600 px-1.5 text-center text-[11px] leading-5 font-bold text-white">
+                          {badges[item.badge]}
+                        </span>
+                      ) : null}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          ))}
         </nav>
-        <div className="relative mt-auto">
+        <div className="relative mt-3 shrink-0">
           <Leaves className="pointer-events-none absolute -bottom-6 -start-8 w-56" />
           <p className="relative text-[13px] leading-snug text-ink-2">
             {t("One Loop.")}

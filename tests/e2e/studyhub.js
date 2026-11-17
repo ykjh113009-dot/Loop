@@ -33,16 +33,16 @@ async function login(browser, name, viewport = { width: 1280, height: 850 }) {
     const p = maya.p;
     await go(p, '/home');
     const labels = await p.locator('aside nav[aria-label=Main] a').allInnerTexts();
-    const want = ['Home', 'Community', 'Chats', 'Calendar', 'Activities', 'Academic Resources', 'Tutors Directory', 'University & Opportunities', 'Rewards Shop'];
-    check('The sidebar has exactly the nine items in order', JSON.stringify(labels.map((l) => l.trim().replace(/\s+\d+$/, ''))) === JSON.stringify(want), labels.join(' | '));
+    const want = ['Home', 'Community', 'Chats', 'Calendar', 'Activities', 'Academic Resources', 'Tutors Directory', 'University & Opportunities', 'Tawjihi corner', 'Rewards Shop', 'Clubs', 'Groups', 'Leaderboards', 'Polls', 'Competitions', 'Volunteering hours', 'Buy, sell & swap', 'Student council', 'Suggestion box', 'Leadership', 'My points & badges', 'Talk to the counselor'];
+    check('The sidebar has every item in order', JSON.stringify(labels.map((l) => l.trim().replace(/\s+\d+$/, ''))) === JSON.stringify(want), labels.join(' | '));
     const icons = await p.locator('aside nav[aria-label=Main] a').evaluateAll((as) => as.map((a) => a.firstElementChild && a.firstElementChild.tagName.toLowerCase() === 'svg'));
     check('Every item has an icon on the left', icons.every(Boolean));
     const iconSides = await p.locator('aside nav[aria-label=Main] a').evaluateAll((as) => as.every((a) => { const svg = a.querySelector('svg').getBoundingClientRect(); const range = document.createRange(); range.selectNodeContents(a); const t = [...a.childNodes].find((n) => n.nodeType === 3); if (!t) return true; const r = document.createRange(); r.selectNodeContents(t); return svg.right <= r.getBoundingClientRect().left + 1; }));
     check('The icons sit left of the labels', iconSides);
-    const dividerBefore = await p.locator('aside nav[aria-label=Main] li').evaluateAll((lis) => lis.findIndex((li) => getComputedStyle(li).borderTopWidth !== '0px'));
-    check('A divider sits between Activities and Academic Resources', dividerBefore === 5, 'index ' + dividerBefore);
+    const groups = await p.locator('aside nav[aria-label=Main] ul[data-nav-group]').count();
+    check('The sidebar is split into topic groups with dividers', groups === 5, 'groups ' + groups);
     const hrefs = await p.locator('aside nav[aria-label=Main] a').evaluateAll((as) => as.map((a) => a.getAttribute('href')));
-    check('The four Study Hub items are separate destinations', ['/academic-resources', '/tutors', '/opportunities', '/shop'].every((h, i) => hrefs[5 + i] === h));
+    check('The four Study Hub items are separate destinations', ['/academic-resources', '/tutors', '/opportunities'].every((h, i) => hrefs[5 + i] === h) && hrefs[9] === '/shop');
     for (const [h, re] of [['/academic-resources', /Academic Resources/], ['/tutors', /Tutors Directory/], ['/opportunities', /University & Opportunities/], ['/shop', /Rewards Shop/]]) {
       await go(p, h);
       const active = await p.locator(`aside nav a[href="${h}"]`).getAttribute('aria-current');

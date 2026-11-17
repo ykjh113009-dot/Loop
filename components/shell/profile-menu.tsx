@@ -15,6 +15,7 @@ export type ShellUser = {
   isStaff: boolean;
   isAdmin: boolean;
   isCounselor: boolean;
+  isStudent: boolean;
 };
 
 // The profile button in the top bar, with the small menu under it.
@@ -42,8 +43,6 @@ export function ProfileMenu({ user, compact = false, locale = "en" }: { user: Sh
     { href: "/profile/edit", label: "Edit profile", icon: "pencil" },
     { href: "/friends", label: "Friends", icon: "community" },
     { href: "/saved", label: "Saved posts", icon: "bookmark" },
-    { href: "/market", label: "Marketplace", icon: "store" },
-    { href: "/more", label: "More features", icon: "grid" },
     { href: "/settings", label: "Settings", icon: "lock" },
   ];
   if (user.isCounselor) items.push({ href: "/counselor", label: "Counselor inbox", icon: "lock" });

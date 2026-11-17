@@ -24,6 +24,17 @@ async function Clubs({ searchParams }: { searchParams: PageProps<"/clubs">["sear
     supabase.from("club_members").select("club_id").eq("profile_id", me.id),
     supabase.from("clubs").select("id, name, emoji, status, review_note").eq("requested_by", me.id).neq("status", "approved"),
   ]);
+  const clubIds = (clubs ?? []).map((c) => c.id);
+  const [{ data: leaderRows }, { data: eventRows }] = clubIds.length
+    ? await Promise.all([
+        supabase.from("club_members").select("club_id, profile:profiles(full_name)").in("club_id", clubIds).eq("role", "leader"),
+        supabase.from("events").select("club_id, starts_at").in("club_id", clubIds).eq("status", "approved").gt("starts_at", new Date().toISOString()).order("starts_at"),
+      ])
+    : [{ data: [] }, { data: [] }];
+  const leadersOf = new Map<string, string[]>();
+  for (const r of leaderRows ?? []) if (r.profile) leadersOf.set(r.club_id, [...(leadersOf.get(r.club_id) ?? []), r.profile.full_name]);
+  const nextOf = new Map<string, string>();
+  for (const e of eventRows ?? []) if (e.club_id && !nextOf.has(e.club_id)) nextOf.set(e.club_id, e.starts_at);
   const { requested } = await searchParams;
   const mine = new Set((memberships ?? []).map((m) => m.club_id));
   const all = (clubs ?? []) as ClubSummary[];
@@ -67,7 +78,7 @@ async function Clubs({ searchParams }: { searchParams: PageProps<"/clubs">["sear
       <section>
         <h2 className="section-title">My clubs</h2>
         {joined.length ? (
-          <div className="space-y-2">{joined.map((c) => <ClubCard key={c.id} club={c} joined />)}</div>
+          <div className="space-y-2">{joined.map((c) => <ClubCard key={c.id} club={c} joined leaders={leadersOf.get(c.id)} nextAt={nextOf.get(c.id)} />)}</div>
         ) : (
           <Empty emoji="🧭" title="You're not in any club yet">Pick one below and tap Join.</Empty>
         )}
@@ -76,7 +87,7 @@ async function Clubs({ searchParams }: { searchParams: PageProps<"/clubs">["sear
       <section>
         <h2 className="section-title">Discover</h2>
         {others.length ? (
-          <div className="space-y-2">{others.map((c) => <ClubCard key={c.id} club={c} />)}</div>
+          <div className="space-y-2">{others.map((c) => <ClubCard key={c.id} club={c} leaders={leadersOf.get(c.id)} nextAt={nextOf.get(c.id)} />)}</div>
         ) : (
           <Empty emoji="✨" title="You've joined every club!" />
         )}
