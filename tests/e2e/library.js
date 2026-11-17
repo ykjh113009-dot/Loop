@@ -40,7 +40,7 @@ async function fillForm(p, v) {
 
 (async () => {
   const browser = await chromium.launch();
-  sql(`delete from public.library_resources; delete from public.library_settings; delete from public.rate_events;
+  sql(`delete from public.library_resources; delete from public.library_settings; delete from public.point_rules where reason = 'library_resource'; delete from public.rate_events;
        delete from public.points_ledger where reason = 'library_resource';
        delete from public.notifications where kind like 'library_%';
        update public.study_categories set name = name;`);
@@ -289,7 +289,7 @@ async function fillForm(p, v) {
     await p.fill('input[name=points]', '25');
     await p.getByRole('button', { name: 'Save' }).click();
     await waitText(p, /Saved/);
-    check('Admins can change the points', sql(`select points_per_approval from public.library_settings`) === '25');
+    check('Admins can change the points', sql(`select points from public.point_rules where reason = 'library_resource'`) === '25');
     await go(p, '/academic-resources/manage');
     await p.fill('input[name=points]', '10');
     await p.getByRole('button', { name: 'Save' }).click();
