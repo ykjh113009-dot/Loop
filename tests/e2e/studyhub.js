@@ -215,7 +215,7 @@ async function login(browser, name, viewport = { width: 1280, height: 850 }) {
     const q = maya.p;
     await go(q, '/shop');
     check('The shop shows the balance and redeemable rewards', (await q.locator('[data-testid=balance]').count()) === 1 && (await q.locator('[data-reward]').count()) >= 1);
-    check('Students cannot redeem without enough points', await q.locator('[data-reward] button').first().isDisabled().catch(() => true));
+    check('Students cannot redeem without enough points', (await q.locator('[data-reward] button:disabled').count()) >= 1);
     await q.getByRole('tab', { name: 'Top 10 prizes' }).click();
     await q.waitForURL('**/shop?tab=top10');
     check('Top 10 prizes live inside the Rewards Shop', /Top 10 student prizes/.test(await text(q)) && /Pizza party/.test(await text(q)) && /Ranking period/.test(await text(q)));
