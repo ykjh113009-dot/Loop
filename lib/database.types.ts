@@ -3536,7 +3536,7 @@ isOneToOne: false
 { Args: { "p_club": string }; Returns: Json
                            },
 "complete_onboarding":
-{ Args: { "p_avatar": string,"p_bio": string,"p_grade": number,"p_interests": (number)[] }; Returns: undefined
+{ Args: { "p_avatar": string,"p_bio": string,"p_grade": number,"p_interests": (number)[],"p_photo"?: string,"p_section"?: string }; Returns: undefined
                            },
 "complete_volunteering":
 { Args: { "p_app": string,"p_hours": number }; Returns: undefined

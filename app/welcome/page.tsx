@@ -2,8 +2,8 @@ import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { getMe } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { PageSkeleton } from "@/components/skeleton";
-import { WelcomeForm } from "./welcome-form";
+import { getLocale } from "@/lib/i18n-server";
+import { WelcomeWizard } from "./welcome-wizard";
 
 export const metadata = { title: "Welcome" };
 
@@ -14,30 +14,32 @@ async function Welcome() {
   if (me.onboarded_at) redirect("/home");
 
   const supabase = await createClient();
-  const { data: interests } = await supabase.from("interests").select("id, name, emoji").order("name");
-
+  const [{ data: interests }, { data: contact }, locale] = await Promise.all([
+    supabase.from("interests").select("id, name").order("name"),
+    supabase.from("private_profiles").select("email").eq("id", me.id).maybeSingle(),
+    getLocale(),
+  ]);
   return (
-    <>
-      <div>
-        <h1 className="text-2xl font-bold">Welcome, {me.full_name.split(" ")[0]}! 👋</h1>
-        <p className="mt-1 text-black/60">Set up your profile for {me.school.name}. It takes 30 seconds.</p>
-      </div>
-      <WelcomeForm
-        grades={me.school.grades}
-        fixedGrade={me.grade}
-        noGradeReason={me.role === "counselor" ? "You are set up as the school counselor." : me.alumni_year ? `You are set up as an alumni mentor (class of ${me.alumni_year}).` : null}
-        interests={interests ?? []}
-      />
-    </>
+    <WelcomeWizard
+      locale={locale}
+      schoolId={me.school_id}
+      userId={me.id}
+      name={me.full_name}
+      email={contact?.email ?? ""}
+      schoolName={me.school.name}
+      grades={me.school.grades}
+      fixedGrade={me.grade}
+      fixedSection={me.section}
+      noClassReason={me.role === "counselor" ? "counselor" : me.alumni_year ? "alumni" : null}
+      interests={interests ?? []}
+    />
   );
 }
 
 export default function WelcomePage() {
   return (
-    <main className="mx-auto max-w-md space-y-6 px-5 py-8">
-      <Suspense fallback={<PageSkeleton />}>
-        <Welcome />
-      </Suspense>
-    </main>
+    <Suspense fallback={<main className="min-h-dvh bg-cream" />}>
+      <Welcome />
+    </Suspense>
   );
 }

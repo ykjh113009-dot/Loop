@@ -34,6 +34,7 @@ create function tests.notes(p_profile uuid, p_kind text) returns bigint language
 grant execute on all functions in schema tests to authenticated, anon;
 \set maya  '''00000000-0000-0000-0000-0000000000a5'''
 \set yousef '''00000000-0000-0000-0000-0000000000a4'''
+update public.profiles set photo_path = null, avatar = 'a09' where id = :maya;
 select set_config('t.school', (select school_id::text from public.profiles where id = :maya), true);
 
 select tests.login(:maya);

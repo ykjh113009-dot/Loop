@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { AVATARS, avatarSrc } from "@/lib/avatars";
+import { NEW_AVATARS, avatarSrc } from "@/lib/avatars";
 
 type Interest = { id: number; name: string; emoji: string };
 
@@ -30,7 +30,7 @@ export function ProfileFields({
         <legend className="label">Choose your avatar</legend>
         <input type="hidden" name="avatar" value={avatar} />
         <div className="grid grid-cols-6 gap-2">
-          {AVATARS.map((id) => (
+          {NEW_AVATARS.map((id) => (
             <button
               type="button"
               key={id}

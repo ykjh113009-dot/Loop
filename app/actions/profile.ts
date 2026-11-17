@@ -1,6 +1,5 @@
 "use server";
 
-import { redirect } from "next/navigation";
 import { refresh } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { requireMe } from "@/lib/auth";
@@ -22,9 +21,12 @@ export async function completeOnboarding(_: ActionResult, formData: FormData): P
     p_avatar: avatar,
     p_bio: String(formData.get("bio") ?? "").trim().slice(0, 200),
     p_interests: readInterests(formData),
+    p_section: String(formData.get("section") ?? ""),
+    p_photo: String(formData.get("image_path") ?? ""),
   });
   if (error) return { error: friendlyError(error) };
-  redirect("/home");
+  // The welcome screen shows next, then the person continues to Home.
+  return { ok: true };
 }
 
 export async function updateProfile(_: ActionResult, formData: FormData): Promise<ActionResult> {
