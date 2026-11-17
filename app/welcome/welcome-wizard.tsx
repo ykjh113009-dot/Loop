@@ -232,11 +232,11 @@ export function WelcomeWizard({
                 <h1 className="text-2xl font-bold text-brand-900" style={display}>{t("Choose an avatar")}</h1>
                 <p className="mt-1 text-sm text-black/60">{t("Pick a fun avatar or upload your own photo!")}</p>
               </div>
+              <button type="button" onClick={() => { setPicking(false); fileInput.current?.click(); }} className="flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-black/15 py-3 text-sm font-medium text-black/60" data-upload-tile>
+                <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 8h3l1.5-2.5h7L17 8h3a1 1 0 0 1 1 1v9.5a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1" /><circle cx="12" cy="13.5" r="3.5" /></svg>
+                {t("Upload Photo")}
+              </button>
               <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
-                <button type="button" onClick={() => { setPicking(false); fileInput.current?.click(); }} className="flex aspect-square flex-col items-center justify-center gap-1 rounded-2xl border-2 border-dashed border-black/15 text-xs font-medium text-black/60">
-                  <svg viewBox="0 0 24 24" className="size-6" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 8h3l1.5-2.5h7L17 8h3a1 1 0 0 1 1 1v9.5a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1" /><circle cx="12" cy="13.5" r="3.5" /></svg>
-                  {t("Upload Photo")}
-                </button>
                 {NEW_AVATARS.map((id) => {
                   const on = !photo && avatar === id;
                   return (

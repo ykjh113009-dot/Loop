@@ -76,6 +76,8 @@ async function signIn(b, name, vp) {
   // ---- Phone: pick an avatar, continue immediately
   reset(ID.layla);
   ({ ctx, p } = await signIn(b, 'Layla Nasser', { width: 390, height: 844 }));
+  await p.waitForSelector('[data-step=profile]', { timeout: 15000 });
+  await p.waitForTimeout(500);
   check('Setup fits a phone (profile)', /\/welcome/.test(p.url()) && (await noSideScroll(p)));
   await p.screenshot({ path: SHOTS + 'onb-1-profile-mobile.png', fullPage: true });
   await p.locator('[data-choose-avatar]').click(); await p.waitForSelector('[data-step=avatars]');
