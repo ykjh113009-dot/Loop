@@ -3,8 +3,12 @@ import Link from "next/link";
 import { requireMe } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { getT } from "@/lib/i18n-server";
+import { getLocale } from "@/lib/i18n-server";
+import { AchievementGrid, type Ach } from "@/components/rewards/pin-badges";
+import { leadershipLabel } from "@/lib/leadership";
+import { formatDate } from "@/lib/time";
 import { POINT_REASONS, mergeRules } from "@/lib/points";
-import { timeAgo, weekStart } from "@/lib/time";
+import { weekStart } from "@/lib/time";
 import { claimPoints } from "@/app/actions/community";
 import { ActionForm } from "@/components/action-form";
 import { LevelCard, type MyPoints } from "@/components/level-card";
@@ -23,10 +27,13 @@ async function Points() {
   if (!me.isStudent) {
     return <p className="text-sm text-black/60">{t("Points are for current students. Alumni and staff don't collect points.")}</p>;
   }
-  const [{ data: ledger }, { data: badges }, { data: mine }, { data: my }, { data: defaults }, { data: overrides }, { data: claims }] = await Promise.all([
-    supabase.from("points_ledger").select("id, points, reason, created_at").eq("profile_id", me.id).order("created_at", { ascending: false }).limit(60),
-    supabase.from("badges").select("code, name, emoji, description").order("sort"),
-    supabase.from("profile_badges").select("badge_code, earned_at").eq("profile_id", me.id),
+  const locale = await getLocale();
+  const [{ data: ledger }, { data: ach }, { data: streak }, { data: roles }, { data: redemptions }, { data: my }, { data: defaults }, { data: overrides }, { data: claims }] = await Promise.all([
+    supabase.from("points_ledger").select("id, points, reason, kind, note, created_at").eq("profile_id", me.id).order("created_at", { ascending: false }).limit(60),
+    supabase.rpc("my_achievements"),
+    supabase.rpc("my_streak"),
+    supabase.from("leadership_roles").select("id, kind, scope, club:clubs(name)").eq("profile_id", me.id),
+    supabase.from("reward_redemptions").select("id, cost, status, created_at, reward:rewards(name)").eq("profile_id", me.id).order("created_at", { ascending: false }).limit(20),
     supabase.rpc("my_points"),
     supabase.from("point_rule_defaults").select("*"),
     supabase.from("point_rules").select("reason, points, daily_limit, weekly_limit, enabled"),
@@ -35,7 +42,12 @@ async function Points() {
   const rows = ledger ?? [];
   const since = weekStart().toISOString();
   const week = rows.filter((r) => r.created_at >= since).reduce((sum, r) => sum + r.points, 0);
-  const earned = new Map((mine ?? []).map((b) => [b.badge_code, b.earned_at]));
+  const achievements = (ach ?? []) as unknown as Ach[];
+  const st = streak as unknown as { current: number; longest: number; today_active: boolean; next: number | null; earned: number[]; week: { day: string; active: boolean }[] };
+  const history = [
+    ...rows.map((r) => ({ key: `l${r.id}`, at: r.created_at, label: POINT_REASONS[r.reason] ?? r.reason, note: r.note, n: r.points, spent: false })),
+    ...(redemptions ?? []).filter((r) => r.status !== "cancelled").map((r) => ({ key: `r${r.id}`, at: r.created_at, label: `${t("Spent")}: ${(r.reward as unknown as { name: string } | null)?.name ?? t("Reward")}`, note: null as string | null, n: -r.cost, spent: true })),
+  ].sort((a, b) => b.at.localeCompare(a.at)).slice(0, 40);
   const rules = mergeRules(defaults ?? [], overrides ?? []);
   const auto = rules.filter((r) => !r.requires_verification && r.enabled && r.points > 0);
   const claimable = rules.filter((r) => r.requires_verification && r.enabled);
@@ -72,21 +84,34 @@ async function Points() {
         )}
       </section>
 
-      <section>
-        <h2 className="section-title">{t("Badges")} ({earned.size}/{badges?.length ?? 0})</h2>
-        <div className="grid grid-cols-3 gap-2">
-          {(badges ?? []).map((b) => {
-            const has = earned.has(b.code);
-            return (
-              <div key={b.code} className={`card p-3 text-center ${has ? "" : "opacity-45 grayscale"}`} title={b.description}>
-                <div className="text-3xl">{b.emoji}</div>
-                <p className="mt-1 text-xs leading-tight font-semibold">{b.name}</p>
-                <p className="mt-0.5 text-[11px] leading-tight text-black/50">{b.description}</p>
-              </div>
-            );
-          })}
+      <section className="card space-y-3 p-4" data-streak>
+        <div className="flex items-center justify-between gap-3">
+          <h2 className="font-semibold">🔥 {t("Your streak")}</h2>
+          <span className={`chip ${st.today_active ? "bg-brand-50 text-brand-800" : "bg-amber-50 text-amber-900"}`}>{st.today_active ? t("Today counts ✓") : t("Do one thing today to keep it")}</span>
         </div>
+        <div className="grid grid-cols-3 gap-2 text-center">
+          <div><p className="text-2xl font-bold tabular-nums" data-testid="streak-current">{st.current}</p><p className="text-xs text-black/50">{t("Current")}</p></div>
+          <div><p className="text-2xl font-bold tabular-nums" data-testid="streak-longest">{st.longest}</p><p className="text-xs text-black/50">{t("Longest")}</p></div>
+          <div><p className="text-2xl font-bold tabular-nums">{st.next ? st.next - st.current : "–"}</p><p className="text-xs text-black/50">{st.next ? t("days to {n}", { n: st.next }) : t("all milestones done")}</p></div>
+        </div>
+        <div className="flex justify-center gap-1.5" aria-label={t("The last 7 days")}>
+          {(st.week ?? []).map((d) => <span key={d.day} className={`size-6 rounded-full ${d.active ? "bg-brand-600" : "bg-black/10"}`} title={d.day} />)}
+        </div>
+        <p className="text-xs text-black/50">{t("A streak day needs you to sign in and do something real, like voting in a poll, saving a resource or joining a challenge. Refreshing does not count.")}</p>
+        <p className="text-xs text-black/50">{t("Milestones")}: {[7, 14, 30, 60, 100].map((m) => <span key={m} className={`me-2 ${st.earned?.includes(m) ? "font-semibold text-brand-700" : ""}`}>{m}{st.earned?.includes(m) ? " ✓" : ""}</span>)}</p>
       </section>
+
+      <section>
+        <h2 className="section-title">{t("Achievements")} ({achievements.filter((a) => a.unlocked).length}/{achievements.length})</h2>
+        <AchievementGrid items={achievements} locale={locale} />
+      </section>
+
+      {(roles ?? []).length > 0 && (
+        <section className="card p-4">
+          <h2 className="font-semibold">{t("Your roles")}</h2>
+          <div className="mt-2 flex flex-wrap gap-1.5">{(roles ?? []).map((r) => <span key={r.id} className="chip bg-brand-50 text-brand-800">{leadershipLabel(r.kind, r.scope, (r.club as unknown as { name: string } | null)?.name)}</span>)}</div>
+        </section>
+      )}
 
       <section>
         <h2 className="section-title">{t("How to earn points")}</h2>
@@ -103,17 +128,17 @@ async function Points() {
         </ul>
       </section>
 
-      <section>
+      <section data-history>
         <h2 className="section-title">{t("History")}</h2>
-        {rows.length === 0 ? (
+        {history.length === 0 ? (
           <p className="text-sm text-black/50">{t("No points yet. Join a club to get started!")}</p>
         ) : (
           <ul className="card divide-y divide-black/5 text-sm">
-            {rows.slice(0, 40).map((r) => (
-              <li key={r.id} className="flex items-center justify-between gap-2 px-4 py-2">
-                <span className="min-w-0 flex-1 truncate">{POINT_REASONS[r.reason] ?? r.reason}</span>
-                <span className="text-xs text-black/40">{timeAgo(r.created_at)}</span>
-                <span className="w-10 text-end font-semibold tabular-nums text-brand-700">+{r.points}</span>
+            {history.map((r) => (
+              <li key={r.key} className="flex items-center justify-between gap-2 px-4 py-2">
+                <span className="min-w-0 flex-1"><span className="block truncate">{r.label}</span>{r.note && <span className="block truncate text-xs text-black/45">{r.note}</span>}</span>
+                <span className="text-xs text-black/40">{formatDate(r.at)}</span>
+                <span className={`w-12 text-end font-semibold tabular-nums ${r.n < 0 ? "text-red-700" : "text-brand-700"}`}>{r.n > 0 ? "+" : ""}{r.n}</span>
               </li>
             ))}
           </ul>
@@ -126,7 +151,7 @@ async function Points() {
 export default function PointsPage() {
   return (
     <>
-      <PageHeader title="My points & badges" back="/more" />
+      <PageHeader title="My points & badges" back="/home" />
       <Suspense fallback={<PageSkeleton />}>
         <Points />
       </Suspense>

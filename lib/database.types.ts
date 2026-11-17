@@ -117,14 +117,14 @@ isOneToOne: false
                   ]
                 },"badges": {
                   Row: {
-                    "code": string,"description": string,"emoji": string,"name": string,"sort": number
+                    "active": boolean,"category": string,"code": string,"description": string,"emoji": string,"metric": string | null,"name": string,"points_reward": number,"sort": number,"threshold": number | null,"tier": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "code": string,"description": string,"emoji": string,"name": string,"sort"?: number
+                    "active"?: boolean,"category"?: string,"code": string,"description": string,"emoji": string,"metric"?: string | null,"name": string,"points_reward"?: number,"sort"?: number,"threshold"?: number | null,"tier"?: string
                   }
                   Update: {
-                    "code"?: string,"description"?: string,"emoji"?: string,"name"?: string,"sort"?: number
+                    "active"?: boolean,"category"?: string,"code"?: string,"description"?: string,"emoji"?: string,"metric"?: string | null,"name"?: string,"points_reward"?: number,"sort"?: number,"threshold"?: number | null,"tier"?: string
                   }
                   Relationships: [
                     
@@ -1935,6 +1935,26 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"login_days": {
+                  Row: {
+                    "active": boolean,"created_at": string,"day": string,"profile_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "active"?: boolean,"created_at"?: string,"day": string,"profile_id": string
+                  }
+                  Update: {
+                    "active"?: boolean,"created_at"?: string,"day"?: string,"profile_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "login_days_profile_id_fkey"
+      columns: ["profile_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"message_reactions": {
                   Row: {
                     "conversation_id": string,"created_at": string,"emoji": string,"message_id": string,"profile_id": string
@@ -2137,21 +2157,33 @@ isOneToOne: false
                   ]
                 },"points_ledger": {
                   Row: {
-                    "created_at": string,"id": number,"points": number,"profile_id": string,"reason": string,"school_id": string,"source_id": string
+                    "created_at": string,"created_by": string | null,"id": number,"kind": string,"note": string | null,"points": number,"profile_id": string,"reason": string,"reverses_id": number | null,"school_id": string,"source_id": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "created_at"?: string,"id"?: never,"points": number,"profile_id": string,"reason": string,"school_id": string,"source_id": string
+                    "created_at"?: string,"created_by"?: string | null,"id"?: never,"kind"?: string,"note"?: string | null,"points": number,"profile_id": string,"reason": string,"reverses_id"?: number | null,"school_id": string,"source_id": string
                   }
                   Update: {
-                    "created_at"?: string,"id"?: never,"points"?: number,"profile_id"?: string,"reason"?: string,"school_id"?: string,"source_id"?: string
+                    "created_at"?: string,"created_by"?: string | null,"id"?: never,"kind"?: string,"note"?: string | null,"points"?: number,"profile_id"?: string,"reason"?: string,"reverses_id"?: number | null,"school_id"?: string,"source_id"?: string
                   }
                   Relationships: [
                     {
+      foreignKeyName: "points_ledger_created_by_fkey"
+      columns: ["created_by"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
       foreignKeyName: "points_ledger_profile_id_fkey"
       columns: ["profile_id"]
 isOneToOne: false
       referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "points_ledger_reverses_id_fkey"
+      columns: ["reverses_id"]
+isOneToOne: false
+      referencedRelation: "points_ledger"
       referencedColumns: ["id"]
     },{
       foreignKeyName: "points_ledger_school_id_fkey"
@@ -2459,14 +2491,14 @@ isOneToOne: true
                   ]
                 },"profile_badges": {
                   Row: {
-                    "badge_code": string,"earned_at": string,"profile_id": string,"school_id": string
+                    "badge_code": string,"earned_at": string,"pinned": boolean,"profile_id": string,"school_id": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "badge_code": string,"earned_at"?: string,"profile_id": string,"school_id": string
+                    "badge_code": string,"earned_at"?: string,"pinned"?: boolean,"profile_id": string,"school_id": string
                   }
                   Update: {
-                    "badge_code"?: string,"earned_at"?: string,"profile_id"?: string,"school_id"?: string
+                    "badge_code"?: string,"earned_at"?: string,"pinned"?: boolean,"profile_id"?: string,"school_id"?: string
                   }
                   Relationships: [
                     {
@@ -2786,6 +2818,46 @@ isOneToOne: false
       columns: ["school_id"]
 isOneToOne: false
       referencedRelation: "schools"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"streak_milestones": {
+                  Row: {
+                    "awarded_at": string,"days": number,"profile_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "awarded_at"?: string,"days": number,"profile_id": string
+                  }
+                  Update: {
+                    "awarded_at"?: string,"days"?: number,"profile_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "streak_milestones_profile_id_fkey"
+      columns: ["profile_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"student_stats": {
+                  Row: {
+                    "current_streak": number,"longest_streak": number,"profile_id": string,"updated_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "current_streak"?: number,"longest_streak"?: number,"profile_id": string,"updated_at"?: string
+                  }
+                  Update: {
+                    "current_streak"?: number,"longest_streak"?: number,"profile_id"?: string,"updated_at"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "student_stats_profile_id_fkey"
+      columns: ["profile_id"]
+isOneToOne: true
+      referencedRelation: "profiles"
       referencedColumns: ["id"]
     }
                   ]
@@ -3373,7 +3445,10 @@ isOneToOne: false
             [_ in never]: never
           }
           Functions: {
-            "ack_application_decision":
+            "achievement_metric":
+{ Args: { "p_metric": string,"p_profile": string }; Returns: number
+                           },
+"ack_application_decision":
 { Args: { "p_id": string,"p_kind": string }; Returns: undefined
                            },
 "add_event_attachment":
@@ -3390,6 +3465,15 @@ isOneToOne: false
                            },
 "add_tutor_document":
 { Args: { "p_kind": string,"p_name": string,"p_path": string,"p_size": number }; Returns: string
+                           },
+"admin_adjust_points":
+{ Args: { "p_points": number,"p_profile": string,"p_reason": string }; Returns: undefined
+                           },
+"admin_reverse_entry":
+{ Args: { "p_entry": number,"p_reason": string }; Returns: undefined
+                           },
+"admin_set_achievement":
+{ Args: { "p_active": boolean,"p_code": string,"p_points": number }; Returns: undefined
                            },
 "admin_set_alumni":
 { Args: { "p_user": string,"p_year": number }; Returns: undefined
@@ -3727,6 +3811,9 @@ isOneToOne: false
 "level_for_xp":
 { Args: { "p_xp": number }; Returns: number
                            },
+"level_name":
+{ Args: { "p_level": number }; Returns: string
+                           },
 "library_delete":
 { Args: { "p_resource": string }; Returns: undefined
                            },
@@ -3804,11 +3891,19 @@ isOneToOne: false
 "manage_attendee":
 { Args: { "p_action": string,"p_event": string,"p_profile": string }; Returns: undefined
                            },
+"mark_active":
+{ Args: { "p_profile": string,"p_reason": string }; Returns: undefined
+                           },
 "mfa_ok":
 { Args: Record<PropertyKey, never>; Returns: boolean
                            },
 "moderate_report":
 { Args: { "p_action": string,"p_note": string,"p_report": string }; Returns: undefined
+                           },
+"my_achievements":
+{ Args: Record<PropertyKey, never>; Returns: {
+              "category": string,"code": string,"description": string,"earned_at": string,"emoji": string,"name": string,"pinned": boolean,"points_reward": number,"progress": number,"threshold": number,"tier": string,"unlocked": boolean
+            }[]
                            },
 "my_badges":
 { Args: Record<PropertyKey, never>; Returns: Json
@@ -3824,6 +3919,9 @@ isOneToOne: false
                            },
 "my_school_id":
 { Args: Record<PropertyKey, never>; Returns: string
+                           },
+"my_streak":
+{ Args: Record<PropertyKey, never>; Returns: Json
                            },
 "normalize_text":
 { Args: { "t": string }; Returns: string
@@ -3860,6 +3958,12 @@ isOneToOne: false
               "idx": number,"label": string,"mine": boolean,"post_id": string,"votes": number
             }[]
                            },
+"profile_check_complete":
+{ Args: { "p_profile": string }; Returns: undefined
+                           },
+"profile_public_rewards":
+{ Args: { "p_profile": string }; Returns: Json
+                           },
 "promote_waitlist":
 { Args: { "p_event": string }; Returns: undefined
                            },
@@ -3875,11 +3979,17 @@ isOneToOne: false
 "reactivate_my_account":
 { Args: Record<PropertyKey, never>; Returns: undefined
                            },
+"record_login":
+{ Args: Record<PropertyKey, never>; Returns: Json
+                           },
 "record_security_event":
 { Args: { "p_ip": string,"p_kind": string,"p_user_agent": string }; Returns: undefined
                            },
 "redeem_reward":
 { Args: { "p_reward": string }; Returns: string
+                           },
+"refresh_streak":
+{ Args: { "p_profile": string }; Returns: undefined
                            },
 "reject_blocked":
 { Args: { "p_school": string,"p_text": string }; Returns: undefined
@@ -3968,8 +4078,14 @@ isOneToOne: false
 "review_volunteer_application":
 { Args: { "p_accept": boolean,"p_app": string,"p_note": string,"p_responsibility": string }; Returns: undefined
                            },
+"reward_stats":
+{ Args: Record<PropertyKey, never>; Returns: Json
+                           },
 "role_rank":
 { Args: { "p_role": string }; Returns: number
+                           },
+"rule_points":
+{ Args: { "p_reason": string,"p_school": string }; Returns: number
                            },
 "save_challenge":
 { Args: { "p": Json,"p_id": string,"p_submit": boolean }; Returns: string
@@ -3988,6 +4104,9 @@ isOneToOne: false
                            },
 "school_stats_phase2":
 { Args: Record<PropertyKey, never>; Returns: Json
+                           },
+"school_today":
+{ Args: Record<PropertyKey, never>; Returns: string
                            },
 "send_event_reminders":
 { Args: Record<PropertyKey, never>; Returns: undefined
@@ -4019,6 +4138,9 @@ isOneToOne: false
 "set_opportunity_status":
 { Args: { "p_id": string,"p_status": string }; Returns: undefined
                            },
+"set_pinned_badges":
+{ Args: { "p_codes": (string)[] }; Returns: undefined
+                           },
 "set_responsibility":
 { Args: { "p_app": string,"p_text": string }; Returns: undefined
                            },
@@ -4040,11 +4162,17 @@ isOneToOne: false
 "split_subjects":
 { Args: { "p": string }; Returns: (string)[]
                            },
+"staff_points_summary":
+{ Args: { "p_profile": string }; Returns: Json
+                           },
 "start_counselor_request":
 { Args: { "p_message": string,"p_topic": string,"p_urgent": boolean }; Returns: string
                            },
 "start_direct_conversation":
 { Args: { "p_other": string }; Returns: string
+                           },
+"streak_now":
+{ Args: { "p_profile": string }; Returns: number
                            },
 "submit_admin_application":
 { Args: { "p_contribution": string,"p_experience": string,"p_motivation": string,"p_position": string,"p_role": string }; Returns: string
@@ -4054,6 +4182,11 @@ isOneToOne: false
                            },
 "suspend_user":
 { Args: { "p_days": number,"p_reason": string,"p_user": string }; Returns: undefined
+                           },
+"suspicious_rewards":
+{ Args: Record<PropertyKey, never>; Returns: {
+              "entries_24h": number,"full_name": string,"points_24h": number,"profile_id": string,"reasons": string
+            }[]
                            },
 "trending_tags":
 { Args: { "p_limit"?: number }; Returns: {

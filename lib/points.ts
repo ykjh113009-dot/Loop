@@ -21,7 +21,24 @@ export const POINT_REASONS: Record<string, string> = {
   academic: "Academic achievement",
   other_approved: "School-approved activity",
   club_achievement: "Club achievement",
+  daily_login: "Daily login",
+  profile_complete: "Completed your profile",
+  streak_7: "7-day streak", streak_14: "14-day streak", streak_30: "30-day streak", streak_60: "60-day streak", streak_100: "100-day streak",
+  resource_save: "Saved a study resource",
+  resource_review: "Reviewed a study resource",
+  tutor_apply: "Applied to be a tutor",
+  tutor_approved: "Became a tutor",
+  idea_planned: "Your idea was planned",
+  idea_done: "Your idea was carried out",
+  volunteer_5: "5 volunteering activities",
+  club_leader: "Became a club leader",
+  achievement: "Achievement reward",
+  adjustment: "Adjusted by an admin",
+  reversal: "Correction",
 };
+
+export const LEVEL_NAMES = ["Newcomer", "Explorer", "Contributor", "Rising Star", "Community Star", "Achiever", "Champion", "Legend"];
+export const levelName = (level: number) => LEVEL_NAMES[Math.min(Math.max(level, 1), LEVEL_NAMES.length) - 1];
 
 export type Rule = { reason: string; label: string; points: number; daily_limit: number | null; weekly_limit: number | null; requires_verification: boolean; enabled: boolean };
 

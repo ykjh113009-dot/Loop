@@ -154,7 +154,7 @@ async function fillForm(p, v) {
 
     await go(p, '/academic-resources/my-contributions');
     t = await text(p);
-    check('The student sees Approved and the points earned', /Approved/.test(t) && /Points earned/.test(t) && /⭐ 10/.test(t), t.slice(0, 200));
+    check('The student sees Approved and the points earned', /Approved/.test(t) && /Points earned/.test(t) && /⭐ 20/.test(t), t.slice(0, 200));
     check('Points were added to the ledger once', sql(`select count(*) from public.points_ledger where profile_id='${ID.maya}' and reason='library_resource'`) === '1');
     await go(p, '/academic-resources/my-contributions?status=approved');
     check('The status tabs filter the list', (await p.locator('[data-contribution=approved]').count()) === 1);

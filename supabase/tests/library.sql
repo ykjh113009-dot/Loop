@@ -128,7 +128,7 @@ select tests.ok((select source from public.library_resources where id = current_
 -- 4. Points: once
 reset role;
 select tests.ok((select count(*) from public.points_ledger where profile_id = :yousef and reason = 'library_resource') = 1, 'points awarded on approval');
-select tests.ok((select points from public.points_ledger where profile_id = :yousef and reason = 'library_resource') = 10, 'the default amount is 10');
+select tests.ok((select points from public.points_ledger where profile_id = :yousef and reason = 'library_resource') = 20, 'the default amount is 20');
 select tests.login(:yousef);
 select tests.ok(tests.notes(:yousef, 'library_approved') = 1 and tests.notes(:yousef, 'library_points') = 1, 'the student is told about approval and points');
 

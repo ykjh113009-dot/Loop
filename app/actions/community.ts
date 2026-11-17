@@ -65,7 +65,7 @@ export async function saveRule(_: ActionResult, fd: FormData): Promise<ActionRes
   const supabase = await createClient();
   const lim = (k: string) => (s(fd, k) === "" ? null : Math.max(0, Math.round(n(fd, k))));
   const { error } = await supabase.from("point_rules").upsert({
-    school_id: me.school_id, reason: s(fd, "reason"), points: Math.min(100, Math.max(0, Math.round(n(fd, "points")))),
+    school_id: me.school_id, reason: s(fd, "reason"), points: Math.min(1000, Math.max(0, Math.round(n(fd, "points")))),
     daily_limit: lim("daily_limit"), weekly_limit: lim("weekly_limit"), enabled: fd.get("enabled") === "on",
     updated_by: me.id, updated_at: new Date().toISOString(),
   });

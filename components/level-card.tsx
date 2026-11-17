@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-export type MyPoints = { xp: number; spent: number; balance: number; level: number; level_start: number; next_level: number };
+export type MyPoints = { xp: number; spent: number; balance: number; level: number; level_start: number; next_level: number; level_name?: string; lifetime?: number; badges?: number; badges_total?: number };
 
 // Level, XP bar and spendable balance.
 export function LevelCard({ p, week, t }: { p: MyPoints; week: number; t: (s: string, v?: Record<string, string | number>) => string }) {
@@ -13,6 +13,7 @@ export function LevelCard({ p, week, t }: { p: MyPoints; week: number; t: (s: st
           <div>
             <p className="text-xs text-white/75">{t("Level")}</p>
             <p className="text-4xl font-bold tabular-nums" data-testid="level">{p.level}</p>
+            {p.level_name && <p className="text-sm font-semibold text-white/90" data-testid="level-name">{t(p.level_name)}</p>}
           </div>
           <div className="text-end">
             <p className="text-xs text-white/75">{t("To spend")}</p>

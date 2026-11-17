@@ -10,10 +10,11 @@ import { PageHeader } from "@/components/page-header";
 import { SubmitButton } from "@/components/submit-button";
 import { PageSkeleton } from "@/components/skeleton";
 import { timeAgo } from "@/lib/time";
+import { RewardTools } from "./reward-tools";
 
 export const metadata = { title: "Points" };
 
-async function PointsAdmin() {
+async function PointsAdmin({ q, profileId }: { q: string; profileId: string }) {
   const me = await requireMe();
   const supabase = await createClient();
   const { data: roles } = await supabase.from("leadership_roles").select("kind").eq("profile_id", me.id).eq("kind", "school_staff");
@@ -77,7 +78,7 @@ async function PointsAdmin() {
               <ActionForm action={saveRule} className="card flex flex-wrap items-center gap-2 p-3 text-sm" >
                 <input type="hidden" name="reason" value={r.reason} />
                 <span className="min-w-40 flex-1"><strong>{r.label}</strong>{r.requires_verification && <span className="chip ms-2 bg-amber-50 text-amber-900">Checked by staff</span>}</span>
-                <label className="flex items-center gap-1 text-xs">Points <input name="points" type="number" min={0} max={100} defaultValue={r.points} disabled={!me.isAdmin} className="input w-16 py-1 text-sm" /></label>
+                <label className="flex items-center gap-1 text-xs">Points <input name="points" type="number" min={0} max={1000} defaultValue={r.points} disabled={!me.isAdmin} className="input w-16 py-1 text-sm" /></label>
                 <label className="flex items-center gap-1 text-xs">Per day <input name="daily_limit" type="number" min={0} defaultValue={r.daily_limit ?? ""} disabled={!me.isAdmin} placeholder="∞" className="input w-16 py-1 text-sm" /></label>
                 <label className="flex items-center gap-1 text-xs">Per week <input name="weekly_limit" type="number" min={0} defaultValue={r.weekly_limit ?? ""} disabled={!me.isAdmin} placeholder="∞" className="input w-16 py-1 text-sm" /></label>
                 <label className="flex items-center gap-1 text-xs"><input type="checkbox" name="enabled" defaultChecked={r.enabled} disabled={!me.isAdmin} className="size-4 accent-brand-700" /> On</label>
@@ -88,17 +89,23 @@ async function PointsAdmin() {
         </ul>
         <p className="text-xs text-black/50">Weekly challenges, volunteering and tutoring set their own points when they are approved. <Link href="/admin/rewards" className="underline">Manage the rewards shop</Link>.</p>
       </section>
+      <RewardTools q={q} profileId={profileId} isAdmin={me.isAdmin} />
     </div>
   );
 }
 
-export default function AdminPointsPage() {
+async function Resolved({ searchParams }: { searchParams: Promise<{ q?: string; profile?: string }> }) {
+  const sp = await searchParams;
+  return <PointsAdmin q={sp.q ?? ""} profileId={sp.profile ?? ""} />;
+}
+
+export default function AdminPointsPage(props: PageProps<"/admin/points">) {
   return (
     <>
       <PageHeader title="Admin" />
       <AdminNav current="/admin/points" />
       <Suspense fallback={<PageSkeleton />}>
-        <PointsAdmin />
+        <Resolved searchParams={props.searchParams as Promise<{ q?: string; profile?: string }>} />
       </Suspense>
     </>
   );

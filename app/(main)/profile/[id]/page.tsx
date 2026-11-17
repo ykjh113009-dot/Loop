@@ -5,6 +5,7 @@ import { FeedPostCard } from "@/components/dashboard/feed-post";
 import { ACCENTS } from "@/lib/accent";
 import { loadFeed } from "@/lib/feed";
 import { getT } from "@/lib/i18n-server";
+import { levelName } from "@/lib/points";
 import { signImages } from "@/lib/images";
 import { leadershipLabel } from "@/lib/leadership";
 import Link from "next/link";
@@ -43,7 +44,7 @@ async function Profile({ params, searchParams }: { params: PageProps<"/profile/[
     supabase.from("profile_interests").select("interest:interests(slug, name, emoji)").eq("profile_id", id),
     supabase.from("club_members").select("role, club:clubs(id, name, emoji, status)").eq("profile_id", id),
     supabase.from("blocks").select("blocked_id").eq("blocker_id", me.id).eq("blocked_id", id).maybeSingle(),
-    supabase.from("profile_badges").select("earned_at, badge:badges(code, name, emoji, description, sort)").eq("profile_id", id),
+    supabase.from("profile_badges").select("earned_at, badge:badges(code, name, emoji, description, sort)").eq("profile_id", id).eq("pinned", true),
     supabase.from("tutor_profiles").select("subjects, availability, active").eq("profile_id", id).maybeSingle(),
     supabase.from("leadership_roles").select("id, kind, scope, club:clubs(name)").eq("profile_id", id),
     supabase.from("follows").select("*", { count: "exact", head: true }).eq("followed_id", id),
@@ -56,7 +57,7 @@ async function Profile({ params, searchParams }: { params: PageProps<"/profile/[
     supabase.from("profiles").select("grade, section").eq("id", id).maybeSingle().then(async ({ data: p }) => p?.grade && p.section
       ? supabase.from("house_classes").select("house:houses(name, emoji)").eq("grade", p.grade).eq("section", p.section).maybeSingle()
       : { data: null }),
-    id === me.id ? supabase.rpc("my_points") : Promise.resolve({ data: null }),
+    supabase.rpc("profile_public_rewards", { p_profile: id }),
   ]);
   if (!profile || profile.deactivated_at || !profile.onboarded_at) notFound();
   const isMe = profile.id === me.id;
@@ -100,7 +101,7 @@ async function Profile({ params, searchParams }: { params: PageProps<"/profile/[
           <div className="mt-2 flex flex-wrap justify-center gap-1.5">
             {ROLE_BADGE[profile.role] && <span className="chip bg-brand-50 text-brand-800">{ROLE_BADGE[profile.role]}</span>}
             {house?.house && <span className="chip bg-brand-50 text-brand-800" data-testid="house-chip">{house.house.emoji} {house.house.name}</span>}
-            {lvl && <span className="chip bg-amber-50 text-amber-900">⭐ {t("Level {n}", { n: (lvl as unknown as { level: number }).level })}</span>}
+            {lvl && <span className="chip bg-amber-50 text-amber-900">⭐ {t("Level {n}", { n: (lvl as unknown as { level: number }).level })} · {t(levelName((lvl as unknown as { level: number }).level))}</span>}
             {(roles ?? []).map((r) => (
               <span key={r.id} className="chip bg-brand-50 text-brand-800">{leadershipLabel(r.kind, r.scope, r.club?.name)}</span>
             ))}
@@ -183,6 +184,9 @@ async function Profile({ params, searchParams }: { params: PageProps<"/profile/[
         </div>
       </div>
 
+      {earned.length === 0 && isMe && (
+        <p className="text-xs text-black/45">{t("Only the badges you pick show here.")} <Link href="/points" className="underline">{t("Choose badges")}</Link></p>
+      )}
       {earned.length > 0 && (
         <section>
           <h2 className="section-title">{t("Badges")}</h2>
