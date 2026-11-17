@@ -230,7 +230,7 @@ async function login(browser, name, viewport = { width: 1280, height: 850 }) {
       check(`No sideways scrolling on a phone: ${u}`, await noSideScroll(p));
     }
     await go(p, '/more');
-    check('On a phone, the Study Hub is reachable from More', /study hub/i.test(await text(p)) && /Tutors Directory/i.test(await text(p)));
+    check('On a phone, the Study Hub is reachable from the menu', (await p.locator('main [data-nav-group=Study] a').count()) === 5 && /Tutors Directory/i.test(await text(p)));
   }
   sql(`delete from public.tutor_applications where profile_id='${ID.maya}'; delete from public.tutor_profiles where profile_id='${ID.maya}'; delete from public.study_resources where title like 'E2E %'; delete from public.study_opportunities where title like 'E2E %'; delete from public.top10_prizes; delete from public.study_categories where slug='ap-statistics';`);
   await browser.close();
