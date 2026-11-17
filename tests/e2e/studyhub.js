@@ -215,7 +215,11 @@ async function login(browser, name, viewport = { width: 1280, height: 850 }) {
     const q = maya.p;
     await go(q, '/shop');
     check('The shop shows the balance and redeemable rewards', (await q.locator('[data-testid=balance]').count()) === 1 && (await q.locator('[data-reward]').count()) >= 1);
-    check('Students cannot redeem without enough points', (await q.locator('[data-reward] button:disabled').count()) >= 1);
+    sql(`delete from public.rewards where name = 'E2E Big prize'; insert into public.rewards (school_id, name, description, cost, kind, created_by) select school_id, 'E2E Big prize', 'Too expensive for the test', 50000, 'prize', id from public.profiles where id = '${ID.rania}'`);
+    await go(q, '/shop');
+    const big = q.locator('[data-reward]', { hasText: 'E2E Big prize' });
+    check('Students cannot redeem without enough points', (await big.count()) === 1 && (await big.locator('button').first().isDisabled().catch(() => true)));
+    sql(`delete from public.rewards where name = 'E2E Big prize'`);
     await q.getByRole('tab', { name: 'Top 10 prizes' }).click();
     await q.waitForURL('**/shop?tab=top10');
     check('Top 10 prizes live inside the Rewards Shop', /Top 10 student prizes/.test(await text(q)) && /Pizza party/.test(await text(q)) && /Ranking period/.test(await text(q)));
