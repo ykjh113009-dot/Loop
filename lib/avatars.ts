@@ -1,9 +1,11 @@
 // The illustrated avatars students can choose from (files in public/avatars).
-const ids = (prefix: string) => Array.from({ length: 12 }, (_, i) => `${prefix}${String(i + 1).padStart(2, "0")}`);
-// The set offered when picking an avatar. b01–b12 (dog drawings) are no longer offered but still display for anyone who chose one.
-export const NEW_AVATARS = ids("a");
+const ids = (prefix: string, n = 12) => Array.from({ length: n }, (_, i) => `${prefix}${String(i + 1).padStart(2, "0")}`);
+// The set offered when picking an avatar: b01–b16, the Loop animal friends (PNG files in public/avatars).
+export const NEW_AVATARS = ids("b", 16);
 // Everything that is a valid avatar. a01–a12 are the older illustrations that existing students may still have.
-export const AVATARS = [...ids("a"), ...ids("b")];
+export const AVATARS = [...ids("a"), ...NEW_AVATARS];
+// a01–a12 are the older SVG illustrations; the animal friends are PNGs.
+export const avatarFile = (id: string) => `/avatars/${AVATARS.includes(id) ? id : "b01"}.${id.startsWith("b") ? "png" : "svg"}`;
 
 // "a05" is an illustration. "u:<student id>:<version>" means the student uploaded a photo: it is served
 // through /api/avatar, which checks that you are signed in to the same school (photos are private).
@@ -12,5 +14,5 @@ const PHOTO = /^u:([0-9a-f-]{36}):(\d+)$/;
 export const avatarSrc = (id: string) => {
   const photo = PHOTO.exec(id);
   if (photo) return `/api/avatar/${photo[1]}?v=${photo[2]}`;
-  return `/avatars/${AVATARS.includes(id) ? id : "a01"}.svg`;
+  return avatarFile(id);
 };

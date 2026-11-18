@@ -29,7 +29,7 @@ export function ProfileFields({
       <fieldset>
         <legend className="label">Choose your avatar</legend>
         <input type="hidden" name="avatar" value={avatar} />
-        <div className="grid grid-cols-6 gap-2">
+        <div className="grid grid-cols-4 gap-2 sm:grid-cols-8">
           {NEW_AVATARS.map((id) => (
             <button
               type="button"

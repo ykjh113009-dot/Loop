@@ -46,7 +46,7 @@ export function WelcomeWizard({
   const fileInput = useRef<HTMLInputElement>(null);
   const [step, setStep] = useState(0);
   const [picking, setPicking] = useState(false);
-  const [avatar, setAvatar] = useState("a01");
+  const [avatar, setAvatar] = useState("b01");
   const [photo, setPhoto] = useState<{ path: string; preview: string } | null>(null);
   const [uploading, setUploading] = useState(false);
   const [grade, setGrade] = useState<number | null>(fixedGrade);

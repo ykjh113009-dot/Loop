@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { avatarFile } from "@/lib/avatars";
 import { createClient } from "@/lib/supabase/server";
 
 // A student's profile photo. Photos are private, so this only answers for signed-in people of the same school
@@ -17,5 +18,5 @@ export async function GET(_req: NextRequest, ctx: RouteContext<"/api/avatar/[id]
     const { data: signed } = await supabase.storage.from("post-images").createSignedUrl(p.photo_path, 900);
     if (signed?.signedUrl) return NextResponse.redirect(signed.signedUrl, { status: 302, headers });
   }
-  return NextResponse.redirect(new URL(`/avatars/${p.avatar_icon}.svg`, _req.url), { status: 302, headers });
+  return NextResponse.redirect(new URL(avatarFile(p.avatar_icon), _req.url), { status: 302, headers });
 }

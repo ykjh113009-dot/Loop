@@ -34,12 +34,12 @@ async function signIn(b, name, vp) {
   check('Class is required', sql(`select onboarded_at is null from public.profiles where id='${ID.maya}'`) === 't');
   await p.locator('[data-choose-avatar]').click();
   await p.waitForSelector('[data-step=avatars]');
-  check('There are 12 new avatars to choose from', (await p.locator('[data-avatar]').count()) === 12);
-  check('They are the the offered set', (await p.locator('[data-avatar] img').first().getAttribute('src')).includes('/avatars/a'));
+  check('There are 16 animal avatars to choose from', (await p.locator('[data-avatar]').count()) === 16);
+  check('They are the the offered set', (await p.locator('[data-avatar] img').first().getAttribute('src')).includes('/avatars/b'));
   await p.screenshot({ path: SHOTS + 'onb-2-avatars-desktop.png' });
-  await p.locator('[data-avatar=a05]').click();
+  await p.locator('[data-avatar=b05]').click();
   await p.locator('[data-avatar-done]').click();
-  check('The preview shows the chosen avatar', (await p.locator('[data-preview]').getAttribute('src')).includes('a05'));
+  check('The preview shows the chosen avatar', (await p.locator('[data-preview]').getAttribute('src')).includes('b05'));
   await p.locator('[data-photo-input]').setInputFiles(path.join(__dirname, 'proof.png'));
   await p.waitForFunction(() => !/Uploading/.test(document.body.innerText), null, { timeout: 20000 });
   await p.waitForTimeout(500);
@@ -83,7 +83,7 @@ async function signIn(b, name, vp) {
   await p.locator('[data-choose-avatar]').click(); await p.waitForSelector('[data-step=avatars]');
   check('Avatar picker fits a phone', await noSideScroll(p));
   await p.screenshot({ path: SHOTS + 'onb-2-avatars-mobile.png', fullPage: true });
-  await p.locator('[data-avatar=a02]').click(); await p.locator('[data-avatar-done]').click();
+  await p.locator('[data-avatar=b02]').click(); await p.locator('[data-avatar-done]').click();
   await p.locator('[role=radio]', { hasText: /A$/ }).first().click();
   await p.locator('[data-next]').click(); await p.waitForSelector('[data-step=interests]');
   check('Interests fit a phone', await noSideScroll(p));
@@ -96,6 +96,6 @@ async function signIn(b, name, vp) {
   await p.locator('[data-continue]').click();
   await p.waitForURL('**/home', { timeout: 15000 });
   check('"Continue to Dashboard" goes straight to Home', /\/home/.test(p.url()));
-  check('The chosen avatar is saved', sql(`select avatar from public.profiles where id='${ID.layla}'`) === 'a02');
+  check('The chosen avatar is saved', sql(`select avatar from public.profiles where id='${ID.layla}'`) === 'b02');
   await ctx.close(); await b.close();
 })();
