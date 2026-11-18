@@ -8,7 +8,6 @@ import { signImages } from "@/lib/images";
 import { Avatar } from "@/components/avatar";
 import { DashCard } from "@/components/dashboard/card";
 import { PageSkeleton } from "@/components/skeleton";
-import { LoopDog } from "@/components/mascot";
 import { PageBanner } from "@/components/ui/page-banner";
 import { SectionTabs } from "@/components/ui/section-tabs";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -67,13 +66,12 @@ async function Marketplace() {
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
         <section className="card relative overflow-hidden p-5" data-card="points">
-          <div className="relative z-10 max-w-[62%] space-y-2">
+          <div className="relative z-10 max-w-full space-y-2">
             <h2 className="flex items-center gap-1.5 text-[15px] font-semibold"><Star className="size-4 fill-amber-400 text-amber-500" strokeWidth={1.8} aria-hidden="true" />{t("Your Points")}</h2>
             {balance !== null ? <p className="font-heading text-3xl font-semibold tabular-nums" data-testid="mk-balance">{balance.toLocaleString("en")} <span className="text-base font-medium text-ink-2">{t("pts")}</span></p> : <p className="text-sm text-ink-2">{t("Points are for current students.")}</p>}
             {(rewards ?? []).length > 0 && <p className="text-xs text-ink-2">{t("Rewards from {n} points", { n: Number(rewards![0].cost) })}</p>}
             <Link href="/shop" className="btn-primary inline-flex items-center gap-1.5 px-4 py-2 text-sm">{t("Visit Rewards Shop")} <ArrowRight className="size-4 rtl:rotate-180" aria-hidden="true" /></Link>
           </div>
-          <div className="pointer-events-none absolute inset-y-0 end-0 flex w-[40%] items-end justify-end" aria-hidden="true"><LoopDog mood="happy" className="mb-[-14px] h-[115%] w-auto" /></div>
         </section>
 
         <DashCard title={t("Top 10 Prizes")} href="/shop?tab=top10" linkLabel={t("View Winners")}>

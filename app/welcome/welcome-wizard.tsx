@@ -4,7 +4,6 @@ import { useEffect, useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { completeOnboarding } from "@/app/actions/profile";
-import { LoopDog } from "@/components/mascot";
 import { Confetti } from "@/components/confetti";
 import { NEW_AVATARS, avatarSrc } from "@/lib/avatars";
 import { uploadPhoto } from "@/lib/upload";
@@ -47,7 +46,7 @@ export function WelcomeWizard({
   const fileInput = useRef<HTMLInputElement>(null);
   const [step, setStep] = useState(0);
   const [picking, setPicking] = useState(false);
-  const [avatar, setAvatar] = useState("b09");
+  const [avatar, setAvatar] = useState("a01");
   const [photo, setPhoto] = useState<{ path: string; preview: string } | null>(null);
   const [uploading, setUploading] = useState(false);
   const [grade, setGrade] = useState<number | null>(fixedGrade);
@@ -123,7 +122,6 @@ export function WelcomeWizard({
           {wordmark("h-10 w-auto")}
           <h1 className="text-3xl font-bold text-brand-900 sm:text-4xl" style={display}>{t("You're officially part of Loop!")}</h1>
           <p className="text-lg text-black/65">{t("Welcome to our school community, {n}.", { n: first })}</p>
-          <div className="motion-safe:animate-bounce [animation-duration:2.4s]"><LoopDog mood="celebrate" className="w-64" /></div>
           <button onClick={() => router.replace("/home")} className="btn-primary px-8 py-3 text-base" data-continue>{t("Continue to Dashboard")} →</button>
           <p className="text-xs text-black/45" aria-live="polite">{t("Taking you there in {n}…", { n: Math.max(seconds, 0) })}</p>
         </div>
@@ -133,13 +131,12 @@ export function WelcomeWizard({
 
   return (
     <main className="min-h-dvh bg-cream lg:flex" style={font}>
-      {/* Brand side: the dog and the promise. A slim version on phones. */}
+      {/* Brand side: the promise. A slim version on phones. */}
       <aside className="relative flex items-center justify-center gap-4 overflow-hidden bg-gradient-to-b from-sage-soft/70 to-cream px-5 py-5 lg:w-[42%] lg:flex-col lg:justify-center lg:gap-2 lg:py-10">
         <div className="lg:text-center">
           {wordmark("h-9 w-auto lg:h-16")}
           <p className="mt-1 text-sm text-brand-900/70 lg:mt-3 lg:text-xl" style={display}>{t("Your school. Your community.")}</p>
         </div>
-        <LoopDog mood="happy" className="w-24 shrink-0 lg:mt-4 lg:w-80" />
         <span className="pointer-events-none absolute -bottom-10 -start-10 hidden size-56 rounded-full bg-sage-soft/50 lg:block" aria-hidden="true" />
       </aside>
 

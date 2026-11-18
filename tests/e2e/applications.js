@@ -40,7 +40,7 @@ async function signIn(browser, name, viewport = { width: 1280, height: 850 }) {
     check('It says Congratulations and welcomes them to the team', /Congratulations!/.test(t) && /Welcome to the Loop team!/.test(t));
     check('It shows the role they were actually given, not the one they asked for', (await p.locator('[data-role]').innerText()) === 'Moderator' && /You asked for Admin/.test(t));
     check('It shows the reviewer message', /Start as a moderator, then we can talk about admin\./.test(t));
-    check('It shows the dog and the Loop logo', (await p.locator('svg[aria-label*="dog"]').count()) === 1 && (await p.locator('main img[alt=Loop]:visible').count()) === 1);
+    check('It shows no dog but the Loop logo', (await p.locator("svg[role=img][aria-label*=dog]").count()) === 0 && (await p.locator('main img[alt=Loop]:visible').count()) === 1);
     check('There is a confetti layer', (await p.locator('main span[style*="loop-confetti"]').count()) > 5);
     await p.screenshot({ path: '/home/user/loop-tests/app-approved.png' });
     await p.getByRole('button', { name: /Go to My Dashboard/ }).click();
@@ -64,7 +64,7 @@ async function signIn(browser, name, viewport = { width: 1280, height: 850 }) {
     const t = await text(p);
     check('A waiting applicant sees the review screen', /application-update/.test(p.url()) && /We're reviewing your application/.test(t));
     check('It shows what they applied for, the date and the status', /School administration \/ staff/.test(t) && /Waiting for review/.test(t) && /Submitted/.test(t));
-    check('It shows the waiting dog', (await p.locator('svg[aria-label*="waiting"]').count()) === 1);
+    check('It shows no dog', (await p.locator("svg[role=img][aria-label*=dog]").count()) === 0);
     await p.getByRole('button', { name: /Continue to Loop/ }).click();
     await p.waitForURL('**/home', { timeout: 20000 });
     check('They can continue into Loop', /\/home/.test(p.url()));
@@ -94,7 +94,7 @@ async function signIn(browser, name, viewport = { width: 1280, height: 850 }) {
     const t = await text(p);
     check('A rejected applicant sees a considerate update', /Application update/.test(t) && /Unfortunately, your application wasn't approved this time\./.test(t));
     check('The reviewer feedback is shown clearly', /Please talk to your homeroom teacher first/.test(await p.locator('[data-feedback]').innerText()));
-    check('It shows the sympathetic dog and an Edit & Resubmit button', (await p.locator('svg[aria-label*="understanding"]').count()) === 1 && (await p.getByRole('button', { name: /Edit & Resubmit/ }).count()) === 1);
+    check('It shows no dog but an Edit & Resubmit button', (await p.locator("svg[role=img][aria-label*=dog]").count()) === 0 && (await p.getByRole('button', { name: /Edit & Resubmit/ }).count()) === 1);
     await p.getByRole('button', { name: /Edit & Resubmit/ }).click();
     await p.waitForURL('**/leadership', { timeout: 20000 });
     check('Edit & Resubmit opens the application form', /\/leadership/.test(p.url()));

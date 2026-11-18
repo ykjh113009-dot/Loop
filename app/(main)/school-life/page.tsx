@@ -59,7 +59,7 @@ async function SchoolLife() {
           <DashCard title={t("This week's challenges")} href="/challenges" linkLabel={t("See all")}>
             <p className="mb-3 text-xs text-ink-2">{t("Academic, creative, sports and fun challenges. Complete them to earn points.")}</p>
             {(challenges ?? []).length === 0 ? (
-              <EmptyState compact dog="happy" title={t("No challenges are running right now")} action={{ href: "/challenges", label: t("Browse challenges") }} secondary={{ href: "/challenges/new", label: t("Suggest a challenge") }}>
+              <EmptyState compact scene="community" title={t("No challenges are running right now")} action={{ href: "/challenges", label: t("Browse challenges") }} secondary={{ href: "/challenges/new", label: t("Suggest a challenge") }}>
                 {t("New ones start often. Have an idea? Suggest it.")}
               </EmptyState>
             ) : (

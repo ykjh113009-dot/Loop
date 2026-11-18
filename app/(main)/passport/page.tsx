@@ -15,7 +15,7 @@ export const metadata = { title: "Loop Passport" };
 async function Passport() {
   const me = await requireMe();
   const { t } = await getT();
-  if (!me.isStudent) return <EmptyState dog="waiting" title={t("The Passport is for current students")}>{t("Alumni and staff do not collect a Passport.")}</EmptyState>;
+  if (!me.isStudent) return <EmptyState scene="books" title={t("The Passport is for current students")}>{t("Alumni and staff do not collect a Passport.")}</EmptyState>;
   const supabase = await createClient();
   const [{ data: clubs }, { data: rsvps }, { data: vol }, { data: subs }, { data: badges }, { data: roles }] = await Promise.all([
     supabase.from("club_members").select("joined_at, club:clubs(id, name, emoji, status)").eq("profile_id", me.id),
@@ -31,7 +31,7 @@ async function Passport() {
   const challenges = (subs ?? []).map((s) => s.challenge).filter((c): c is NonNullable<typeof c> => !!c);
   const earned = (badges ?? []).filter((b) => b.badge);
   const stats: [string, number][] = [["Clubs", myClubs.length], ["Events", events.length], ["Volunteering hours", Math.round(hours * 10) / 10], ["Challenges done", challenges.length], ["Achievements", earned.length]];
-  const empty = (text: string, href: string, label: string) => <EmptyState compact dog="happy" title={text} action={{ href, label }} />;
+  const empty = (text: string, href: string, label: string) => <EmptyState compact scene="community" title={text} action={{ href, label }} />;
 
   return (
     <div className="space-y-5" data-passport>

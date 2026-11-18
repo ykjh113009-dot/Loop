@@ -1,71 +1,33 @@
 import { Suspense } from "react";
-import { CardSkeleton } from "@/components/dashboard/card";
-import { Achievements } from "@/components/dashboard/achievements";
-import { Announcements } from "@/components/dashboard/announcements";
-import { CommunityFeed } from "@/components/dashboard/community-feed";
-import { Featured } from "@/components/dashboard/featured";
-import { Greeting } from "@/components/dashboard/greeting";
-import { LeaderboardCard } from "@/components/dashboard/leaderboard-card";
-import { MiniCalendar } from "@/components/dashboard/mini-calendar";
-import { NextUp } from "@/components/dashboard/next-up";
-import { QuickActions } from "@/components/dashboard/quick-actions";
-import { QuickChats } from "@/components/dashboard/quick-chats";
-import { RecentChats } from "@/components/dashboard/recent-chats";
-import { StudentCouncil } from "@/components/dashboard/student-council";
-import { UpcomingActivities } from "@/components/dashboard/upcoming-activities";
-import { WeekEvents } from "@/components/dashboard/week-events";
-import "@/components/dashboard/dashboard.css";
+import { HomeHero } from "@/components/home/hero";
+import { QuickPills } from "@/components/home/quick-pills";
+import { LatestFromLoop } from "@/components/home/latest";
+import { MyCalendar } from "@/components/home/my-calendar";
+import { HomeLeaderboard } from "@/components/home/leaderboard";
+import { ResourcesMini } from "@/components/home/resources-mini";
+import { RewardsCard } from "@/components/home/rewards-card";
 
 export const metadata = { title: "Home" };
+
+const Block = ({ h = "h-40", children }: { h?: string; children: React.ReactNode }) => <Suspense fallback={<div className={`${h} animate-pulse rounded-2xl bg-white/60`} />}>{children}</Suspense>;
 
 // Each block loads on its own, so the page appears at once and fills in.
 export default function HomePage() {
   return (
-    <div data-wide className="dash">
-      <div className="dash-main">
-        <div className="dash-greet">
-          <Suspense fallback={<div className="card h-[104px] animate-pulse" />}>
-            <Greeting />
-          </Suspense>
+    <div data-wide className="space-y-4" data-home>
+      <Block h="h-[210px]"><HomeHero /></Block>
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-5">
+        <div className="min-w-0 space-y-4">
+          <Block h="h-12"><QuickPills /></Block>
+          <Block h="h-72"><LatestFromLoop /></Block>
+          <div className="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
+            <Block h="h-40"><ResourcesMini /></Block>
+            <Block h="h-40"><RewardsCard /></Block>
+          </div>
         </div>
-        <div className="dash-actions">
-          <Suspense fallback={<div className="card h-[96px] animate-pulse" />}><QuickActions /></Suspense>
-        </div>
-        <div className="dash-chats">
-          <Suspense fallback={<CardSkeleton />}><RecentChats /></Suspense>
-        </div>
-        <div className="dash-announce">
-          <Suspense fallback={<CardSkeleton />}><Announcements /></Suspense>
-        </div>
-        <div className="dash-feed">
-          <Suspense fallback={<CardSkeleton rows={4} />}><CommunityFeed /></Suspense>
-        </div>
-        <div className="dash-calendar">
-          <Suspense fallback={<CardSkeleton rows={4} />}><MiniCalendar /></Suspense>
-        </div>
-        <div className="dash-week">
-          <Suspense fallback={<CardSkeleton />}><WeekEvents /></Suspense>
-        </div>
-        <div className="dash-next">
-          <Suspense fallback={<CardSkeleton rows={2} />}><NextUp /></Suspense>
-        </div>
-        <div className="dash-featured"><Featured /></div>
-      </div>
-      <div className="dash-side">
-        <div className="dash-upcoming">
-          <Suspense fallback={<CardSkeleton />}><UpcomingActivities /></Suspense>
-        </div>
-        <div className="dash-leader">
-          <Suspense fallback={<CardSkeleton rows={4} />}><LeaderboardCard /></Suspense>
-        </div>
-        <div className="dash-ach">
-          <Suspense fallback={<CardSkeleton rows={2} />}><Achievements /></Suspense>
-        </div>
-        <div className="dash-quick">
-          <Suspense fallback={<CardSkeleton rows={4} />}><QuickChats /></Suspense>
-        </div>
-        <div className="dash-council">
-          <Suspense fallback={<CardSkeleton rows={2} />}><StudentCouncil /></Suspense>
+        <div className="min-w-0 space-y-4">
+          <Block h="h-56"><MyCalendar /></Block>
+          <Block h="h-56"><HomeLeaderboard /></Block>
         </div>
       </div>
     </div>

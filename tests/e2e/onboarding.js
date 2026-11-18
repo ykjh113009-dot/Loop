@@ -25,7 +25,7 @@ async function signIn(b, name, vp) {
   check('A first-time student is taken to the setup screen', /\/welcome/.test(p.url()), p.url());
   await p.waitForSelector('[data-step=profile]', { timeout: 15000 });
   let t = await text(p);
-  check('It shows the brand side with the dog', /Your school\. Your community\./.test(t) && (await p.locator('svg[aria-label*="dog"]').count()) >= 1);
+  check('It shows the brand side (no dog)', /Your school\. Your community\./.test(t));
   check('The name comes from Google and cannot be edited', (await p.locator('#wz-name').inputValue()) === 'Maya Odeh' && (await p.locator('#wz-name').getAttribute('readonly')) !== null && /From your Google account/.test(t));
   check('The three steps are shown', /Profile/.test(t) && /Interests/.test(t) && /Done/.test(t));
   await p.screenshot({ path: SHOTS + 'onb-1-profile-desktop.png' });
@@ -35,11 +35,11 @@ async function signIn(b, name, vp) {
   await p.locator('[data-choose-avatar]').click();
   await p.waitForSelector('[data-step=avatars]');
   check('There are 12 new avatars to choose from', (await p.locator('[data-avatar]').count()) === 12);
-  check('They are the new set, not the old one', (await p.locator('[data-avatar] img').first().getAttribute('src')).includes('/avatars/b'));
+  check('They are the the offered set', (await p.locator('[data-avatar] img').first().getAttribute('src')).includes('/avatars/a'));
   await p.screenshot({ path: SHOTS + 'onb-2-avatars-desktop.png' });
-  await p.locator('[data-avatar=b05]').click();
+  await p.locator('[data-avatar=a05]').click();
   await p.locator('[data-avatar-done]').click();
-  check('The preview shows the chosen avatar', (await p.locator('[data-preview]').getAttribute('src')).includes('b05'));
+  check('The preview shows the chosen avatar', (await p.locator('[data-preview]').getAttribute('src')).includes('a05'));
   await p.locator('[data-photo-input]').setInputFiles(path.join(__dirname, 'proof.png'));
   await p.waitForFunction(() => !/Uploading/.test(document.body.innerText), null, { timeout: 20000 });
   await p.waitForTimeout(500);
@@ -60,7 +60,7 @@ async function signIn(b, name, vp) {
   await p.waitForSelector('[data-welcome-done]', { timeout: 20000 });
   t = await text(p);
   check('The welcome screen appears', /You're officially part of Loop!/.test(t) && /Welcome to our school community/.test(t));
-  check('It has the happy dog and confetti', (await p.locator('svg[aria-label*="smiling"]').count()) === 1 && (await p.locator('main span[style*="loop-confetti"]').count()) > 5);
+  check('It has no dog and has confetti', (await p.locator("svg[role=img][aria-label*=dog]").count()) === 0 && (await p.locator('main span[style*="loop-confetti"]').count()) > 5);
   await p.waitForTimeout(600);
   await p.screenshot({ path: SHOTS + 'onb-4-welcome-desktop.png' });
   const row = sql(`select onboarded_at is not null, section, avatar like 'u:%', bio from public.profiles where id='${ID.maya}'`);
@@ -83,7 +83,7 @@ async function signIn(b, name, vp) {
   await p.locator('[data-choose-avatar]').click(); await p.waitForSelector('[data-step=avatars]');
   check('Avatar picker fits a phone', await noSideScroll(p));
   await p.screenshot({ path: SHOTS + 'onb-2-avatars-mobile.png', fullPage: true });
-  await p.locator('[data-avatar=b02]').click(); await p.locator('[data-avatar-done]').click();
+  await p.locator('[data-avatar=a02]').click(); await p.locator('[data-avatar-done]').click();
   await p.locator('[role=radio]', { hasText: /A$/ }).first().click();
   await p.locator('[data-next]').click(); await p.waitForSelector('[data-step=interests]');
   check('Interests fit a phone', await noSideScroll(p));
@@ -96,6 +96,6 @@ async function signIn(b, name, vp) {
   await p.locator('[data-continue]').click();
   await p.waitForURL('**/home', { timeout: 15000 });
   check('"Continue to Dashboard" goes straight to Home', /\/home/.test(p.url()));
-  check('The chosen avatar is saved', sql(`select avatar from public.profiles where id='${ID.layla}'`) === 'b02');
+  check('The chosen avatar is saved', sql(`select avatar from public.profiles where id='${ID.layla}'`) === 'a02');
   await ctx.close(); await b.close();
 })();

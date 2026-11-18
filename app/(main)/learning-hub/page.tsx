@@ -87,7 +87,7 @@ async function LearningHub() {
           <DashCard title={t("Find a Tutor")} href="/tutors" linkLabel={t("See all")}>
             <p className="mb-3 text-xs text-ink-2">{t("Find students who can help you learn, or share your own knowledge.")}</p>
             {(tutors ?? []).length === 0 ? (
-              <EmptyState compact dog="waiting" title={t("No approved tutors available yet.")} action={{ href: "/tutors/apply", label: t("Become a Tutor") }}>
+              <EmptyState compact scene="books" title={t("No approved tutors available yet.")} action={{ href: "/tutors/apply", label: t("Become a Tutor") }}>
                 {t("Tutors are approved by the school before they appear here.")}
               </EmptyState>
             ) : (

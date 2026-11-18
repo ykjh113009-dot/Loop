@@ -7,7 +7,6 @@ import { getT } from "@/lib/i18n-server";
 import { formatDate } from "@/lib/time";
 import { myApplications, pickGate, type AppView } from "@/lib/applications";
 import { acknowledgeApplication } from "@/app/actions/applications";
-import { LoopDog } from "@/components/mascot";
 import { Confetti } from "@/components/confetti";
 
 const NEXT_OK = ["/home", "/apply-admin"];
@@ -49,7 +48,6 @@ async function Update({ searchParams }: { searchParams: Promise<{ id?: string; n
         <Confetti />
         <div className="relative space-y-5 text-center" data-decision="approved">
           {head}
-          <LoopDog mood="happy" className="mx-auto w-48" />
           <div className="card space-y-3 rounded-3xl p-6">
             <h1 className="text-3xl font-bold" style={{ fontFamily: "var(--font-display)" }}>{t("Congratulations!")}</h1>
             <p className="text-black/70">{t("Your application has been approved. Welcome to the Loop team!")}</p>
@@ -72,7 +70,6 @@ async function Update({ searchParams }: { searchParams: Promise<{ id?: string; n
     return (
       <div className="space-y-5 text-center" data-decision="rejected">
         {head}
-        <LoopDog mood="sympathetic" className="mx-auto w-44" />
         <div className="card space-y-3 rounded-3xl p-6">
           <h1 className="text-3xl font-bold" style={{ fontFamily: "var(--font-display)" }}>{t("Application update")}</h1>
           <p className="text-black/70">{t("Unfortunately, your application wasn't approved this time.")}</p>
@@ -95,7 +92,6 @@ async function Update({ searchParams }: { searchParams: Promise<{ id?: string; n
   return (
     <div className="space-y-5 text-center" data-decision="pending">
       {head}
-      <LoopDog mood="waiting" className="mx-auto w-44" />
       <div className="card space-y-3 rounded-3xl p-6">
         <h1 className="text-3xl font-bold" style={{ fontFamily: "var(--font-display)" }}>{t("We're reviewing your application")}</h1>
         <p className="text-black/70">{t("Your application is being reviewed. We'll let you know once a decision has been made.")}</p>

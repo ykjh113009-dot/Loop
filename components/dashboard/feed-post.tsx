@@ -17,12 +17,12 @@ const KIND_BADGE: Record<string, { label: string; className: string }> = {
 };
 
 // One post: who, what, photo or poll, and the reaction row.
-export function FeedPostCard({ post, meId, locale = "en", full = false }: { post: FeedItem; meId: string; locale?: Locale; full?: boolean }) {
+export function FeedPostCard({ post, meId, locale = "en", full = false, wide = false }: { post: FeedItem; meId: string; locale?: Locale; full?: boolean; wide?: boolean }) {
   const t = makeT(locale);
   const mine = post.author_id === meId;
   const badge = KIND_BADGE[post.kind];
   return (
-    <article className="flex min-w-0 flex-col rounded-2xl border border-brand-700/10 bg-white p-3.5" data-post={post.id}>
+    <article className={`flex min-w-0 flex-col rounded-2xl border border-brand-700/10 bg-white shadow-[0_1px_2px_rgba(40,60,40,0.04)] ${wide ? "p-5" : "p-3.5"}`} data-post={post.id}>
       <header className="flex items-start gap-2.5">
         <Link href={`/profile/${post.author_id}`} className="shrink-0">
           <Avatar avatar={post.author?.avatar ?? "a01"} size="md" />
@@ -59,12 +59,12 @@ export function FeedPostCard({ post, meId, locale = "en", full = false }: { post
       {post.status === "held" && (
         <p className="mt-2.5 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800">{t("Only you can see this. It's waiting for a moderator to check it.")}</p>
       )}
-      <p className={`mt-2.5 text-sm break-words whitespace-pre-wrap ${full ? "" : "[display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:6] overflow-hidden"}`}>
+      <p className={`mt-3 ${wide ? "text-[15px] leading-relaxed" : "text-sm"} break-words whitespace-pre-wrap ${full ? "" : "[display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:6] overflow-hidden"}`}>
         <RichText text={post.body} />
       </p>
       {post.imageUrl && (
         // eslint-disable-next-line @next/next/no-img-element -- already compressed when uploaded
-        <img src={post.imageUrl} alt="" loading="lazy" className={`mt-2.5 w-full rounded-xl bg-black/5 object-cover ${full ? "max-h-[32rem]" : "h-44"}`} />
+        <img src={post.imageUrl} alt="" loading="lazy" className={`mt-2.5 w-full rounded-xl bg-black/5 object-cover ${full || wide ? "max-h-[34rem]" : "h-44"}`} />
       )}
       {post.kind === "poll" && post.poll.length > 0 && <PollBox postId={post.id} options={post.poll} locale={locale} />}
       {post.kind === "repost" && (

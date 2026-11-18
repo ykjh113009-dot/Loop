@@ -1,9 +1,9 @@
 // The illustrated avatars students can choose from (files in public/avatars).
 const ids = (prefix: string) => Array.from({ length: 12 }, (_, i) => `${prefix}${String(i + 1).padStart(2, "0")}`);
-// The set offered when picking an avatar (b01–b12: the Loop dog in different moods).
-export const NEW_AVATARS = ids("b");
+// The set offered when picking an avatar. b01–b12 (dog drawings) are no longer offered but still display for anyone who chose one.
+export const NEW_AVATARS = ids("a");
 // Everything that is a valid avatar. a01–a12 are the older illustrations that existing students may still have.
-export const AVATARS = [...ids("a"), ...NEW_AVATARS];
+export const AVATARS = [...ids("a"), ...ids("b")];
 
 // "a05" is an illustration. "u:<student id>:<version>" means the student uploaded a photo: it is served
 // through /api/avatar, which checks that you are signed in to the same school (photos are private).
