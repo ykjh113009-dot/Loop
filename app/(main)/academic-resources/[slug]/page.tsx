@@ -55,13 +55,13 @@ async function Title({ params }: { params: PageProps<"/academic-resources/[slug]
   const { slug } = await params;
   const supabase = await createClient();
   const { data: cat } = await supabase.from("study_categories").select("name, emoji").eq("slug", slug).maybeSingle();
-  return <PageHeader title={cat ? `${cat.emoji} ${cat.name}` : "Academic Resources"} back="/academic-resources" />;
+  return <PageHeader title={cat ? `${cat.emoji} ${cat.name}` : "Academic Library"} back="/academic-resources" />;
 }
 
 export default function SubjectPage(props: PageProps<"/academic-resources/[slug]">) {
   return (
     <>
-      <Suspense fallback={<PageHeader title="Academic Resources" back="/academic-resources" />}><Title params={props.params} /></Suspense>
+      <Suspense fallback={<PageHeader title="Academic Library" back="/academic-resources" />}><Title params={props.params} /></Suspense>
       <Suspense fallback={<PageSkeleton />}><Subject params={props.params} searchParams={props.searchParams as Promise<{ sort?: string }>} /></Suspense>
     </>
   );

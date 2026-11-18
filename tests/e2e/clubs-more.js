@@ -34,7 +34,7 @@ async function signIn(b, name, vp) { const ctx = await b.newContext({ viewport: 
   const ph = await signIn(b, 'Maya Odeh', { width: 390, height: 844 });
   await go(ph.p, '/more');
   const items = await ph.p.locator('main [data-nav-group] a').allInnerTexts();
-  check('The phone menu lists everything the sidebar does', items.length >= 24 && items.some((i) => /Clubs/.test(i)) && items.some((i) => /Mentorship/.test(i)), String(items.length));
+  check('The phone menu lists everything the sidebar does', items.length >= 24 && items.some((i) => /Clubs/.test(i)) && items.some((i) => /Tutors/.test(i)), String(items.length));
   check('The phone menu fits the screen', await noSideScroll(ph.p));
   await ph.p.screenshot({ path: '/home/user/loop-tests/more-mobile.png', fullPage: true });
   await b.close();

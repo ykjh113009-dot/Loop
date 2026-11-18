@@ -18,7 +18,7 @@ const TREE = {
   Home: ['Dashboard'],
   Community: ['Feed', 'Chats', 'Groups', 'Clubs', 'Student Profiles', 'Skill Exchange', 'Loop Magazine', 'Digital Yearbook'],
   'School Life': ['Calendar & Events', 'Activities & Challenges', 'Houses', 'Leaderboards', 'Student Council', 'Volunteering', 'Loop Passport', 'Campus Map & Directory'],
-  'Learning Hub': ['Academic Resources', 'Tutors Directory', 'Mentorship', 'University & Opportunities'],
+  'Learning Hub': ['Academic Library', 'Tutors Directory'],
   Marketplace: ['Student Marketplace', 'Rewards Shop', 'Top 10 Prizes'],
 };
 const LANDING = { Home: '/home', Community: '/community', 'School Life': '/school-life', 'Learning Hub': '/learning-hub', Marketplace: '/marketplace' };
@@ -86,6 +86,25 @@ const LANDING = { Home: '/home', Community: '/community', 'School Life': '/schoo
   const mk = await body((await (async () => { await p.goto(BASE + '/marketplace', { waitUntil: 'networkidle' }); return p; })()));
   check('Marketplace page shows the points balance and Top 10 Prizes', /Top 10 Prizes/.test(mk) && /Your Points/.test(mk));
 
+  // Learning Hub is only the Academic Library and the Tutors Directory
+  await p.goto(BASE + '/learning-hub', { waitUntil: 'networkidle' });
+  const lh = await body(p);
+  check('Learning Hub has no University, Scholarship or Mentorship sections', !/University|Universities|Scholarship|Mentor|Opportunit|Tawjihi/i.test(lh));
+  const lhTabs = await p.locator('[data-section-tabs] a').allInnerTexts();
+  check('Learning Hub has just two tabs: Academic Library and Tutors Directory', JSON.stringify(lhTabs.map((x) => x.trim())) === JSON.stringify(['Academic Library', 'Tutors Directory']), lhTabs.join(','));
+  check('The library links My Library, My Contributions and Suggest a Resource are there', (await p.locator('[data-library-links] a').count()) === 3);
+  const sideText = await p.locator('[data-sidebar-root]').innerText();
+  check('The sidebar has no postponed items', !/Mentorship|University|Opportunit/i.test(sideText));
+  for (const old of ['/opportunities', '/opportunities/new', '/mentorship', '/tawjihi', '/tawjihi/ask']) {
+    await p.goto(BASE + old, { waitUntil: 'networkidle' });
+    if (!p.url().endsWith('/learning-hub')) check(`Old link ${old} goes to the Learning Hub`, false, p.url());
+  }
+  check('Old links to postponed features lead to the Learning Hub', true);
+  for (const r of ['/academic-resources', '/academic-resources/my-library', '/academic-resources/my-contributions', '/academic-resources/suggest', '/tutors', '/tutors/apply']) {
+    const resp = await p.goto(BASE + r, { waitUntil: 'networkidle' });
+    check(`${r} opens`, !!resp && resp.status() < 400 && p.url().includes(r.split('?')[0]) && !/Application error|couldn.t load/i.test(await body(p)), p.url().replace(BASE, ''));
+  }
+
   // honest placeholders
   for (const r of ['/skill-exchange', '/magazine', '/yearbook', '/campus']) {
     await p.goto(BASE + r, { waitUntil: 'networkidle' });
@@ -115,7 +134,7 @@ const LANDING = { Home: '/home', Community: '/community', 'School Life': '/schoo
     await dr.locator('[data-nav-category="community"] button').click(); await pg.waitForTimeout(200);
     await dr.locator('a[href="/groups"]').click(); await pg.waitForURL('**/groups'); await pg.waitForTimeout(500);
     check(`Phone ${w}px: choosing a page closes the drawer`, !(await dr.isVisible().catch(() => false)));
-    for (const r of ['/home', '/community', '/school-life', '/learning-hub', '/marketplace', '/houses', '/passport', '/mentorship', '/groups', '/clubs', '/tutors', '/market', '/more']) {
+    for (const r of ['/home', '/community', '/school-life', '/learning-hub', '/marketplace', '/houses', '/passport', '/groups', '/clubs', '/tutors', '/market', '/more']) {
       await pg.goto(BASE + r, { waitUntil: 'networkidle' });
       const over = await pg.evaluate((w) => Math.max(document.documentElement.scrollWidth, innerWidth) - w, w);
       if (over > 0) check(`Phone ${w}px ${r}: no sideways scroll`, false, 'over=' + over);

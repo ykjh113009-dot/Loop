@@ -17,7 +17,13 @@ const nextConfig: NextConfig = {
     serverActions: { bodySizeLimit: "1mb" },
   },
   async redirects() {
-    return [{ source: "/", destination: "/home", permanent: false }];
+    return [
+      { source: "/", destination: "/home", permanent: false },
+      // Postponed features (see app/(main)/_postponed/README.md): old links go to the Learning Hub.
+      { source: "/opportunities/:path*", destination: "/learning-hub", permanent: false },
+      { source: "/mentorship", destination: "/learning-hub", permanent: false },
+      { source: "/tawjihi/:path*", destination: "/learning-hub", permanent: false },
+    ];
   },
   async headers() {
     return [

@@ -1031,4 +1031,5 @@ export const AR: Record<string, string> = {
   "No saved resources yet": "لا توجد مصادر محفوظة بعد",
   "Tap Save on a study resource to keep it here. Only you can see this list.": "اضغط حفظ على مصدر دراسي ليبقى هنا. أنت وحدك ترى هذه القائمة.",
   "No saved polls yet": "لا توجد استطلاعات محفوظة بعد",
+  "Academic Library": "المكتبة الأكاديمية",
 };

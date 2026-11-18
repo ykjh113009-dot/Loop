@@ -57,7 +57,7 @@ async function fillForm(p, v) {
     const p = maya.p;
     await go(p, '/academic-resources');
     const t = await text(p);
-    check('The home page has the title and subtitle', /Academic Resources/.test(t) && /Your school library, all in one place\./.test(t));
+    check('The home page has the title and subtitle', /Academic Library/.test(t) && /Your school library, all in one place\./.test(t));
     check('The home page has a search bar and a visible Suggest a Resource button', (await p.locator('main input[name=q]').count()) === 1 && (await p.locator('[data-suggest]').isVisible()));
     const subjects = await p.locator('[data-category]').allInnerTexts();
     check('Browse by Subject shows the six subjects', ['SAT', 'AP Chemistry', 'AP Biology', 'AP Physics', 'AP Calculus', 'Other subjects'].every((s) => subjects.some((x) => x.includes(s))), subjects.join(' | '));

@@ -1,10 +1,8 @@
 import { Suspense } from "react";
 import Link from "next/link";
-import { ArrowRight, GraduationCap, HeartHandshake } from "lucide-react";
 import { requireMe } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { getT } from "@/lib/i18n-server";
-import { formatDate } from "@/lib/time";
 import { RESOURCE_COLUMNS, signCovers, type LibraryResource } from "@/lib/library";
 import { signImages } from "@/lib/images";
 import { Avatar } from "@/components/avatar";
@@ -21,15 +19,12 @@ async function LearningHub() {
   await requireMe();
   const { t } = await getT();
   const supabase = await createClient();
-  const today = new Date().toISOString().slice(0, 10);
   const live = () => supabase.from("library_resources").select(RESOURCE_COLUMNS).eq("visibility", "visible").is("deleted_at", null).not("published_at", "is", null);
-  const [{ data: ranked }, { data: recent }, { data: subjects }, { data: tutors }, { data: opps }, { count: mentors }] = await Promise.all([
+  const [{ data: ranked }, { data: recent }, { data: subjects }, { data: tutors }] = await Promise.all([
     supabase.rpc("library_top_rated", { p_limit: 3 }),
     live().order("published_at", { ascending: false }).limit(3),
     supabase.from("study_categories").select("id, slug, name, emoji, sort").order("sort").limit(8),
     supabase.from("tutor_profiles").select("profile_id, subjects, photo_path, profile:profiles(id, full_name, avatar, grade)").not("approved_at", "is", null).eq("active", true).limit(3),
-    supabase.from("study_opportunities").select("id, title, organization, deadline, category").eq("status", "active").gte("deadline", today).order("deadline").limit(3),
-    supabase.from("profiles").select("id", { count: "exact", head: true }).not("alumni_year", "is", null).is("deactivated_at", null).not("onboarded_at", "is", null),
   ]);
   const ids = (ranked ?? []).map((r) => r.resource_id);
   let popular: LibraryResource[] = [];
@@ -45,14 +40,19 @@ async function LearningHub() {
     <div className="space-y-5" data-category-page="learning-hub">
       <PageBanner title={t("Learning Hub")} subtitle={t("Learn. Prepare. Achieve.")} note={t("Your academic hub in one place.")} scene="books" />
       <SectionTabs label={t("Learning Hub")} current="" items={[
-        { href: "/academic-resources", label: t("Library"), icon: "library" }, { href: "/tutors", label: t("Tutors"), icon: "tutors" },
-        { href: "/mentorship", label: t("Mentorship"), icon: "mentor" }, { href: "/opportunities", label: t("Universities"), icon: "graduation" },
+        { href: "/academic-resources", label: t("Academic Library"), icon: "library" }, { href: "/tutors", label: t("Tutors Directory"), icon: "tutors" },
       ]} />
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
         <div className="space-y-5">
-          <DashCard title={popular.length ? t("Popular resources") : t("Recently added")} href="/academic-resources" linkLabel={t("See all")}>
+          <DashCard title={t("Academic Library")} href="/academic-resources" linkLabel={t("See all")}>
             <p className="mb-3 text-xs text-ink-2">{t("Explore notes, textbooks, past papers and study guides.")}</p>
+            <div className="mb-3 flex flex-wrap gap-2" data-library-links>
+              <Link href="/academic-resources/my-library" className="chip bg-white shadow-sm hover:bg-brand-50">{t("My Library")}</Link>
+              <Link href="/academic-resources/my-contributions" className="chip bg-white shadow-sm hover:bg-brand-50">{t("My Contributions")}</Link>
+              <Link href="/academic-resources/suggest" className="chip bg-white shadow-sm hover:bg-brand-50">{t("Suggest a Resource")}</Link>
+            </div>
+            <h3 className="mb-2 text-sm font-semibold">{popular.length ? t("Popular resources") : t("Recently added")}</h3>
             {(subjects ?? []).length > 0 && (
               <div className="mb-3 flex flex-wrap gap-1.5" data-subjects>
                 {(subjects ?? []).map((s) => <Link key={s.id} href={`/academic-resources/${s.slug}`} className="chip bg-white shadow-sm hover:bg-brand-50">{s.emoji} {s.name}</Link>)}
@@ -64,27 +64,10 @@ async function LearningHub() {
               </EmptyState>
             ) : <div className="space-y-3" data-card="resources">{shown.map((r) => <ResourceCard key={r.id} r={r} cover={r.cover_path ? covers.get(r.cover_path) ?? null : null} t={t} />)}</div>}
           </DashCard>
-
-          <DashCard title={t("University & Opportunities")} href="/opportunities" linkLabel={t("See all")}>
-            <p className="mb-3 text-xs text-ink-2">{t("Scholarships, programs and deadlines to plan your next step.")}</p>
-            {(opps ?? []).length === 0 ? (
-              <EmptyState compact scene="books" title={t("No opportunities listed yet")} action={{ href: "/opportunities", label: t("Explore opportunities") }}>
-                {t("Scholarships and programs appear here as soon as your school adds them.")}
-              </EmptyState>
-            ) : (
-              <ul className="divide-y divide-black/5" data-card="opportunities">
-                {(opps ?? []).map((o) => (
-                  <li key={o.id}><Link href={`/opportunities/${o.id}`} className="flex items-center gap-3 py-2.5 hover:bg-black/[0.02]"><GraduationCap className="size-5 shrink-0 text-brand-700" strokeWidth={1.8} aria-hidden="true" />
-                    <span className="min-w-0 flex-1"><span className="block truncate text-sm font-semibold">{o.title}</span><span className="block truncate text-xs text-ink-2">{o.organization}</span></span>
-                    <span className="shrink-0 text-xs text-ink-2">{t("Deadline")} {formatDate(o.deadline!)}</span></Link></li>
-                ))}
-              </ul>
-            )}
-          </DashCard>
         </div>
 
         <div className="space-y-5">
-          <DashCard title={t("Find a Tutor")} href="/tutors" linkLabel={t("See all")}>
+          <DashCard title={t("Tutors Directory")} href="/tutors" linkLabel={t("See all")}>
             <p className="mb-3 text-xs text-ink-2">{t("Find students who can help you learn, or share your own knowledge.")}</p>
             {(tutors ?? []).length === 0 ? (
               <EmptyState compact scene="books" title={t("No approved tutors available yet.")} action={{ href: "/tutors/apply", label: t("Become a Tutor") }}>
@@ -109,16 +92,6 @@ async function LearningHub() {
                 })}
               </ul>
             )}
-          </DashCard>
-          <DashCard title={t("Mentorship")} href="/mentorship" linkLabel={t("See all")}>
-            <div className="flex items-start gap-3">
-              <HeartHandshake className="mt-0.5 size-6 shrink-0 text-brand-700" strokeWidth={1.7} aria-hidden="true" />
-              <div className="space-y-1.5 text-sm">
-                <p className="text-ink-2">{t("Learn from alumni who already walked this road: universities, majors and how they got there.")}</p>
-                <p className="font-semibold">{(mentors ?? 0) > 0 ? t("{n} alumni mentors", { n: mentors ?? 0 }) : t("Mentors will appear here when alumni join.")}</p>
-                <Link href="/mentorship" className="inline-flex items-center gap-1 font-medium text-brand-700 hover:underline">{t("Meet the mentors")} <ArrowRight className="size-4 rtl:rotate-180" aria-hidden="true" /></Link>
-              </div>
-            </div>
           </DashCard>
         </div>
       </div>

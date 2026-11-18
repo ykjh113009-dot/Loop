@@ -48,10 +48,8 @@ export const CATEGORIES: NavCategory[] = [
   {
     key: "learning-hub", href: "/learning-hub", label: "Learning Hub", icon: "book",
     children: [
-      { href: "/academic-resources", label: "Academic Resources", icon: "library" },
+      { href: "/academic-resources", label: "Academic Library", icon: "library" },
       { href: "/tutors", label: "Tutors Directory", icon: "tutors" },
-      { href: "/mentorship", label: "Mentorship", icon: "mentor", also: ["/tawjihi"] },
-      { href: "/opportunities", label: "University & Opportunities", icon: "graduation" },
     ],
   },
   {

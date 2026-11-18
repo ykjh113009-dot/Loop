@@ -231,7 +231,7 @@ async function Requests({ meId }: { meId: string }) {
 
 async function Tutors({ searchParams }: { searchParams: PageProps<"/tutors">["searchParams"] }) {
   const me = await requireMe();
-  if (!me.isStudent) redirect("/tawjihi");
+  if (!me.isStudent) redirect("/learning-hub");
   const sp = await searchParams;
   const tab = TABS.some((t) => t.id === sp.tab) ? (sp.tab as string) : "find";
   if (sp.tab === "me") redirect("/tutors/me");

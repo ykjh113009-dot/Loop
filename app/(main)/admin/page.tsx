@@ -105,7 +105,6 @@ async function Dashboard() {
           <Tile label="Peer tutors" value={p2.tutors} sub={`${p2.tutoring_done} sessions done`} />
           <Tile label="Challenge entries" value={p2.challenge_entries_week} sub="this week" href="/challenges" />
           <Tile label="New suggestions" value={p2.suggestions_new} href="/suggestions?tab=inbox" />
-          <Tile label="Tawjihi questions" value={p2.tawjihi_questions} href="/tawjihi" />
           <Tile label="Items for sale/swap" value={p2.listings_active} href="/market" />
         </div>
       </section>

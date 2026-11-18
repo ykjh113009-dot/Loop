@@ -31,7 +31,7 @@ async function login(browser, name, viewport = { width: 1280, height: 850 }) {
   // 1. The sidebar (the full tree is covered by nav.js; here: the Study Hub destinations)
   {
     const p = maya.p;
-    for (const [h, re] of [['/academic-resources', /Academic Resources/], ['/tutors', /Tutors Directory/], ['/opportunities', /University & Opportunities/], ['/shop', /Rewards Shop/]]) {
+    for (const [h, re] of [['/academic-resources', /Academic Library/], ['/tutors', /Tutors Directory/], ['/shop', /Rewards Shop/]]) {
       await go(p, h);
       const active = await p.locator(`[data-sidebar-root] a[href="${h}"]`).first().getAttribute('aria-current');
       check(`${h} opens its own page and is highlighted`, active === 'page' && re.test(await text(p)));
@@ -167,32 +167,6 @@ async function login(browser, name, viewport = { width: 1280, height: 850 }) {
     check('An approved tutor cannot open the application again', (await go(p, '/tutors/apply'), p.url().endsWith('/tutors/me')));
   }
 
-  // 4. Opportunities
-  {
-    const p = rania.p;
-    await go(p, '/opportunities/new');
-    await p.selectOption('select[name=category]', 'scholarships');
-    await p.fill('input[name=title]', 'E2E Sample scholarship');
-    await p.fill('input[name=organization]', 'Sample Foundation');
-    await p.fill('textarea[name=description]', 'A clearly labelled sample.');
-    await p.fill('input[name=link]', 'https://example.org/apply');
-    await p.check('input[name=is_sample]');
-    await p.getByRole('button', { name: 'Publish' }).click();
-    await p.waitForURL(/\/opportunities\/[0-9a-f-]{36}$/, { timeout: 20000 });
-    const q = maya.p;
-    await go(q, '/opportunities?category=scholarships');
-    check('Students can browse and filter opportunities', /E2E Sample scholarship/.test(await text(q)) && /Sample/.test(await text(q)));
-    await go(q, '/opportunities?category=summer');
-    check('The category filter hides other categories', !/E2E Sample scholarship/.test(await text(q)));
-    await go(q, '/opportunities?q=Sample+Foundation');
-    await q.getByText('E2E Sample scholarship').click();
-    await q.waitForURL(/\/opportunities\/[0-9a-f-]{36}$/);
-    await waitText(q, /Open the application page/);
-    check('An opportunity has its own listing with an application link', /Open the application page/.test(await text(q)) && (await q.locator('a[href="https://example.org/apply"]').count()) === 1);
-    await go(q, '/opportunities');
-    check('Students do not see the add button', (await q.getByRole('link', { name: /\+ Add/ }).count()) === 0);
-  }
-
   // 5. Rewards Shop
   {
     const p = rania.p;
@@ -217,12 +191,12 @@ async function login(browser, name, viewport = { width: 1280, height: 850 }) {
   // 6. Phones
   {
     const p = mobile.p;
-    for (const u of ['/academic-resources', '/academic-resources/sat', '/tutors', `/tutors/${ID.layla}`, '/tutors/apply', '/opportunities', '/shop', '/shop?tab=top10', '/more']) {
+    for (const u of ['/academic-resources', '/academic-resources/sat', '/tutors', `/tutors/${ID.layla}`, '/tutors/apply', '/shop', '/shop?tab=top10', '/more']) {
       await go(p, u);
       check(`No sideways scrolling on a phone: ${u}`, await noSideScroll(p));
     }
     await go(p, '/more');
-    check("On a phone, the Study Hub is reachable from the menu", (await p.locator("main [data-nav-group=\"Learning Hub\"] a").count()) === 5 && /Tutors Directory/i.test(await text(p)));
+    check("On a phone, the Study Hub is reachable from the menu", (await p.locator("main [data-nav-group=\"Learning Hub\"] a").count()) === 3 && /Tutors Directory/i.test(await text(p)));
   }
   sql(`delete from public.tutor_applications where profile_id='${ID.maya}'; delete from public.tutor_profiles where profile_id='${ID.maya}'; delete from public.study_resources where title like 'E2E %'; delete from public.study_opportunities where title like 'E2E %'; delete from public.top10_prizes; delete from public.study_categories where slug='ap-statistics';`);
   await browser.close();

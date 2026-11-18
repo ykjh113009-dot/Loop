@@ -53,7 +53,7 @@ const text = async (p) => (await p.locator('body').innerText()).replace(/\s+/g, 
 
   // ---------- 3. demo account login, persistence, existing features, logout
   for (const [who, email, routes] of [
-    ['student Layla', 'demo.layla@pioneers.edu.ps', ['/home', '/clubs', '/events', '/messages', '/notifications', '/people', '/points', '/leaderboard', '/challenges', '/polls', '/volunteering', '/tutors', '/market', '/tawjihi', '/council', '/suggestions', '/counselor', '/more']],
+    ['student Layla', 'demo.layla@pioneers.edu.ps', ['/home', '/clubs', '/events', '/messages', '/notifications', '/people', '/points', '/leaderboard', '/challenges', '/polls', '/volunteering', '/tutors', '/market', '/council', '/suggestions', '/counselor', '/more']],
     ['admin Rania', 'demo.rania@pioneers.edu.ps', ['/home', '/admin', '/admin/students', '/admin/announcements', '/admin/settings', '/moderation']],
   ]) {
     const ctx = await browser.newContext({ viewport: { width: 1280, height: 800 } }); const p = await ctx.newPage();

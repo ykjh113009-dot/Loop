@@ -25,7 +25,7 @@ export async function ResourcesMini() {
   return (
     <section className="rounded-2xl border border-brand-700/10 bg-white/80 p-4 lg:p-5" data-card="resources">
       <header className="mb-2 flex items-center justify-between">
-        <h2 className="flex items-center gap-2 text-[17px] font-semibold"><BookOpen className="size-5 text-brand-700" strokeWidth={1.8} aria-hidden="true" />{t("Academic Resources")}</h2>
+        <h2 className="flex items-center gap-2 text-[17px] font-semibold"><BookOpen className="size-5 text-brand-700" strokeWidth={1.8} aria-hidden="true" />{t("Academic Library")}</h2>
         <Link href="/academic-resources" className="text-xs font-medium text-brand-700 hover:underline">{t("See all")} →</Link>
       </header>
       <ResourceTabs topLabel={t("Top Rated")} recentLabel={t("Recently Added")} empty={t("Your library is waiting for its first resources.")} top={map(top)} recent={map(rec)} />

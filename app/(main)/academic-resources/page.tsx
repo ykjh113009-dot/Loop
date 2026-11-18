@@ -11,7 +11,7 @@ import { RESOURCE_COLUMNS, signCovers, type LibraryResource } from "@/lib/librar
 import { signImages } from "@/lib/images";
 import { AddCategoryForm, SubjectPhotos } from "./forms";
 
-export const metadata = { title: "Academic Resources" };
+export const metadata = { title: "Academic Library" };
 
 function safeQuery(q: string) {
   return q.replace(/[%_,()"'\\*:]/g, " ").replace(/\s+/g, " ").trim().slice(0, 60);
@@ -139,7 +139,7 @@ async function Page({ searchParams }: { searchParams: Promise<{ q?: string }> })
 export default function AcademicResourcesPage(props: PageProps<"/academic-resources">) {
   return (
     <>
-      <PageHeader title="Academic Resources" />
+      <PageHeader title="Academic Library" />
       <Suspense fallback={<PageSkeleton />}><Page searchParams={props.searchParams as Promise<{ q?: string }>} /></Suspense>
     </>
   );
