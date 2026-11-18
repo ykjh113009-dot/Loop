@@ -35,12 +35,7 @@ async function Update({ searchParams }: { searchParams: Promise<{ id?: string; n
   const next = NEXT_OK.includes(sp.next ?? "") ? sp.next! : "/home";
   const others = apps.filter((a) => a.id !== app.id && a.status !== "pending" && !a.seen).length;
 
-  const head = (
-    <div className="flex justify-center pt-2">
-      {/* eslint-disable-next-line @next/next/no-img-element -- static brand image */}
-      <img src="/brand/loop-wordmark.png" alt="Loop" className="h-9 w-auto" />
-    </div>
-  );
+  const head = null;
 
   if (app.status === "approved") {
     return (
@@ -107,11 +102,26 @@ async function Update({ searchParams }: { searchParams: Promise<{ id?: string; n
 }
 
 export default function ApplicationUpdatePage(props: PageProps<"/application-update">) {
+  const font = { fontFamily: "var(--font-body), system-ui, sans-serif" } as const;
+  const display = { fontFamily: "var(--font-display), system-ui, sans-serif" } as const;
   return (
-    <main className="relative mx-auto flex min-h-dvh max-w-md flex-col justify-center overflow-hidden bg-cream px-5 py-8" style={{ fontFamily: "var(--font-body), system-ui, sans-serif" }}>
-      <Suspense fallback={<p className="text-center text-black/50">…</p>}>
-        <Update searchParams={props.searchParams as Promise<{ id?: string; next?: string }>} />
-      </Suspense>
+    <main className="relative min-h-dvh overflow-hidden bg-cream lg:flex" style={font}>
+      {/* The same brand side as the student set-up screens. */}
+      <aside className="relative flex items-center justify-center gap-4 overflow-hidden bg-gradient-to-b from-sage-soft/70 to-cream px-5 py-5 lg:w-[42%] lg:flex-col lg:justify-center lg:gap-2 lg:py-10">
+        <div className="lg:text-center">
+          {/* eslint-disable-next-line @next/next/no-img-element -- static brand image */}
+          <img src="/brand/loop-wordmark.png" alt="Loop" className="h-9 w-auto lg:h-16" />
+          <p className="mt-1 text-sm text-brand-900/70 lg:mt-3 lg:text-xl" style={display}>Your school. Your community.</p>
+        </div>
+        <span className="pointer-events-none absolute -bottom-10 -start-10 hidden size-56 rounded-full bg-sage-soft/50 lg:block" aria-hidden="true" />
+      </aside>
+      <section className="flex flex-1 items-start justify-center px-4 py-6 lg:items-center lg:py-10">
+        <div className="w-full max-w-lg">
+          <Suspense fallback={<p className="text-center text-black/50">…</p>}>
+            <Update searchParams={props.searchParams as Promise<{ id?: string; next?: string }>} />
+          </Suspense>
+        </div>
+      </section>
       <Link href="/home" className="sr-only">Home</Link>
     </main>
   );
