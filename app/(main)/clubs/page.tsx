@@ -4,6 +4,7 @@ import { requireMe } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { ClubCard, type ClubSummary } from "@/components/club-card";
 import { LayoutGrid, Volleyball, GraduationCap, Laptop, Globe, Heart, Search, Plus } from "lucide-react";
+import { signClubImages } from "@/lib/images";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PageSkeleton } from "@/components/skeleton";
 
@@ -21,7 +22,7 @@ async function Clubs({ searchParams }: { searchParams: PageProps<"/clubs">["sear
   const me = await requireMe();
   const supabase = await createClient();
   const [{ data: clubs }, { data: memberships }, { data: myRequests }] = await Promise.all([
-    supabase.from("clubs").select("id, name, emoji, description, status, category, club_members(count)").eq("status", "approved").order("name"),
+    supabase.from("clubs").select("id, name, emoji, description, status, category, recruiting, image_path, club_members(count)").eq("status", "approved").order("name"),
     supabase.from("club_members").select("club_id").eq("profile_id", me.id),
     supabase.from("clubs").select("id, name, emoji, status, review_note").eq("requested_by", me.id).neq("status", "approved"),
   ]);
@@ -36,6 +37,7 @@ async function Clubs({ searchParams }: { searchParams: PageProps<"/clubs">["sear
   for (const r of leaderRows ?? []) if (r.profile) leadersOf.set(r.club_id, [...(leadersOf.get(r.club_id) ?? []), r.profile.full_name]);
   const nextOf = new Map<string, string>();
   for (const e of eventRows ?? []) if (e.club_id && !nextOf.has(e.club_id)) nextOf.set(e.club_id, e.starts_at);
+  const images = await signClubImages(supabase, (clubs ?? []).map((c) => c.image_path));
   const { requested, cat: rawCat, q: rawQ } = await searchParams;
   const cat = typeof rawCat === "string" && CATS.some(([k]) => k === rawCat) ? rawCat : "";
   const query = typeof rawQ === "string" ? rawQ.trim().slice(0, 40).toLowerCase() : "";
@@ -95,14 +97,14 @@ async function Clubs({ searchParams }: { searchParams: PageProps<"/clubs">["sear
       {joined.length > 0 && (
         <section>
           <h2 className="section-title">My clubs</h2>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">{joined.map((c) => <ClubCard key={c.id} club={c} joined leaders={leadersOf.get(c.id)} nextAt={nextOf.get(c.id)} />)}</div>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">{joined.map((c) => <ClubCard key={c.id} club={c} imageUrl={c.image_path ? images.get(c.image_path) : null} joined leaders={leadersOf.get(c.id)} nextAt={nextOf.get(c.id)} />)}</div>
         </section>
       )}
 
       <section>
         {joined.length > 0 && <h2 className="section-title">Discover</h2>}
         {others.length ? (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">{others.map((c) => <ClubCard key={c.id} club={c} canJoin={!me.isSuspended} leaders={leadersOf.get(c.id)} nextAt={nextOf.get(c.id)} />)}</div>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">{others.map((c) => <ClubCard key={c.id} club={c} imageUrl={c.image_path ? images.get(c.image_path) : null} canJoin={!me.isSuspended} leaders={leadersOf.get(c.id)} nextAt={nextOf.get(c.id)} />)}</div>
         ) : joined.length === 0 ? (
           <EmptyState scene="community" title="No clubs here yet. Be the first to start one!" action={{ href: "/clubs/new", label: "Request a club" }}>Find your people. Join clubs that match your interests.</EmptyState>
         ) : (

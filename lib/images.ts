@@ -19,3 +19,11 @@ export async function signProof(supabase: Supabase, paths: (string | null)[]) {
   const { data } = await supabase.storage.from("challenge-proof").createSignedUrls(unique, 3600);
   return new Map((data ?? []).filter((d) => d.signedUrl && d.path).map((d) => [d.path!, d.signedUrl]));
 }
+
+// Club pictures are private to the school; the database decides who may open them.
+export async function signClubImages(supabase: Supabase, paths: (string | null)[]) {
+  const unique = [...new Set(paths.filter((p): p is string => !!p))];
+  if (unique.length === 0) return new Map<string, string>();
+  const { data } = await supabase.storage.from("club-images").createSignedUrls(unique, 3600);
+  return new Map((data ?? []).filter((d) => d.signedUrl && d.path).map((d) => [d.path!, d.signedUrl]));
+}

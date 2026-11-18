@@ -4,6 +4,8 @@ import { getClub } from "@/lib/clubs";
 import { joinClub, leaveClub } from "@/app/actions/clubs";
 import { applyToClub, withdrawApplication } from "@/app/actions/community";
 import { createClient } from "@/lib/supabase/server";
+import { signClubImages } from "@/lib/images";
+import { ClubIcon } from "@/components/club-icon";
 import { ActionForm } from "@/components/action-form";
 import { Icon } from "@/components/icons";
 import { ReportButton } from "@/components/report-button";
@@ -21,6 +23,7 @@ async function ClubHeader({ params }: { params: LayoutProps<"/clubs/[id]">["para
     supabase.from("club_members").select("title, profile:profiles(id, full_name, avatar)").eq("club_id", club.id).eq("role", "leader"),
     supabase.from("events").select("title, starts_at").eq("club_id", club.id).eq("status", "approved").gt("starts_at", new Date().toISOString()).order("starts_at").limit(1).maybeSingle(),
   ]);
+  const imageUrl = club.image_path ? (await signClubImages(supabase, [club.image_path])).get(club.image_path) ?? null : null;
   const { data: application } = isMember ? { data: null } : await supabase.from("club_applications").select("id").eq("club_id", club.id).eq("profile_id", me.id).eq("status", "pending").maybeSingle();
 
   return (
@@ -30,7 +33,7 @@ async function ClubHeader({ params }: { params: LayoutProps<"/clubs/[id]">["para
       </Link>
       <div className="card mt-1 p-4">
         <div className="flex items-start gap-3">
-          <div className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-brand-50 text-3xl">{club.emoji}</div>
+          <ClubIcon emoji={club.emoji} url={imageUrl} className="size-16 text-3xl" />
           <div className="min-w-0 flex-1">
             <h1 className="text-lg leading-tight font-bold">{club.name}</h1>
             <p className="text-sm text-black/55">

@@ -11,6 +11,8 @@ import {
 import { ActionForm } from "@/components/action-form";
 import { Avatar } from "@/components/avatar";
 import { SubmitButton } from "@/components/submit-button";
+import { signClubImages } from "@/lib/images";
+import { ClubImageField } from "./club-image-field";
 import { PageSkeleton } from "@/components/skeleton";
 
 export const metadata = { title: "Manage club" };
@@ -36,6 +38,7 @@ async function Manage({ params, searchParams }: { params: PageProps<"/clubs/[id]
   const tab = TABS.find(([k]) => k === rawTab)?.[0] ?? "overview";
   const supabase = await createClient();
   const cid = club.id;
+  const imageUrl = club.image_path ? (await signClubImages(supabase, [club.image_path])).get(club.image_path) ?? null : null;
 
   const { data: members } = await supabase.from("club_members").select("role, title, joined_at, profile:profiles(id, full_name, avatar, grade)").eq("club_id", cid).order("joined_at");
   const people = (members ?? []).filter((m) => m.profile);
@@ -61,6 +64,7 @@ async function Manage({ params, searchParams }: { params: PageProps<"/clubs/[id]
             <section className="grid grid-cols-2 gap-2 sm:grid-cols-3" data-testid="analytics">
               {tiles.map(([label, v]) => <div key={label} className="card p-3"><p className="text-xs text-black/50">{label}</p><p className="text-xl font-bold tabular-nums">{v}</p></div>)}
             </section>
+            <section className="card p-4"><ClubImageField clubId={cid} schoolId={club.school_id} emoji={club.emoji} url={imageUrl} /></section>
             <ActionForm action={updateClubSettings} className="card space-y-3 p-4">
               <input type="hidden" name="clubId" value={cid} />
               <h2 className="font-semibold">Club settings</h2>

@@ -719,14 +719,14 @@ isOneToOne: false
                   ]
                 },"clubs": {
                   Row: {
-                    "application_question": string,"category": string,"created_at": string,"description": string,"emoji": string,"id": string,"name": string,"recruiting": string,"requested_by": string | null,"review_note": string | null,"reviewed_at": string | null,"reviewed_by": string | null,"school_id": string,"status": string
+                    "application_question": string,"category": string,"created_at": string,"description": string,"emoji": string,"id": string,"image_path": string | null,"name": string,"recruiting": string,"requested_by": string | null,"review_note": string | null,"reviewed_at": string | null,"reviewed_by": string | null,"school_id": string,"status": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "application_question"?: string,"category"?: string,"created_at"?: string,"description"?: string,"emoji"?: string,"id"?: string,"name": string,"recruiting"?: string,"requested_by"?: string | null,"review_note"?: string | null,"reviewed_at"?: string | null,"reviewed_by"?: string | null,"school_id": string,"status"?: string
+                    "application_question"?: string,"category"?: string,"created_at"?: string,"description"?: string,"emoji"?: string,"id"?: string,"image_path"?: string | null,"name": string,"recruiting"?: string,"requested_by"?: string | null,"review_note"?: string | null,"reviewed_at"?: string | null,"reviewed_by"?: string | null,"school_id": string,"status"?: string
                   }
                   Update: {
-                    "application_question"?: string,"category"?: string,"created_at"?: string,"description"?: string,"emoji"?: string,"id"?: string,"name"?: string,"recruiting"?: string,"requested_by"?: string | null,"review_note"?: string | null,"reviewed_at"?: string | null,"reviewed_by"?: string | null,"school_id"?: string,"status"?: string
+                    "application_question"?: string,"category"?: string,"created_at"?: string,"description"?: string,"emoji"?: string,"id"?: string,"image_path"?: string | null,"name"?: string,"recruiting"?: string,"requested_by"?: string | null,"review_note"?: string | null,"reviewed_at"?: string | null,"reviewed_by"?: string | null,"school_id"?: string,"status"?: string
                   }
                   Relationships: [
                     {
@@ -3619,6 +3619,9 @@ isOneToOne: false
 "club_analytics":
 { Args: { "p_club": string }; Returns: Json
                            },
+"club_image_manager":
+{ Args: { "p_name": string }; Returns: boolean
+                           },
 "complete_onboarding":
 { Args: { "p_avatar": string,"p_bio": string,"p_grade": number,"p_interests": (number)[],"p_photo"?: string,"p_section"?: string }; Returns: undefined
                            },
@@ -4116,6 +4119,9 @@ isOneToOne: false
                            },
 "set_club_attendance":
 { Args: { "p_present": boolean,"p_profile": string,"p_session": string }; Returns: undefined
+                           },
+"set_club_image":
+{ Args: { "p_club": string,"p_path": string }; Returns: undefined
                            },
 "set_council_info":
 { Args: { "p": Json }; Returns: undefined

@@ -55,9 +55,10 @@ const noSideScroll = (p) => p.evaluate(() => document.documentElement.scrollWidt
     }
     check('A student is sent home from every admin page', results.every((r) => r[0]));
     await p.goto(BASE + '/apply-admin', { waitUntil: 'networkidle' });
-    check('Application form shows the verified name and school email', await p.locator('input[readonly]').nth(0).inputValue() === 'Maya Odeh' && (await p.locator('input[readonly]').nth(1).inputValue()) === 'demo.maya@pioneers.edu.ps');
-    await p.selectOption('select[name=role]', 'admin');
-    await p.fill('input[name=position]', 'Grade 9 student');
+    check('Application form shows the verified name and school email', await p.locator('input[readonly]').nth(0).inputValue() === 'Maya Odeh' && /demo\.maya@pioneers\.edu\.ps/.test(await p.locator('main').innerText()));
+    await p.fill('#ad-position', 'Grade 9 student');
+    await p.locator('[data-next]').click();
+    await p.getByRole('radio', { name: /Admin/ }).click();
     await p.fill('textarea[name=motivation]', 'I want to help keep Loop a friendly place for everyone.');
     await p.fill('textarea[name=contribution]', 'I will check reports every day and help plan events.');
     await p.fill('textarea[name=experience]', 'Class representative in grade 8.');

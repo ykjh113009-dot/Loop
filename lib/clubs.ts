@@ -9,7 +9,7 @@ export const getClub = cache(async (id: string) => {
   const me = await requireMe();
   const supabase = await createClient();
   const [{ data: club }, { data: membership }, { count }] = await Promise.all([
-    supabase.from("clubs").select("id, name, emoji, description, status, school_id, created_at, recruiting, application_question").eq("id", id).maybeSingle(),
+    supabase.from("clubs").select("id, name, emoji, description, status, school_id, created_at, recruiting, application_question, image_path").eq("id", id).maybeSingle(),
     supabase.from("club_members").select("role").eq("club_id", id).eq("profile_id", me.id).maybeSingle(),
     supabase.from("club_members").select("profile_id", { count: "exact", head: true }).eq("club_id", id),
   ]);
