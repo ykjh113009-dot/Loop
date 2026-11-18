@@ -35,9 +35,9 @@ function Stepper({ step, t }: { step: number; t: (s: string) => string }) {
 }
 
 export function WelcomeWizard({
-  locale, schoolId, userId, name, email, schoolName, grades, fixedGrade, fixedSection, noClassReason, interests,
+  locale, after = "/home", schoolId, userId, name, email, schoolName, grades, fixedGrade, fixedSection, noClassReason, interests,
 }: {
-  locale: Locale; schoolId: string; userId: string; name: string; email: string; schoolName: string; grades: number[];
+  locale: Locale; after?: string; schoolId: string; userId: string; name: string; email: string; schoolName: string; grades: number[];
   fixedGrade: number | null; fixedSection: string | null; noClassReason: "counselor" | "alumni" | null;
   interests: { id: number; name: string }[];
 }) {
@@ -101,10 +101,10 @@ export function WelcomeWizard({
   // The welcome screen continues to Home by itself after a moment.
   useEffect(() => {
     if (step !== 2) return;
-    if (seconds <= 0) { router.replace("/home"); return; }
+    if (seconds <= 0) { router.replace(after); return; }
     const timer = setTimeout(() => setSeconds((s) => s - 1), 1000);
     return () => clearTimeout(timer);
-  }, [step, seconds, router]);
+  }, [step, seconds, router, after]);
 
   const shownAvatar = photo ? photo.preview : avatarSrc(avatar);
   const font = { fontFamily: "var(--font-body), system-ui, sans-serif" } as const;
@@ -122,7 +122,7 @@ export function WelcomeWizard({
           {wordmark("h-10 w-auto")}
           <h1 className="text-3xl font-bold text-brand-900 sm:text-4xl" style={display}>{t("You're officially part of Loop!")}</h1>
           <p className="text-lg text-black/65">{t("Welcome to our school community, {n}.", { n: first })}</p>
-          <button onClick={() => router.replace("/home")} className="btn-primary px-8 py-3 text-base" data-continue>{t("Continue to Dashboard")} →</button>
+          <button onClick={() => router.replace(after)} className="btn-primary px-8 py-3 text-base" data-continue>{after === "/home" ? t("Continue to Dashboard") : t("Continue")} →</button>
           <p className="text-xs text-black/45" aria-live="polite">{t("Taking you there in {n}…", { n: Math.max(seconds, 0) })}</p>
         </div>
       </main>

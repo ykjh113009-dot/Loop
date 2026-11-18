@@ -55,6 +55,22 @@ async function signIn(b, email, vp = { width: 1440, height: 900 }) {
   check('An admin can remove the club picture', q(`select image_path from public.clubs where id='${CLUB}'`) === '');
   await rania.ctx.close();
 
+  // a new club can have a picture from the start
+  {
+    const m = await signIn(b, 'demo.omar@pioneers.edu.ps').catch(() => null);
+    if (m) {
+      await m.p.goto(BASE + '/clubs/new', { waitUntil: 'networkidle' });
+      await m.p.locator('input[name=name]').fill('E2E Picture Club'); await m.p.locator('textarea[name=description]').fill('A club that starts with its own picture.');
+      await m.p.locator('[data-picture-input]').setInputFiles(PNG);
+      check('The request form previews the chosen picture', (await m.p.locator('[data-picture-preview]').count()) === 1);
+      await m.p.getByRole('button', { name: 'Send request' }).click(); await m.p.waitForURL('**requested=1**', { timeout: 20000 });
+      const ip = q("select image_path from public.clubs where name='E2E Picture Club'");
+      check('A new club request is saved with its picture', /^[0-9a-f-]{36}\/[0-9a-f-]{36}\/.+\.(webp|jpg)$/.test(ip), ip);
+      q("delete from public.clubs where name='E2E Picture Club'");
+      await m.ctx.close();
+    }
+  }
+
   // admin set-up page matches the student one
   const m2 = await signIn(b, 'demo.maya@pioneers.edu.ps');
   p = m2.p;

@@ -19,6 +19,8 @@ async function Application() {
   const me = await getMe();
   if (!me) redirect("/login");
   if (me.deactivated_at) redirect("/removed");
+  // Same first steps as every student: set up the profile, then come back here for the application.
+  if (!me.onboarded_at) redirect("/welcome?next=apply-admin");
 
   const supabase = await createClient();
   const [{ data: mine }, { data: contact }] = await Promise.all([

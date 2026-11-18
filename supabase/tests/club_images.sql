@@ -53,4 +53,17 @@ select tests.login(:rania);
 select public.set_club_image(:club::uuid, null);
 select tests.ok((select image_path from public.clubs where id = :club) is null, 'An admin can remove the club picture');
 
+-- the requester of a waiting club may set its picture; others may not
+\set req '00000000-0000-0000-0000-0000000000a5'
+reset role;
+insert into public.clubs (id, school_id, name, description, emoji, status, requested_by)
+  values ('00000000-0000-0000-0000-00000000c0ff', current_setting('t.school')::uuid, 'Picture Test Club', 'A test club for pictures.', '⭐', 'pending', :maya);
+update public.clubs set requested_by = :maya, status = 'pending' where id = '00000000-0000-0000-0000-00000000c0ff';
+select set_config('t.path2', current_setting('t.school') || '/00000000-0000-0000-0000-00000000c0ff/pic.jpg', true);
+select tests.login(:maya);
+select public.set_club_image('00000000-0000-0000-0000-00000000c0ff'::uuid, current_setting('t.path2'));
+select tests.ok((select image_path from public.clubs where id = '00000000-0000-0000-0000-00000000c0ff') = current_setting('t.path2'), 'The requester can set the picture of a waiting club');
+select tests.login(:layla);
+select tests.refused('select public.set_club_image(''00000000-0000-0000-0000-00000000c0ff''::uuid, ' || quote_literal(current_setting('t.path2')) || ')', 'leaders and admins', 'Someone else cannot set a waiting club''s picture');
+
 rollback;

@@ -12,4 +12,4 @@ export function friendlyError(error: { message?: string; code?: string } | null 
   return "Something went wrong. Please try again.";
 }
 
-export type ActionResult = { ok?: boolean; error?: string; message?: string } | null;
+export type ActionResult = { ok?: boolean; error?: string; message?: string; clubId?: string } | null;

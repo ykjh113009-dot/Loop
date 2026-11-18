@@ -18,7 +18,7 @@ export async function requestClub(_: ActionResult, formData: FormData): Promise<
   if (description.length < 10) return { error: "Tell people a bit more about the club." };
 
   const supabase = await createClient();
-  const { error } = await supabase.from("clubs").insert({
+  const { data: created, error } = await supabase.from("clubs").insert({
     name: name.slice(0, 60),
     description: description.slice(0, 500),
     emoji,
@@ -26,9 +26,11 @@ export async function requestClub(_: ActionResult, formData: FormData): Promise<
     school_id: me.school_id,
     requested_by: me.id,
     status: "pending",
-  });
+  }).select("id").single();
   if (error?.code === "23505") return { error: "A club with that name already exists or is waiting for approval." };
   if (error) return { error: friendlyError(error) };
+  // With a picture to upload, the page uploads it first and then goes to the list.
+  if (formData.get("hasPicture") === "1" && created) return { ok: true, clubId: created.id };
   redirect("/clubs?requested=1");
 }
 

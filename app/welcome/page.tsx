@@ -7,11 +7,13 @@ import { WelcomeWizard } from "./welcome-wizard";
 
 export const metadata = { title: "Welcome" };
 
-async function Welcome() {
+async function Welcome({ searchParams }: { searchParams: PageProps<"/welcome">["searchParams"] }) {
+  const { next } = await searchParams;
+  const after = next === "apply-admin" ? "/apply-admin" : "/home";
   const me = await getMe();
   if (!me) redirect("/login");
   if (me.deactivated_at) redirect("/removed");
-  if (me.onboarded_at) redirect("/home");
+  if (me.onboarded_at) redirect(after);
 
   const supabase = await createClient();
   const [{ data: interests }, { data: contact }, locale] = await Promise.all([
@@ -22,6 +24,7 @@ async function Welcome() {
   return (
     <WelcomeWizard
       locale={locale}
+      after={after}
       schoolId={me.school_id}
       userId={me.id}
       name={me.full_name}
@@ -36,10 +39,10 @@ async function Welcome() {
   );
 }
 
-export default function WelcomePage() {
+export default function WelcomePage(props: PageProps<"/welcome">) {
   return (
     <Suspense fallback={<main className="min-h-dvh bg-cream" />}>
-      <Welcome />
+      <Welcome searchParams={props.searchParams} />
     </Suspense>
   );
 }

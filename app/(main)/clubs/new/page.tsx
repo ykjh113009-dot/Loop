@@ -9,7 +9,7 @@ export const metadata = { title: "Request a club" };
 async function Gate() {
   const me = await requireMe();
   if (me.isSuspended) redirect("/clubs");
-  return <RequestClubForm />;
+  return <RequestClubForm schoolId={me.school_id} />;
 }
 
 export default function NewClubPage() {

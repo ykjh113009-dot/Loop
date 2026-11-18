@@ -38,7 +38,7 @@ async function Clubs({ searchParams }: { searchParams: PageProps<"/clubs">["sear
   const nextOf = new Map<string, string>();
   for (const e of eventRows ?? []) if (e.club_id && !nextOf.has(e.club_id)) nextOf.set(e.club_id, e.starts_at);
   const images = await signClubImages(supabase, (clubs ?? []).map((c) => c.image_path));
-  const { requested, cat: rawCat, q: rawQ } = await searchParams;
+  const { requested, picture, cat: rawCat, q: rawQ } = await searchParams;
   const cat = typeof rawCat === "string" && CATS.some(([k]) => k === rawCat) ? rawCat : "";
   const query = typeof rawQ === "string" ? rawQ.trim().slice(0, 40).toLowerCase() : "";
   const mine = new Set((memberships ?? []).map((m) => m.club_id));
@@ -75,7 +75,7 @@ async function Clubs({ searchParams }: { searchParams: PageProps<"/clubs">["sear
 
       {requested && (
         <p className="rounded-xl bg-brand-50 px-3 py-2 text-sm text-brand-800">
-          🎉 Your club request was sent. A moderator will review it and you&apos;ll get a notification.
+          🎉 Your club request was sent. A moderator will review it and you&apos;ll get a notification.{picture === "failed" ? " The picture didn&apos;t upload. You can add it from the club's Manage page once it is approved." : ""}
         </p>
       )}
 
