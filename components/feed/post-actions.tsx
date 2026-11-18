@@ -11,9 +11,9 @@ type Kind = keyof typeof REACTIONS;
 
 // The row under a post: react, comment, share, save.
 export function PostActions({
-  postId, reactionCount, commentCount, myReaction, saved, canShare, locale,
+  postId, reactionCount, commentCount, myReaction, saved, canShare, locale, pills = false,
 }: {
-  postId: string; reactionCount: number; commentCount: number; myReaction: Kind | null; saved: boolean; canShare: boolean; locale: Locale;
+  pills?: boolean; postId: string; reactionCount: number; commentCount: number; myReaction: Kind | null; saved: boolean; canShare: boolean; locale: Locale;
 }) {
   const t = makeT(locale);
   const [mine, setMine] = useState<Kind | null>(myReaction);
@@ -52,9 +52,11 @@ export function PostActions({
     });
   }
 
+  const btn = pills ? "rounded-full bg-brand-50/80 px-3.5 py-2 text-sm font-medium hover:bg-sage-soft" : "rounded-full px-2 py-1 text-xs font-medium hover:bg-brand-50";
+  const icon = pills ? "size-5" : "size-[18px]";
   return (
     <footer className="mt-auto pt-3">
-      <div className="relative flex items-center gap-1 text-ink-2">
+      <div className={`relative flex items-center ${pills ? "flex-wrap gap-2" : "gap-1"} text-ink-2`}>
         {picker && (
           <div role="menu" className="absolute bottom-9 start-0 z-10 flex gap-0.5 rounded-full border border-brand-700/10 bg-white p-1 shadow-lg">
             {(Object.keys(REACTIONS) as Kind[]).map((k) => (
@@ -70,20 +72,20 @@ export function PostActions({
           onContextMenu={(e) => { e.preventDefault(); setPicker((p) => !p); }}
           aria-pressed={!!mine}
           aria-label={mine ? t("Remove your reaction") : t("Like")}
-          className={`flex items-center gap-1.5 rounded-full px-2 py-1 text-xs font-medium hover:bg-brand-50 ${mine ? "text-brand-800" : ""}`}
+          className={`flex items-center gap-1.5 ${btn} ${mine ? "text-brand-800" : ""}`}
         >
-          {mine ? <span className="text-base leading-none">{REACTIONS[mine]}</span> : <LineIcon name="heart" className="size-[18px]" />}
+          {mine ? <span className="text-base leading-none">{REACTIONS[mine]}</span> : <LineIcon name="heart" className={icon} />}
           <span className="tabular-nums" data-testid="reaction-count">{count}</span>
         </button>
         <button type="button" onClick={() => setPicker((p) => !p)} aria-label={t("Choose a reaction")} aria-expanded={picker} className="rounded-full px-1.5 py-1 text-xs hover:bg-brand-50">
           ＋
         </button>
-        <Link href={`/post/${postId}`} aria-label={t("Comments")} className="flex items-center gap-1.5 rounded-full px-2 py-1 text-xs font-medium hover:bg-brand-50">
-          <LineIcon name="comment" className="size-[18px]" />
+        <Link href={`/post/${postId}`} aria-label={t("Comments")} className={`flex items-center gap-1.5 ${btn}`}>
+          <LineIcon name="comment" className={icon} />
           <span className="tabular-nums">{commentCount}</span>
         </Link>
         {canShare && (
-          <button type="button" onClick={share} className="rounded-full px-2 py-1 text-xs font-medium hover:bg-brand-50">
+          <button type="button" onClick={share} className={btn}>
             {t("Share")}
           </button>
         )}

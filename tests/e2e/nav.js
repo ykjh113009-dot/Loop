@@ -79,7 +79,7 @@ const LANDING = { Home: '/home', Community: '/community', 'School Life': '/schoo
   // five landing pages
   for (const [cat, href] of Object.entries(LANDING)) {
     await p.goto(BASE + href, { waitUntil: 'networkidle' });
-    const hasBanner = (await p.locator('[data-banner], .dash-banner, [data-home-stats]').count()) > 0;
+    const hasBanner = (await p.locator('[data-banner], [data-home-hero], [data-section-tabs]').count()) > 0;
     const over = await p.evaluate(() => document.documentElement.scrollWidth - innerWidth);
     check(`${cat} landing page has its banner and fits the screen`, hasBanner && over <= 0, `over=${over}`);
   }

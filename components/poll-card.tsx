@@ -21,12 +21,12 @@ export async function PollCard({ poll, canVote, canDelete }: { poll: Poll; canVo
   const open = new Date(poll.closes_at) > new Date();
 
   return (
-    <article className="card space-y-3 p-4">
+    <article className="space-y-3 rounded-3xl border border-brand-700/10 bg-white/85 p-5 shadow-[0_1px_2px_rgba(40,60,40,0.04)]">
       <div>
         <p className="text-xs text-black/45">
           {poll.club ? `${poll.club.emoji} ${poll.club.name}` : "🏫 Whole school"} · {open ? `closes ${formatDateTime(poll.closes_at)}` : "closed"}
         </p>
-        <h2 className="font-semibold">{poll.question}</h2>
+        <h2 className="text-[17px] font-semibold">{poll.question}</h2>
       </div>
       {r.show && r.counts ? (
         <ul className="space-y-2">

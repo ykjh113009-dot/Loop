@@ -7,7 +7,6 @@ import { loadFeed } from "@/lib/feed";
 import { getT } from "@/lib/i18n-server";
 import { Empty } from "@/components/empty";
 import { PageHeader } from "@/components/page-header";
-import { PageBanner } from "@/components/ui/page-banner";
 import { SectionTabs } from "@/components/ui/section-tabs";
 import { PageSkeleton } from "@/components/skeleton";
 import { FeedPostCard } from "@/components/dashboard/feed-post";
@@ -38,7 +37,7 @@ async function Community({ searchParams }: { searchParams: PageProps<"/community
         <PageHeader title={`#${tag}`} back="/community" />
       ) : (
         <>
-          <PageBanner title={t("Community")} subtitle={t("Connect · Share · Belong")} note={t("Be part of our amazing school community!")} scene="community" />
+          <h1 className="sr-only">{t("Community")}</h1>
           <SectionTabs label={t("Community")} current="/community" items={[
             { href: "/community", label: t("All Posts"), icon: "feed" }, { href: "/messages", label: t("Chats"), icon: "chat" }, { href: "/groups", label: t("Groups"), icon: "groups" },
             { href: "/clubs", label: t("Clubs"), icon: "clubs" }, { href: "/polls", label: t("Polls"), icon: "star" }, { href: "/saved", label: t("Saved"), icon: "yearbook" },
@@ -47,7 +46,7 @@ async function Community({ searchParams }: { searchParams: PageProps<"/community
       )}
       <div className="min-w-0 space-y-4">
       {!tag && !me.isSuspended && (
-        <div className="card p-4">
+        <div className="rounded-3xl border border-brand-700/10 bg-white/85 p-4 shadow-[0_1px_2px_rgba(40,60,40,0.04)] sm:p-5">
           <HomeComposer clubs={clubs} avatar={me.avatar} schoolId={me.school_id} userId={me.id} locale={locale} />
         </div>
       )}
