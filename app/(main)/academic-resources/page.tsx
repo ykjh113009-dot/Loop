@@ -74,7 +74,7 @@ async function Library({ q }: { q: string }) {
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <div className="space-y-3">
-        <p className="text-sm text-black/60">{t("Your school library, all in one place.")}</p>
+        <p className="text-sm text-black/60">{t("Your school library, all in one place.")} {t("Explore notes, textbooks, past papers and study guides.")}</p>
         <div className="flex flex-col gap-2 sm:flex-row">
           <form action="/academic-resources" className="relative flex-1" role="search">
             <span className="pointer-events-none absolute inset-y-0 start-3 flex items-center text-black/40"><LineIcon name="search" className="size-4" /></span>
@@ -100,7 +100,7 @@ async function Library({ q }: { q: string }) {
         <>
           <section className="space-y-3">
             <h2 className="section-title">{t("Browse by subject")}</h2>
-            <div className="grid gap-2 sm:grid-cols-2">{first.map(tile)}</div>
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">{first.map(tile)}</div>
             {more.length > 0 && (
               <details className="group">
                 <summary className="cursor-pointer text-sm font-semibold text-brand-700">{t("Show all subjects")} ({more.length})</summary>

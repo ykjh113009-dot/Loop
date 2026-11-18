@@ -1,6 +1,6 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { ShellChrome } from "@/components/shell/shell-chrome";
 import type { ShellUser } from "@/components/shell/profile-menu";
 import { useBadges } from "@/lib/use-badges";
@@ -11,10 +11,12 @@ import type { Locale } from "@/lib/i18n";
 // The real frame: knows which page is open and keeps the counters fresh.
 export function ShellFrame({ user, initial, locale }: { user: ShellUser | null; initial: Badges; locale: Locale }) {
   const pathname = usePathname();
+  const params = useSearchParams();
+  const search = params.toString() ? `?${params.toString()}` : "";
   const badges = useBadges(user?.id ?? null, initial);
   return (
     <>
-      <ShellChrome user={user} badges={badges} pathname={pathname} locale={locale} />
+      <ShellChrome user={user} badges={badges} pathname={pathname} locale={locale} search={search} />
       {user?.isStudent && <RewardToasts userId={user.id} />}
     </>
   );

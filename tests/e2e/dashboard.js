@@ -28,15 +28,15 @@ async function signIn(browser, email, viewport, mobile = false) {
   check(`Greeting is personal and matches the time of day (Good ${part}, Layla!)`, t.includes(`Good ${part}, Layla!`));
 
   // shell
-  const side = await p.locator('aside nav a').evaluateAll(els => els.map(e => [e.textContent.trim().replace(/\d+$/, ''), e.getAttribute('href')]));
-  const expectSide = [['Home', '/home'], ['Community', '/community'], ['Chats', '/messages'], ['Calendar', '/events'], ['Activities', '/challenges'], ['Academic Resources', '/academic-resources'], ['Tutors Directory', '/tutors'], ['University & Opportunities', '/opportunities'], ['Tawjihi corner', '/tawjihi'], ['Rewards Shop', '/shop'], ['Clubs', '/clubs'], ['Groups', '/groups'], ['Leaderboards', '/leaderboard'], ['Polls', '/polls'], ['Competitions', '/competitions'], ['Volunteering hours', '/volunteering'], ['Buy, sell & swap', '/market'], ['Student council', '/council'], ['Suggestion box', '/suggestions'], ['Leadership', '/leadership'], ['My points & badges', '/points'], ['Talk to the counselor', '/counselor']];
-  check('Sidebar lists everything from the old More page in order, grouped by topic', JSON.stringify(side) === JSON.stringify(expectSide), JSON.stringify(side));
-  check('Sidebar marks Home as the current page', (await p.locator('aside nav a[aria-current=page]').innerText()).trim() === 'Home');
+  const side = await p.locator('[data-sidebar-root] [data-nav-tree] > li > div > a').evaluateAll(els => els.map(e => [e.textContent.trim().replace(/\d+$/, ''), e.getAttribute('href')]));
+  const expectSide = [['Home', '/home'], ['Community', '/community'], ['School Life', '/school-life'], ['Learning Hub', '/learning-hub'], ['Marketplace', '/marketplace']];
+  check('Sidebar shows the five categories in order', JSON.stringify(side) === JSON.stringify(expectSide), JSON.stringify(side));
+  check('Sidebar marks Home as the current page', (await p.locator('[data-sidebar-root] a[aria-current=page]').first().innerText()).trim().startsWith('Home'));
   check('Top bar has search, notifications, messages and the profile (name and grade)', (await p.locator('header input[name=q]').count()) === 1 && (await p.locator('header a[aria-label=Notifications]').first().isVisible()) && (await p.locator('header a[aria-label=Messages]').first().isVisible()) && /Layla Nasser\s*Grade 10/.test(await p.locator('header button[aria-label="Profile menu"]').first().innerText().then(x => x.replace(/\s+/g, ' ')).catch(() => '')) );
 
   // quick actions
   const qa = await p.locator('nav[aria-label="Quick actions"] a').evaluateAll(els => els.map(e => [e.textContent.trim(), e.getAttribute('href')]));
-  check('6 quick actions with the right links', JSON.stringify(qa.map(x => x[0])) === JSON.stringify(['New Post', 'Messages', 'Calendar', 'Activities', 'Academy', 'More']) && qa.every(x => x[1]), JSON.stringify(qa));
+  check('4 quick actions with the right links', JSON.stringify(qa.map(x => x[0])) === JSON.stringify(['Join a Club', 'Browse Resources', 'Explore Events', 'Visit Marketplace']) && qa.every(x => x[1]), JSON.stringify(qa));
 
   // cards present
   const titles = ['Upcoming Activities', 'Recent Chats', 'School Announcements', 'Community Feed', 'Grade Leaderboard', 'Quick Chats', 'Student Council', 'Calendar', "This Week's Events", 'Next Up', 'Featured in Loop'];
@@ -70,7 +70,7 @@ async function signIn(browser, email, viewport, mobile = false) {
   // ---- navigation
   for (const [label, href] of expectSide) {
     await p.goto(BASE + '/home', { waitUntil: 'networkidle' });
-    await p.locator(`aside nav a[href="${href}"]`).click();
+    await p.locator(`[data-sidebar-root] [data-nav-tree] > li > div > a[href="${href}"]`).click();
     await p.waitForURL('**' + href + '*', { timeout: 15000 }).catch(() => {});
     await p.waitForLoadState('networkidle');
     const bt = await body(p);
@@ -156,13 +156,13 @@ async function signIn(browser, email, viewport, mobile = false) {
   // ============ phone ============
   for (const w of [375, 390, 430]) {
     const s = await signIn(browser, 'demo.layla@pioneers.edu.ps', { width: w, height: 800 });
-    const m = await s.p.evaluate(() => ({ over: document.documentElement.scrollWidth - innerWidth, tabs: [...document.querySelectorAll('nav[aria-label=Main]')].filter(n => n.getBoundingClientRect().height > 0).map(n => [...n.querySelectorAll('a')].map(a => a.textContent.trim())), fab: !!document.querySelector('a[aria-label="New post"]'), sidebar: getComputedStyle(document.querySelector('aside')).display, header: !!document.querySelector('header a[aria-label=Notifications]'), cols: getComputedStyle(document.querySelector('nav[aria-label="Quick actions"]')).gridTemplateColumns.split(' ').length }));
-    check(`Phone ${w}px: no sideways scroll, sidebar hidden, bottom tabs Home/Community/Calendar/More, floating new-post button, header icons, quick actions in a grid`, m.over <= 0 && m.sidebar === 'none' && JSON.stringify(m.tabs) === JSON.stringify([['Home', 'Community', 'Calendar', 'More']]) && m.fab && m.header && m.cols === 3, JSON.stringify(m));
+    const m = await s.p.evaluate(() => ({ over: document.documentElement.scrollWidth - innerWidth, tabs: [...document.querySelectorAll('nav[aria-label=Main]')].filter(n => n.getBoundingClientRect().height > 0).map(n => [...n.querySelectorAll('a')].map(a => a.textContent.trim())), fab: !!document.querySelector('a[aria-label="New post"]'), sidebar: getComputedStyle(document.querySelector('[data-sidebar-root]')).display, header: !!document.querySelector('header a[aria-label=Notifications]'), cols: getComputedStyle(document.querySelector('nav[aria-label="Quick actions"]')).gridTemplateColumns.split(' ').length }));
+    check(`Phone ${w}px: no sideways scroll, sidebar hidden, bottom tabs for the five categories, floating new-post button, header icons, quick actions in a grid`, m.over <= 0 && m.sidebar === 'none' && JSON.stringify(m.tabs) === JSON.stringify([['Home', 'Community', 'School', 'Learn', 'Market']]) && m.fab && m.header && m.cols === 2, JSON.stringify(m));
     // touch targets
     const small = await s.p.evaluate(() => [...document.querySelectorAll('nav[aria-label=Main] a, nav[aria-label="Quick actions"] a, a[aria-label="New post"]')].filter(a => a.getBoundingClientRect().height > 0 && (a.getBoundingClientRect().height < 44 || a.getBoundingClientRect().width < 44)).length);
     check(`Phone ${w}px: tabs, quick actions and the new-post button are at least 44 px (touch friendly)`, small === 0, small + ' too small');
     if (w === 390) {
-      for (const [tab, href] of [['Community', '/community'], ['Calendar', '/events'], ['More', '/more'], ['Home', '/home']]) {
+      for (const [tab, href] of [['Community', '/community'], ['School', '/school-life'], ['Market', '/marketplace'], ['Home', '/home']]) {
         await s.p.locator(`nav[aria-label=Main] a[href="${href}"]`).last().click(); await s.p.waitForURL('**' + href); await s.p.waitForLoadState('networkidle');
         const active = await s.p.locator('nav[aria-label=Main] a[aria-current=page]').last().innerText();
         check(`Phone: tab ${tab} opens ${href} and is highlighted`, active.trim() === tab, active.trim());

@@ -207,11 +207,11 @@ const waitText = (p, re, t = 15000) => p.waitForFunction((s) => new RegExp(s).te
     await p.getByRole('button', { name: 'Save settings' }).click();
     await waitText(p, /تم الحفظ/);
     await go(p, '/home');
-    const st = await p.evaluate(() => ({ dir: document.documentElement.dir, lang: document.documentElement.lang, nav: document.querySelector('aside nav')?.innerText || '' }));
+    const st = await p.evaluate(() => ({ dir: document.documentElement.dir, lang: document.documentElement.lang, nav: document.querySelector('[data-sidebar-root] nav')?.innerText || '' }));
     const body = await text(p);
     check('Arabic switches the page to right-to-left', st.dir === 'rtl' && st.lang === 'ar', JSON.stringify(st).slice(0, 80));
     check('The menu, greeting and feed are in Arabic', /الرئيسية/.test(st.nav) && /المجتمع/.test(st.nav) && /(صباح|مساء) الخير/.test(body) && /آخر المنشورات/.test(body));
-    const side = await p.evaluate(() => document.querySelector('aside').getBoundingClientRect().left > innerWidth / 2);
+    const side = await p.evaluate(() => document.querySelector('[data-sidebar-root]').getBoundingClientRect().left > innerWidth / 2);
     check('In Arabic the sidebar sits on the right', side);
     const bad = [];
     for (const r of ['/home', '/community', '/settings', `/profile/${ID.layla}`, '/friends', '/messages', `/post/${postId}`]) { await go(p, r); if (!(await noSideScroll(p))) bad.push(r); }
@@ -221,7 +221,7 @@ const waitText = (p, re, t = 15000) => p.waitForFunction((s) => new RegExp(s).te
     for (const r of ['/home', '/community', '/settings', `/profile/${ID.layla}`, '/friends', '/messages', `/post/${postId}`, '/messages/new']) { await go(m, r); if (!(await noSideScroll(m))) badM.push(r); }
     check('Arabic phone pages have no sideways scrolling', badM.length === 0, badM.join(', '));
     const tabs = await m.evaluate(() => [...document.querySelectorAll('nav[aria-label=Main] li')].pop()?.innerText || '');
-    check('Phone tabs are translated', /المزيد|التقويم|المجتمع|الرئيسية/.test(tabs), tabs);
+    check('Phone tabs are translated', /السوق|تعلّم|المدرسة|المجتمع|الرئيسية/.test(tabs), tabs);
     await m.close();
     await go(p, '/settings');
     await p.selectOption('select[name=locale]', 'en');

@@ -1,19 +1,15 @@
 import Link from "next/link";
-import { Leaves } from "@/components/botanical";
-import { LineIcon } from "@/components/line-icon";
+import { Pencil } from "lucide-react";
+import { NavIcon } from "@/components/nav-icon";
+import { MobileNav } from "@/components/shell/mobile-nav";
 import { ProfileMenu, type ShellUser } from "@/components/shell/profile-menu";
+import { Sidebar } from "@/components/shell/sidebar";
+import { CATEGORIES, categoryActive } from "@/lib/nav";
 import type { Badges } from "@/lib/badges";
 import { makeT, type Locale } from "@/lib/i18n";
 
-import { navFor, isActive, type NavItem } from "@/lib/nav";
-
-// The sidebar shows the whole of Loop, grouped by topic (the same list the phone's More tab shows).
-const TABS: NavItem[] = [
-  { href: "/home", label: "Home", icon: "home" },
-  { href: "/community", label: "Community", icon: "community", also: ["/clubs"] },
-  { href: "/events", label: "Calendar", icon: "calendar" },
-  { href: "/more", label: "More", icon: "dots", also: ["/messages", "/challenges", "/market", "/academic-resources", "/tutors", "/opportunities", "/shop", "/tawjihi", "/volunteering", "/council", "/suggestions", "/points", "/counselor", "/people", "/polls", "/leaderboard", "/announcements", "/search"] },
-];
+// The five categories as phone tabs (short names).
+const TAB_LABEL: Record<string, string> = { home: "Home", community: "Community", "school-life": "School", "learning-hub": "Learn", marketplace: "Market" };
 
 function Count({ n }: { n: number }) {
   if (n <= 0) return null;
@@ -33,61 +29,32 @@ function Wordmark({ className }: { className: string }) {
   );
 }
 
-// Everything that frames a page: sidebar and top bar on a computer, header,
-// bottom tabs and the floating "new post" button on a phone.
-// It has no hooks, so it can also be drawn as the loading placeholder (pathname = null).
-export function ShellChrome({ user, badges, pathname, locale = "en" }: { user: ShellUser | null; badges: Badges; pathname: string | null; locale?: Locale }) {
+function PointsPill({ points, label }: { points: number | null; label: string }) {
+  if (points === null) return null;
+  return (
+    <Link href="/points" aria-label={label} className="inline-flex items-center gap-1.5 rounded-full border border-brand-700/10 bg-white/80 px-3 py-1.5 text-sm font-semibold text-brand-900 hover:bg-white" data-points-pill>
+      <NavIcon name="star" className="size-4 fill-amber-400 text-amber-500" strokeWidth={1.8} />
+      <span className="tabular-nums">{points.toLocaleString("en")}</span>
+      <span className="hidden text-xs font-medium text-ink-2 sm:inline">pts</span>
+    </Link>
+  );
+}
+
+// Everything that frames a page: sidebar and top bar on a computer; header, drawer and bottom tabs on a phone.
+// It can also be drawn as the loading placeholder (pathname = null).
+export function ShellChrome({ user, badges, pathname, locale = "en", search = "" }: { user: ShellUser | null; badges: Badges; pathname: string | null; locale?: Locale; search?: string }) {
   const t = makeT(locale);
   const current = pathname ?? "";
   const showFab = !!user && (current === "/home" || current === "/community");
 
   return (
     <>
-      {/* ---------- computer: sidebar ---------- */}
-      <aside className="fixed inset-y-0 start-0 z-30 hidden w-[236px] flex-col overflow-hidden px-5 pt-6 pb-6 print:hidden lg:flex">
-        <Wordmark className="h-11 w-auto" />
-        <nav aria-label="Main" className="relative z-10 mt-6 min-h-0 flex-1 overflow-y-auto pe-1 [scrollbar-width:thin]">
-          {navFor(user).map((group, gi) => (
-            <ul key={group.title} className={`space-y-0.5 ${gi > 0 ? "mt-2.5 border-t border-brand-700/10 pt-2.5" : ""}`} data-nav-group={group.title}>
-              {group.items.map((item) => {
-                const active = isActive(current, item);
-                return (
-                  <li key={item.href}>
-                    <Link
-                      href={item.href}
-                      aria-current={active ? "page" : undefined}
-                      className={`relative flex items-center gap-3.5 rounded-xl px-3.5 py-2 text-[15px] font-medium transition-colors ${
-                        active ? "bg-sage-soft/80 text-brand-900" : "text-ink-2 hover:bg-brand-700/5 hover:text-ink"
-                      }`}
-                    >
-                      <LineIcon name={item.icon} className={`size-5 shrink-0 ${active ? "text-brand-700" : ""}`} strokeWidth={active ? 2 : 1.7} />
-                      {t(item.label)}
-                      {item.badge && badges[item.badge] ? (
-                        <span className="ms-auto min-w-5 rounded-full bg-red-600 px-1.5 text-center text-[11px] leading-5 font-bold text-white">
-                          {badges[item.badge]}
-                        </span>
-                      ) : null}
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-          ))}
-        </nav>
-        <div className="relative mt-3 shrink-0">
-          <Leaves className="pointer-events-none absolute -bottom-6 -start-8 w-56" />
-          <p className="relative text-[13px] leading-snug text-ink-2">
-            {t("One Loop.")}
-            <br />
-            {t("Endless Possibilities.")}
-          </p>
-        </div>
-      </aside>
+      <Sidebar user={user} badges={badges} locale={locale} search={search} pathname={pathname} />
 
       {/* ---------- computer: top bar ---------- */}
-      <header className="fixed top-0 end-0 start-[236px] z-20 hidden h-[72px] items-center gap-4 px-8 print:hidden lg:flex">
+      <header className="fixed top-0 end-0 start-[var(--sidebar-w,236px)] z-20 hidden h-[72px] items-center gap-4 px-8 transition-[inset] print:hidden lg:flex">
         <form action="/search" method="get" role="search" className="relative max-w-[640px] flex-1">
-          <LineIcon name="search" className="pointer-events-none absolute top-1/2 start-4 size-[18px] -translate-y-1/2 text-ink-2" />
+          <NavIcon name="search" className="pointer-events-none absolute top-1/2 start-4 size-[18px] -translate-y-1/2 text-ink-2" />
           <input
             name="q"
             type="search"
@@ -100,12 +67,13 @@ export function ShellChrome({ user, badges, pathname, locale = "en" }: { user: S
         <div className="ms-auto flex items-center gap-1.5">
           {user && (
             <>
+              {user.isStudent && <PointsPill points={user.points} label={t("My points")} />}
               <Link href="/notifications" aria-label={t("Notifications")} className="relative rounded-full p-2.5 text-ink hover:bg-brand-700/5">
-                <LineIcon name="bell" className="size-[22px]" />
+                <NavIcon name="bell" className="size-[22px]" />
                 <Count n={badges.notifications} />
               </Link>
               <Link href="/messages" aria-label={t("Messages")} className="relative rounded-full p-2.5 text-ink hover:bg-brand-700/5">
-                <LineIcon name="chat" className="size-[22px]" />
+                <NavIcon name="chat" className="size-[22px]" />
                 <Count n={badges.messages} />
               </Link>
               <div className="ms-2">
@@ -117,17 +85,17 @@ export function ShellChrome({ user, badges, pathname, locale = "en" }: { user: S
       </header>
 
       {/* ---------- phone: header ---------- */}
-      <header className="fixed inset-x-0 top-0 z-30 flex h-14 items-center justify-between border-b border-brand-700/5 bg-cream/90 px-4 pt-[env(safe-area-inset-top)] backdrop-blur print:hidden lg:hidden">
-        <Wordmark className="h-8 w-auto" />
+      <header className="fixed inset-x-0 top-0 z-30 flex h-14 items-center justify-between gap-1 border-b border-brand-700/5 bg-cream/90 px-3 pt-[env(safe-area-inset-top)] backdrop-blur print:hidden lg:hidden">
+        <div className="flex items-center gap-1">
+          <MobileNav user={user} badges={badges} locale={locale} search={search} pathname={pathname} />
+          <Wordmark className="h-8 w-auto" />
+        </div>
         {user && (
           <div className="flex items-center gap-0.5">
+            {user.isStudent && <PointsPill points={user.points} label={t("My points")} />}
             <Link href="/notifications" aria-label={t("Notifications")} className="relative rounded-full p-2 text-ink">
-              <LineIcon name="bell" className="size-[22px]" />
+              <NavIcon name="bell" className="size-[22px]" />
               <Count n={badges.notifications} />
-            </Link>
-            <Link href="/messages" aria-label={t("Messages")} className="relative rounded-full p-2 text-ink">
-              <LineIcon name="chat" className="size-[22px]" />
-              <Count n={badges.messages} />
             </Link>
             <ProfileMenu user={user} compact locale={locale} />
           </div>
@@ -141,24 +109,24 @@ export function ShellChrome({ user, badges, pathname, locale = "en" }: { user: S
           aria-label={t("New post")}
           className="fixed end-4 bottom-[calc(4.75rem+env(safe-area-inset-bottom))] z-30 flex size-14 items-center justify-center rounded-full bg-brand-700 text-white shadow-[0_10px_24px_-8px_rgba(58,82,48,0.8)] active:scale-95 print:hidden lg:hidden"
         >
-          <LineIcon name="pencil" className="size-6" />
+          <Pencil className="size-6" strokeWidth={1.9} aria-hidden="true" />
         </Link>
       )}
 
-      {/* ---------- phone: bottom tabs ---------- */}
-      <nav aria-label="Main" className="fixed inset-x-0 bottom-0 z-30 border-t border-brand-700/10 bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur print:hidden lg:hidden">
+      {/* ---------- phone: bottom tabs (the five categories) ---------- */}
+      <nav aria-label="Main" className="fixed inset-x-0 bottom-0 z-30 border-t border-brand-700/10 bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur print:hidden lg:hidden" data-bottom-tabs>
         <ul className="mx-auto flex max-w-2xl">
-          {TABS.map((tab) => {
-            const active = isActive(current, tab);
+          {CATEGORIES.map((cat) => {
+            const active = categoryActive(current, "", cat);
             return (
-              <li key={tab.href} className="flex-1">
+              <li key={cat.key} className="min-w-0 flex-1">
                 <Link
-                  href={tab.href}
+                  href={cat.href}
                   aria-current={active ? "page" : undefined}
-                  className={`flex min-h-14 flex-col items-center justify-center gap-0.5 text-[11px] font-medium ${active ? "text-brand-700" : "text-ink-2"}`}
+                  className={`flex min-h-14 flex-col items-center justify-center gap-0.5 text-[10.5px] font-medium ${active ? "text-brand-700" : "text-ink-2"}`}
                 >
-                  <LineIcon name={tab.icon} className="size-6" strokeWidth={active ? 2.1 : 1.7} />
-                  {t(tab.label)}
+                  <NavIcon name={cat.icon} className="size-[22px]" strokeWidth={active ? 2.2 : 1.8} />
+                  <span className="truncate">{t(TAB_LABEL[cat.key])}</span>
                 </Link>
               </li>
             );

@@ -4,7 +4,7 @@ import { requireMe } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { signImages } from "@/lib/images";
 import { CATEGORIES, priceLabel } from "@/lib/market";
-import { Empty } from "@/components/empty";
+import { EmptyState } from "@/components/ui/empty-state";
 import { Icon } from "@/components/icons";
 import { PageHeader } from "@/components/page-header";
 import { MarketSafetyNote } from "@/components/safety-note";
@@ -46,7 +46,7 @@ async function Market({ searchParams }: { searchParams: PageProps<"/market">["se
         ))}
       </div>
       {listings.length === 0 ? (
-        <Empty emoji="🛍️" title="Nothing here yet">Have old books or a uniform you don&apos;t need? Post them!</Empty>
+        <EmptyState scene="gift" title={"No listings yet. Be the first to share something."} action={{ href: "/market/new", label: "Create Listing" }}>{"Discover what students are sharing and explore Loop rewards."}</EmptyState>
       ) : (
         <div className="grid grid-cols-2 gap-2">
           {listings.map((l) => {
@@ -76,7 +76,7 @@ async function Market({ searchParams }: { searchParams: PageProps<"/market">["se
 export default function MarketPage(props: PageProps<"/market">) {
   return (
     <>
-      <PageHeader title="Buy, sell & swap" back="/more" />
+      <PageHeader title="Student Marketplace" back="/marketplace" />
       <Suspense fallback={<PageSkeleton />}>
         <Market searchParams={props.searchParams} />
       </Suspense>

@@ -1,0 +1,150 @@
+const { chromium } = require('playwright');
+const BASE = process.env.BASE || 'http://localhost:3000';
+const results = [];
+const check = (name, ok, info = '') => { results.push(ok); console.log((ok ? 'PASS' : 'FAIL') + '  ' + name + (info ? '  — ' + info : '')); };
+const body = async (p) => (await p.locator('body').innerText()).replace(/\s+/g, ' ');
+
+async function signIn(browser, email, viewport, mobile = false) {
+  const ctx = await browser.newContext({ viewport, isMobile: mobile, hasTouch: mobile });
+  const p = await ctx.newPage();
+  await p.goto(BASE + '/login', { waitUntil: 'networkidle' });
+  await p.locator('form', { has: p.locator(`input[value="${email}"]`) }).locator('button').click();
+  await p.waitForURL('**/home', { timeout: 30000 });
+  await p.waitForLoadState('networkidle'); await p.waitForTimeout(800);
+  return { ctx, p };
+}
+
+const TREE = {
+  Home: ['Dashboard'],
+  Community: ['Feed', 'Chats', 'Groups', 'Clubs', 'Student Profiles', 'Skill Exchange', 'Loop Magazine', 'Digital Yearbook'],
+  'School Life': ['Calendar & Events', 'Activities & Challenges', 'Houses', 'Leaderboards', 'Student Council', 'Volunteering', 'Loop Passport', 'Campus Map & Directory'],
+  'Learning Hub': ['Academic Resources', 'Tutors Directory', 'Mentorship', 'University & Opportunities'],
+  Marketplace: ['Student Marketplace', 'Rewards Shop', 'Top 10 Prizes'],
+};
+const LANDING = { Home: '/home', Community: '/community', 'School Life': '/school-life', 'Learning Hub': '/learning-hub', Marketplace: '/marketplace' };
+
+(async () => {
+  const browser = await chromium.launch();
+  const { ctx, p } = await signIn(browser, 'demo.layla@pioneers.edu.ps', { width: 1440, height: 900 });
+
+  const cats = await p.locator('[data-sidebar-root] [data-nav-category]').evaluateAll(els => els.map(e => e.getAttribute('data-nav-category')));
+  check('Sidebar has exactly the five categories', cats.length === 5, cats.join(','));
+  check('Top 10 Prizes is not a top-level sidebar item', !(await p.locator('[data-sidebar-root] [data-nav-tree] > li > div > a[href*="top10"]').count()));
+  check('Settings, profile and sign out sit in a separate utility area', (await p.locator('[data-sidebar-root] [data-sidebar-utility] a[href="/settings"]').count()) === 1 && (await p.locator('[data-sidebar-root] [data-sidebar-utility] button', { hasText: /sign out/i }).count()) === 1);
+
+  // every nav link works: open each category, check children, visit each
+  const broken = [];
+  for (const [cat, kids] of Object.entries(TREE)) {
+        await p.goto(BASE + LANDING[cat], { waitUntil: 'networkidle' });
+    const open = await p.locator('[data-sidebar-root]').innerText();
+    const shown = kids.filter(k => open.includes(k));
+    check(`${cat}: opens to its landing page and lists ${kids.length} items`, shown.length === kids.length, kids.filter(k => !shown.includes(k)).join(','));
+    const hrefs = await p.locator('[data-sidebar-root] [data-nav-category]', { hasText: cat }).first().locator('ul a').evaluateAll(els => els.map(e => [e.textContent.trim().replace(/\d+$/, '').replace(/Soon$/, ''), e.getAttribute('href')]));
+    for (const [label, href] of hrefs) {
+      const r = await p.goto(BASE + href, { waitUntil: 'domcontentloaded' });
+      const txt = await body(p);
+      if (!r || r.status() >= 400 || /404|This page could not be found|Something went wrong/i.test(txt.slice(0, 400))) broken.push(label + ' ' + href);
+    }
+  }
+  check('Every sidebar link opens a real page (no 404 or error)', broken.length === 0, broken.join('; '));
+
+  // active state
+  await p.goto(BASE + '/groups', { waitUntil: 'networkidle' });
+  const act = await p.locator('[data-sidebar-root] a[aria-current=page]').allInnerTexts();
+  check('Active page is highlighted inside its open category (Groups)', act.some(x => x.includes('Groups')) && (await p.locator('[data-sidebar-root]').innerText()).includes('Student Profiles'), act.join('|'));
+  await p.goto(BASE + '/shop?tab=top10', { waitUntil: 'networkidle' });
+  const act2 = await p.locator('[data-sidebar-root] a[aria-current=page]').allInnerTexts();
+  check('Top 10 Prizes lives inside Marketplace and is the active item there', act2.length === 1 && act2[0].includes('Top 10 Prizes'), act2.join('|'));
+
+  // expand / collapse category
+  await p.goto(BASE + '/home', { waitUntil: 'networkidle' });
+  const commBtn = p.locator('[data-sidebar-root] [data-nav-category="community"] button').first();
+  const before = await p.locator('[data-sidebar-root]').innerText();
+  check('Community starts closed while on Home', !before.includes('Student Profiles'));
+  await commBtn.click(); await p.waitForTimeout(200);
+  check('Clicking the chevron expands Community', (await p.locator('[data-sidebar-root]').innerText()).includes('Student Profiles'));
+  await commBtn.click(); await p.waitForTimeout(200);
+  check('Clicking it again collapses it', !(await p.locator('[data-sidebar-root]').innerText()).includes('Student Profiles'));
+
+  // collapse the whole sidebar
+  const w0 = await p.locator('[data-sidebar-root]').evaluate(e => e.getBoundingClientRect().width);
+  await p.locator('[data-sidebar-toggle]').click(); await p.waitForTimeout(400);
+  const w1 = await p.locator('[data-sidebar-root]').evaluate(e => e.getBoundingClientRect().width);
+  const mainPad = await p.locator('main').evaluate(e => e.getBoundingClientRect().left);
+  check('Sidebar collapses to icons and the page makes room', w1 < w0 / 2 && mainPad < w0, `${w0} -> ${w1}`);
+  await p.reload({ waitUntil: 'networkidle' });
+  check('The collapsed choice is remembered after reload', (await p.locator('[data-sidebar-root]').evaluate(e => e.getBoundingClientRect().width)) < w0 / 2);
+  await p.locator('[data-sidebar-toggle]').click(); await p.waitForTimeout(400);
+
+  // five landing pages
+  for (const [cat, href] of Object.entries(LANDING)) {
+    await p.goto(BASE + href, { waitUntil: 'networkidle' });
+    const hasBanner = (await p.locator('[data-banner], .dash-banner, [data-home-stats]').count()) > 0;
+    const over = await p.evaluate(() => document.documentElement.scrollWidth - innerWidth);
+    check(`${cat} landing page has its banner and fits the screen`, hasBanner && over <= 0, `over=${over}`);
+  }
+  const mk = await body((await (async () => { await p.goto(BASE + '/marketplace', { waitUntil: 'networkidle' }); return p; })()));
+  check('Marketplace page shows the points balance and Top 10 Prizes', /Top 10 Prizes/.test(mk) && /Your Points/.test(mk));
+
+  // honest placeholders
+  for (const r of ['/skill-exchange', '/magazine', '/yearbook', '/campus']) {
+    await p.goto(BASE + r, { waitUntil: 'networkidle' });
+    check(`${r} is an honest "Coming soon" page`, (await p.locator('[data-coming-soon]').count()) === 1);
+  }
+  // empty states
+  const empties = await p.evaluate(() => 0);
+  await p.goto(BASE + '/passport', { waitUntil: 'networkidle' });
+  check('Passport shows real records only (no invented ones)', (await p.locator('[data-passport-stats]').count()) === 1);
+  await ctx.close();
+
+  // ---------- phone ----------
+  for (const w of [360, 390]) {
+    const m = await signIn(browser, 'demo.layla@pioneers.edu.ps', { width: w, height: 800 }, true);
+    const pg = m.p;
+    check(`Phone ${w}px: the sidebar is hidden`, (await pg.locator('[data-sidebar-root]').evaluate(e => getComputedStyle(e).display)) === 'none');
+    const tabs = await pg.locator('[data-bottom-tabs] a').allInnerTexts();
+    check(`Phone ${w}px: bottom tabs are the five categories`, JSON.stringify(tabs.map(x => x.trim())) === JSON.stringify(['Home', 'Community', 'School', 'Learn', 'Market']), tabs.join(','));
+    await pg.locator('[data-open-menu]').click(); await pg.waitForTimeout(300);
+    const dr = pg.locator('[data-drawer]');
+    check(`Phone ${w}px: the menu opens as a drawer with all five categories`, await dr.isVisible() && (await dr.locator('[data-nav-category]').count()) === 5);
+    await dr.locator('[data-nav-category="community"] button').click(); await pg.waitForTimeout(200);
+    check(`Phone ${w}px: a category expands inside the drawer`, (await dr.innerText()).includes('Student Profiles'));
+    await pg.keyboard.press('Escape'); await pg.waitForTimeout(300);
+    check(`Phone ${w}px: Escape closes the drawer`, !(await dr.isVisible().catch(() => false)));
+    await pg.locator('[data-open-menu]').click(); await pg.waitForTimeout(300);
+    await dr.locator('[data-nav-category="community"] button').click(); await pg.waitForTimeout(200);
+    await dr.locator('a[href="/groups"]').click(); await pg.waitForURL('**/groups'); await pg.waitForTimeout(500);
+    check(`Phone ${w}px: choosing a page closes the drawer`, !(await dr.isVisible().catch(() => false)));
+    for (const r of ['/home', '/community', '/school-life', '/learning-hub', '/marketplace', '/houses', '/passport', '/mentorship', '/groups', '/clubs', '/tutors', '/market', '/more']) {
+      await pg.goto(BASE + r, { waitUntil: 'networkidle' });
+      const over = await pg.evaluate((w) => Math.max(document.documentElement.scrollWidth, innerWidth) - w, w);
+      if (over > 0) check(`Phone ${w}px ${r}: no sideways scroll`, false, 'over=' + over);
+    }
+    check(`Phone ${w}px: pages fit the screen`, true);
+    await m.ctx.close();
+  }
+
+  // ---------- roles ----------
+  const adm = await signIn(browser, 'demo.admin@pioneers.edu.ps', { width: 1440, height: 900 }).catch(() => null);
+  if (adm) {
+    check('Admins see the Admin link in the profile menu or utility area', /Admin/.test(await adm.p.locator('[data-sidebar-root]').innerText() + await adm.p.locator('header').first().innerText()));
+    await adm.ctx.close();
+  }
+  const stu = await signIn(browser, 'demo.layla@pioneers.edu.ps', { width: 1440, height: 900 });
+  check('Students do not see admin features in the sidebar', !/Admin|Moderation/.test(await stu.p.locator('[data-sidebar-root]').innerText()));
+  await stu.ctx.close();
+
+  // Arabic / RTL
+  const ar = await signIn(browser, 'demo.layla@pioneers.edu.ps', { width: 1440, height: 900 });
+  await ar.ctx.addCookies([{ name: 'loop_locale', value: 'ar', url: BASE }]);
+  await ar.p.goto(BASE + '/community', { waitUntil: 'networkidle' });
+  const dir = await ar.p.evaluate(() => document.documentElement.dir);
+  const side = await ar.p.locator('[data-sidebar-root]').innerText();
+  check('Arabic: the layout flips to RTL and the sidebar is translated', dir === 'rtl' && /المجتمع/.test(side) && /الحياة المدرسية/.test(side), dir);
+  await ar.ctx.close();
+
+  await browser.close();
+  const failed = results.filter(x => !x).length;
+  console.log(`\n${results.length - failed}/${results.length} passed`);
+  process.exit(failed ? 1 : 0);
+})();

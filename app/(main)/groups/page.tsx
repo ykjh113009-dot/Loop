@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getT } from "@/lib/i18n-server";
 import { joinGroup } from "@/app/actions/community";
 import { ActionForm } from "@/components/action-form";
-import { Empty } from "@/components/empty";
+import { EmptyState } from "@/components/ui/empty-state";
 import { PageHeader } from "@/components/page-header";
 import { SubmitButton } from "@/components/submit-button";
 import { PageSkeleton } from "@/components/skeleton";
@@ -34,9 +34,9 @@ async function Groups({ searchParams }: { searchParams: PageProps<"/groups">["se
         <button className="btn-secondary">{t("Search")}</button>
       </form>
       {sorted.length === 0 ? (
-        <Empty emoji="👥" title={t("No groups found")}>{t("Start one for something you love: gaming, music, photography, sports…")}</Empty>
+        <EmptyState scene="community" title={t(q ? "No groups found" : "No groups yet? Be the first to start one!")} action={{ href: "/groups/new", label: t("Create a Group") }}>{t("Find your people. Explore communities built around your interests.")}</EmptyState>
       ) : (
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           {sorted.map((g) => {
             const st = status.get(g.id);
             return (
@@ -77,7 +77,7 @@ async function Groups({ searchParams }: { searchParams: PageProps<"/groups">["se
 export default function GroupsPage(props: PageProps<"/groups">) {
   return (
     <>
-      <PageHeader title="Groups" action={<Link href="/groups/new" className="btn-primary px-3 py-2">New group</Link>} />
+      <PageHeader title="Groups" back="/community" action={<Link href="/groups/new" className="btn-primary px-3 py-2">New group</Link>} />
       <Suspense fallback={<PageSkeleton />}>
         <Groups searchParams={props.searchParams} />
       </Suspense>

@@ -44,7 +44,7 @@ async function Clubs({ searchParams }: { searchParams: PageProps<"/clubs">["sear
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Clubs"
+        title="Clubs" back="/community"
         action={
           !me.isSuspended && (
             <Link href="/clubs/new" className="btn-primary px-3 py-2">

@@ -42,3 +42,4 @@ next-env.d.ts
 
 # the example settings file is safe to share
 !.env.example
+shots/

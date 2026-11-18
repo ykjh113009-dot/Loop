@@ -16,6 +16,8 @@ export type ShellUser = {
   isAdmin: boolean;
   isCounselor: boolean;
   isStudent: boolean;
+  /** Spendable Loop Points (students only). */
+  points: number | null;
 };
 
 // The profile button in the top bar, with the small menu under it.

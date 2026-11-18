@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import { CardSkeleton } from "@/components/dashboard/card";
+import { Achievements } from "@/components/dashboard/achievements";
 import { Announcements } from "@/components/dashboard/announcements";
 import { CommunityFeed } from "@/components/dashboard/community-feed";
 import { Featured } from "@/components/dashboard/featured";
@@ -56,6 +57,9 @@ export default function HomePage() {
         </div>
         <div className="dash-leader">
           <Suspense fallback={<CardSkeleton rows={4} />}><LeaderboardCard /></Suspense>
+        </div>
+        <div className="dash-ach">
+          <Suspense fallback={<CardSkeleton rows={2} />}><Achievements /></Suspense>
         </div>
         <div className="dash-quick">
           <Suspense fallback={<CardSkeleton rows={4} />}><QuickChats /></Suspense>

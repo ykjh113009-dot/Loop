@@ -28,28 +28,16 @@ async function login(browser, name, viewport = { width: 1280, height: 850 }) {
   const layla = await login(browser, 'Layla Nasser');
   const mobile = await login(browser, 'Maya Odeh', { width: 390, height: 800 });
 
-  // 1. The sidebar
+  // 1. The sidebar (the full tree is covered by nav.js; here: the Study Hub destinations)
   {
     const p = maya.p;
-    await go(p, '/home');
-    const labels = await p.locator('aside nav[aria-label=Main] a').allInnerTexts();
-    const want = ['Home', 'Community', 'Chats', 'Calendar', 'Activities', 'Academic Resources', 'Tutors Directory', 'University & Opportunities', 'Tawjihi corner', 'Rewards Shop', 'Clubs', 'Groups', 'Leaderboards', 'Polls', 'Competitions', 'Volunteering hours', 'Buy, sell & swap', 'Student council', 'Suggestion box', 'Leadership', 'My points & badges', 'Talk to the counselor'];
-    check('The sidebar has every item in order', JSON.stringify(labels.map((l) => l.trim().replace(/\s+\d+$/, ''))) === JSON.stringify(want), labels.join(' | '));
-    const icons = await p.locator('aside nav[aria-label=Main] a').evaluateAll((as) => as.map((a) => a.firstElementChild && a.firstElementChild.tagName.toLowerCase() === 'svg'));
-    check('Every item has an icon on the left', icons.every(Boolean));
-    const iconSides = await p.locator('aside nav[aria-label=Main] a').evaluateAll((as) => as.every((a) => { const svg = a.querySelector('svg').getBoundingClientRect(); const range = document.createRange(); range.selectNodeContents(a); const t = [...a.childNodes].find((n) => n.nodeType === 3); if (!t) return true; const r = document.createRange(); r.selectNodeContents(t); return svg.right <= r.getBoundingClientRect().left + 1; }));
-    check('The icons sit left of the labels', iconSides);
-    const groups = await p.locator('aside nav[aria-label=Main] ul[data-nav-group]').count();
-    check('The sidebar is split into topic groups with dividers', groups === 5, 'groups ' + groups);
-    const hrefs = await p.locator('aside nav[aria-label=Main] a').evaluateAll((as) => as.map((a) => a.getAttribute('href')));
-    check('The four Study Hub items are separate destinations', ['/academic-resources', '/tutors', '/opportunities'].every((h, i) => hrefs[5 + i] === h) && hrefs[9] === '/shop');
     for (const [h, re] of [['/academic-resources', /Academic Resources/], ['/tutors', /Tutors Directory/], ['/opportunities', /University & Opportunities/], ['/shop', /Rewards Shop/]]) {
       await go(p, h);
-      const active = await p.locator(`aside nav a[href="${h}"]`).getAttribute('aria-current');
+      const active = await p.locator(`[data-sidebar-root] a[href="${h}"]`).first().getAttribute('aria-current');
       check(`${h} opens its own page and is highlighted`, active === 'page' && re.test(await text(p)));
     }
     await go(p, '/shop');
-    check('Rewards Shop is not also highlighting Activities', (await p.locator('aside nav a[href="/challenges"]').getAttribute('aria-current')) === null);
+    check('Rewards Shop is not also highlighting Activities', (await p.locator('[data-sidebar-root] a[href="/challenges"]').count()) === 0 || (await p.locator('[data-sidebar-root] a[href="/challenges"]').first().getAttribute('aria-current')) === null);
   }
 
   // 2. Academic resources
@@ -223,7 +211,7 @@ async function login(browser, name, viewport = { width: 1280, height: 850 }) {
     await q.getByRole('tab', { name: 'Top 10 prizes' }).click();
     await q.waitForURL('**/shop?tab=top10');
     check('Top 10 prizes live inside the Rewards Shop', /Top 10 student prizes/.test(await text(q)) && /Pizza party/.test(await text(q)) && /Ranking period/.test(await text(q)));
-    check('There is no separate Top 10 item in the sidebar', (await q.locator('aside nav a', { hasText: /top 10/i }).count()) === 0);
+    check('There is no separate Top 10 item in the sidebar', (await q.locator('[data-sidebar-root] [data-nav-tree] > li > div > a', { hasText: /top 10/i }).count()) === 0);
   }
 
   // 6. Phones
@@ -234,7 +222,7 @@ async function login(browser, name, viewport = { width: 1280, height: 850 }) {
       check(`No sideways scrolling on a phone: ${u}`, await noSideScroll(p));
     }
     await go(p, '/more');
-    check('On a phone, the Study Hub is reachable from the menu', (await p.locator('main [data-nav-group=Study] a').count()) === 5 && /Tutors Directory/i.test(await text(p)));
+    check("On a phone, the Study Hub is reachable from the menu", (await p.locator("main [data-nav-group=\"Learning Hub\"] a").count()) === 5 && /Tutors Directory/i.test(await text(p)));
   }
   sql(`delete from public.tutor_applications where profile_id='${ID.maya}'; delete from public.tutor_profiles where profile_id='${ID.maya}'; delete from public.study_resources where title like 'E2E %'; delete from public.study_opportunities where title like 'E2E %'; delete from public.top10_prizes; delete from public.study_categories where slug='ap-statistics';`);
   await browser.close();

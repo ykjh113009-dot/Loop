@@ -12,6 +12,7 @@
     "feed"
     "announce"
     "leader"
+    "ach"
     "quick"
     "council"
     "calendar"
@@ -44,6 +45,7 @@
       "chats announce"
       "feed feed"
       "upcoming leader"
+      "ach ach"
       "quick council"
       "calendar week"
       "next featured";
@@ -87,3 +89,5 @@
   }
   .dash-side > div { grid-area: auto; }
 }
+
+.dash-ach { grid-area: ach; }

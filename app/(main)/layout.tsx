@@ -23,7 +23,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
       <Suspense fallback={<ShellChrome user={null} badges={NO_BADGES} pathname={null} />}>
         <Shell />
       </Suspense>
-      <div className="pt-14 print:pt-0 lg:pt-[72px] lg:ps-[236px] print:lg:ps-0">
+      <div className="pt-14 print:pt-0 lg:pt-[72px] lg:ps-[var(--sidebar-w,236px)] print:lg:ps-0">
         <Suspense>
           <SuspendedBanner />
         </Suspense>

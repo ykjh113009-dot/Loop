@@ -1,4 +1,5 @@
 import { getBadges, getMe } from "@/lib/auth";
+import { createClient } from "@/lib/supabase/server";
 import { personLabel } from "@/lib/people";
 import { ShellFrame } from "@/components/shell/shell-frame";
 import { getLocale } from "@/lib/i18n-server";
@@ -8,6 +9,8 @@ export async function Shell() {
   const [me, locale] = await Promise.all([getMe(), getLocale()]);
   if (!me) return <ShellFrame user={null} initial={{ notifications: 0, messages: 0, moderation: 0 }} locale={locale} />;
   const badges = await getBadges();
+  const supabase = await createClient();
+  const { data: pts } = me.isStudent ? await supabase.rpc("my_points") : { data: null };
   return (
     <ShellFrame
       user={{
@@ -20,6 +23,7 @@ export async function Shell() {
         isAdmin: me.isAdmin || me.needsMfa,
         isCounselor: me.isCounselor,
         isStudent: me.isStudent,
+        points: pts ? Number((pts as unknown as { balance: number }).balance) : null,
       }}
       initial={badges}
       locale={locale}

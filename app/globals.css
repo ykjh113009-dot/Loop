@@ -21,6 +21,7 @@
 }
 
 :root {
+  --sidebar-w: 236px;
   color-scheme: light;
 }
 
@@ -99,4 +100,9 @@ html.a11y-calm *::after {
 /* Arabic: headings use the Arabic face and need no tight tracking */
 html[lang="ar"] * {
   letter-spacing: 0 !important;
+}
+
+/* The folded sidebar (the choice is remembered on this device). */
+html[data-sidebar="collapsed"] {
+  --sidebar-w: 76px;
 }

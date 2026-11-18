@@ -11,6 +11,7 @@ import { closeStudyBuddy, finishTutoring, respondTutoring } from "@/app/actions/
 import { startChat } from "@/app/actions/messages";
 import { Avatar } from "@/components/avatar";
 import { Empty } from "@/components/empty";
+import { EmptyState } from "@/components/ui/empty-state";
 import { PageHeader } from "@/components/page-header";
 import { PageSkeleton } from "@/components/skeleton";
 import { SubmitButton } from "@/components/submit-button";
@@ -89,9 +90,9 @@ async function Find({ subject, format, q, meId }: { subject: string; format: str
         ))}
       </div>
       {tutors.length === 0 ? (
-        <Empty emoji="📚" title={t("No approved tutors match yet")}>{t("Try another subject, or apply to become a tutor yourself.")}</Empty>
+        <EmptyState scene="books" title={t("No approved tutors available yet.")} action={{ href: "/tutors/apply", label: t("Become a Tutor") }}>{t("Find students who can help you learn, or share your own knowledge.")}</EmptyState>
       ) : (
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           {tutors.map((x) => (
             <article key={x.profile_id} className="card flex flex-col gap-2 p-4" data-tutor={x.profile_id}>
               <div className="flex items-center gap-3">
@@ -257,7 +258,7 @@ async function Tutors({ searchParams }: { searchParams: PageProps<"/tutors">["se
 export default function TutorsPage(props: PageProps<"/tutors">) {
   return (
     <>
-      <PageHeader title="Tutors Directory" back="/more" />
+      <PageHeader title="Tutors Directory" back="/learning-hub" />
       <Suspense fallback={<PageSkeleton />}>
         <Tutors searchParams={props.searchParams} />
       </Suspense>
