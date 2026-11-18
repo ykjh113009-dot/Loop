@@ -24,7 +24,7 @@ async function signIn(browser, email, viewport, mobile = false) {
   const hour = Number(new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Hebron', hour: '2-digit', hour12: false }).format(new Date())) % 24;
   const part = hour < 12 ? 'morning' : hour < 18 ? 'afternoon' : 'evening';
   check(`Greeting is personal and matches the time of day (Good ${part}, Layla!)`, t.includes(`Good ${part},`) && t.includes('Layla!'));
-  check('The banner has the welcome line and the Loop dog', t.includes("Welcome back to Loop. Let's make today count!") && (await p.locator('[data-home-hero] svg[aria-label*="dog"]').count()) === 1);
+  check('The banner has the welcome line and the Loop dog artwork', t.includes("Welcome back to Loop. Let's make today count!") && (await p.locator('[data-home-hero] img[data-home-art]').evaluate((i) => i.complete && i.naturalWidth > 0)));
 
   const qa = await p.locator('[data-quick-actions] a').evaluateAll(els => els.map(e => [e.textContent.trim(), e.getAttribute('href')]));
   check('4 quick actions with the right links', JSON.stringify(qa) === JSON.stringify([['Join a Challenge', '/challenges'], ['Explore Library', '/academic-resources'], ['Check Events', '/events'], ['Marketplace', '/marketplace']]), JSON.stringify(qa));
