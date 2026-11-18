@@ -32,6 +32,7 @@ const waitText = (p, re, t = 15000) => p.waitForFunction((s) => new RegExp(s).te
   // ---------- Feed
   {
     const p = layla.p;
+    await go(p, '/community');
     const audience = await p.locator('#composer-audience option').allInnerTexts();
     check('The composer can post to the whole school or a club', /Whole school/.test(audience[0]) && audience.length > 1, audience.join(' | '));
     await p.fill('#composer textarea', 'Science fair on Thursday! #ScienceFair come and see @demomaya');
@@ -210,7 +211,7 @@ const waitText = (p, re, t = 15000) => p.waitForFunction((s) => new RegExp(s).te
     const st = await p.evaluate(() => ({ dir: document.documentElement.dir, lang: document.documentElement.lang, nav: document.querySelector('[data-sidebar-root] nav')?.innerText || '' }));
     const body = await text(p);
     check('Arabic switches the page to right-to-left', st.dir === 'rtl' && st.lang === 'ar', JSON.stringify(st).slice(0, 80));
-    check('The menu, greeting and feed are in Arabic', /الرئيسية/.test(st.nav) && /المجتمع/.test(st.nav) && /(صباح|مساء) الخير/.test(body) && /آخر المنشورات/.test(body));
+    check('The menu, greeting and feed are in Arabic', /الرئيسية/.test(st.nav) && /المجتمع/.test(st.nav) && /(صباح|مساء) الخير/.test(body) && /آخر المستجدات من لوب/.test(body));
     const side = await p.evaluate(() => document.querySelector('[data-sidebar-root]').getBoundingClientRect().left > innerWidth / 2);
     check('In Arabic the sidebar sits on the right', side);
     const bad = [];

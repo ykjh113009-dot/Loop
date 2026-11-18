@@ -572,3 +572,12 @@ insert into public.counselor_messages (request_id, school_id, sender_id, body, c
 -- Mark older notifications as read so the demo shows a realistic mix.
 update public.notifications set read_at = now() where created_at < now() - interval '2 days';
 update public.notifications set pushed_at = now();
+
+-- Sort the demo clubs into the categories shown as filters on the Clubs page.
+update public.clubs set category = case
+  when lower(name || ' ' || description) ~ '(robot|coding|code |programm|tech|comput|engineer|arduino|3d)' then 'tech'
+  when lower(name || ' ' || description) ~ '(volunt|charit|green|environment|recycl|donat)' then 'charity'
+  when lower(name || ' ' || description) ~ '(football|soccer|basket|volley|swim|tennis|sport|athlet|run|gym|team)' then 'sports'
+  when lower(name || ' ' || description) ~ '(book|debate|math|science|chess|read|writ|journal|model un|quiz|study)' then 'academics'
+  when lower(name || ' ' || description) ~ '(art|drama|dabke|music|theat|photo|danc|film|craft|culture|language|choir)' then 'culture'
+  else 'other' end;

@@ -34,6 +34,13 @@ export function RequestClubForm() {
         </div>
       </fieldset>
       <div>
+        <label htmlFor="category" className="label">Category</label>
+        <select id="category" name="category" className="input" defaultValue="other">
+          <option value="sports">Sports</option><option value="academics">Academics</option><option value="tech">Tech</option>
+          <option value="culture">Culture</option><option value="charity">Charity</option><option value="other">Something else</option>
+        </select>
+      </div>
+      <div>
         <label htmlFor="description" className="label">What will the club do?</label>
         <textarea id="description" name="description" required minLength={10} maxLength={500} rows={4} className="input resize-none" placeholder="When do you meet? Who is it for?" />
       </div>

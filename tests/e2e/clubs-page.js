@@ -1,0 +1,54 @@
+const { chromium } = require('playwright');
+const { execSync } = require('child_process');
+const BASE = process.env.BASE || 'http://localhost:3000';
+const DB = process.env.DB_URL || 'postgresql://postgres:postgres@127.0.0.1:54322/postgres';
+const q = (sql) => execSync(`psql "${DB}" -qtA -F '|' -c "${sql.replace(/"/g, '\\"')}"`).toString().trim();
+const results = [];
+const check = (name, ok, info = '') => { results.push(ok); console.log((ok ? 'PASS' : 'FAIL') + '  ' + name + (info ? '  — ' + info : '')); };
+
+(async () => {
+  const b = await chromium.launch();
+  const ctx = await b.newContext({ viewport: { width: 1440, height: 900 } });
+  const p = await ctx.newPage();
+  await p.goto(BASE + '/login', { waitUntil: 'networkidle' });
+  await p.locator('form', { has: p.locator('input[value="demo.layla@pioneers.edu.ps"]') }).locator('button').click();
+  await p.waitForURL('**/home'); await p.waitForTimeout(800);
+  await p.goto(BASE + '/clubs', { waitUntil: 'networkidle' });
+  const t = async () => (await p.locator('main').innerText()).replace(/\s+/g, ' ');
+  check('Clubs has its banner with the tagline', /Find your people\. Join clubs that match your interests\./.test(await t()) && (await p.locator('[data-banner] img').evaluate((i) => i.complete && i.naturalWidth > 0)));
+  const pills = await p.locator('[data-club-filters] a').allInnerTexts();
+  check('Category pills: All Clubs, Sports, Academics, Tech, Culture, Charity', JSON.stringify(pills.map((x) => x.trim())) === JSON.stringify(['All Clubs', 'Sports', 'Academics', 'Tech', 'Culture', 'Charity']), pills.join(','));
+  const total = Number(q("select count(*) from public.clubs where status='approved'"));
+  check('All Clubs shows every approved club', (await p.locator('[data-club]').count()) === total, String(total));
+  await p.locator('[data-club-filters] a', { hasText: 'Sports' }).click(); await p.waitForURL('**cat=sports**'); await p.waitForLoadState('networkidle');
+  const sports = q("select name from public.clubs where status='approved' and category='sports'").split('\n');
+  check('Sports shows only the sports clubs', (await p.locator('[data-club]').count()) === sports.length && (await t()).includes(sports[0]), sports.join(','));
+  await p.goto(BASE + '/clubs?q=book', { waitUntil: 'networkidle' });
+  check('Search finds a club by name', (await p.locator('[data-club]').count()) === 1 && /Book Club/.test(await t()));
+  await p.goto(BASE + '/clubs', { waitUntil: 'networkidle' });
+  const card = p.locator('[data-club="Book Club"]');
+  check('Clubs you have not joined have a Join button', (await card.getByRole('button', { name: 'Join' }).count()) === 1);
+  await card.getByRole('button', { name: 'Join' }).click(); await p.waitForTimeout(1500);
+  const joined = q("select count(*) from public.club_members m join public.profiles p on p.id=m.profile_id join public.clubs c on c.id=m.club_id where c.name='Book Club' and p.full_name='Layla Nasser'");
+  check('Tapping Join joins the club', joined === '1');
+  await p.reload({ waitUntil: 'networkidle' });
+  check('Joined clubs say Joined and sit under My clubs', (await p.locator('[data-club="Book Club"]').innerText()).includes('Joined'));
+  await p.goto(BASE + '/clubs/new', { waitUntil: 'networkidle' });
+  check('The club request form asks for a category', (await p.locator('select[name=category] option').count()) === 6);
+  await p.locator('input[name=name]').fill('E2E Charity Crew'); await p.locator('textarea[name=description]').fill('We organise charity drives for the school.');
+  await p.locator('select[name=category]').selectOption('charity'); await p.getByRole('button', { name: 'Send request' }).click(); await p.waitForURL('**requested=1**');
+  check('The requested category is saved', q("select category from public.clubs where name='E2E Charity Crew'") === 'charity');
+  q("delete from public.clubs where name='E2E Charity Crew'");
+  for (const w of [360, 390]) {
+    const c2 = await b.newContext({ viewport: { width: w, height: 800 }, isMobile: true, hasTouch: true });
+    const m = await c2.newPage();
+    await m.goto(BASE + '/login', { waitUntil: 'networkidle' });
+    await m.locator('form', { has: m.locator('input[value="demo.layla@pioneers.edu.ps"]') }).locator('button').click();
+    await m.waitForURL('**/home'); await m.goto(BASE + '/clubs', { waitUntil: 'networkidle' });
+    check(`Phone ${w}px: Clubs fits the screen`, (await m.evaluate((w) => Math.max(document.documentElement.scrollWidth, innerWidth) - w, w)) <= 0);
+    await c2.close();
+  }
+  await b.close();
+  console.log(`\n${results.filter(Boolean).length}/${results.length} passed`);
+  process.exit(results.every(Boolean) ? 0 : 1);
+})().catch((e) => { console.error('SCRIPT ERROR', e); process.exit(2); });

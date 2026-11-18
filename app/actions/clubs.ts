@@ -12,6 +12,8 @@ export async function requestClub(_: ActionResult, formData: FormData): Promise<
   const name = String(formData.get("name") ?? "").trim();
   const description = String(formData.get("description") ?? "").trim();
   const emoji = String(formData.get("emoji") ?? "⭐");
+  const rawCategory = String(formData.get("category") ?? "other");
+  const category = ["sports", "academics", "tech", "culture", "charity", "other"].includes(rawCategory) ? rawCategory : "other";
   if (name.length < 3) return { error: "The club name needs at least 3 letters." };
   if (description.length < 10) return { error: "Tell people a bit more about the club." };
 
@@ -20,6 +22,7 @@ export async function requestClub(_: ActionResult, formData: FormData): Promise<
     name: name.slice(0, 60),
     description: description.slice(0, 500),
     emoji,
+    category,
     school_id: me.school_id,
     requested_by: me.id,
     status: "pending",

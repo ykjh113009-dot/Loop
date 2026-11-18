@@ -3,12 +3,13 @@ import Link from "next/link";
 import { requireMe } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { ClubCard, type ClubSummary } from "@/components/club-card";
-import { Empty } from "@/components/empty";
-import { Icon } from "@/components/icons";
-import { PageHeader } from "@/components/page-header";
+import { LayoutGrid, Volleyball, GraduationCap, Laptop, Globe, Heart, Search, Plus } from "lucide-react";
+import { EmptyState } from "@/components/ui/empty-state";
 import { PageSkeleton } from "@/components/skeleton";
 
 export const metadata = { title: "Clubs" };
+
+const CATS = [["sports", "Sports", Volleyball], ["academics", "Academics", GraduationCap], ["tech", "Tech", Laptop], ["culture", "Culture", Globe], ["charity", "Charity", Heart]] as const;
 
 const STATUS_LABEL: Record<string, string> = {
   pending: "Waiting for a moderator",
@@ -20,7 +21,7 @@ async function Clubs({ searchParams }: { searchParams: PageProps<"/clubs">["sear
   const me = await requireMe();
   const supabase = await createClient();
   const [{ data: clubs }, { data: memberships }, { data: myRequests }] = await Promise.all([
-    supabase.from("clubs").select("id, name, emoji, description, status, club_members(count)").eq("status", "approved").order("name"),
+    supabase.from("clubs").select("id, name, emoji, description, status, category, club_members(count)").eq("status", "approved").order("name"),
     supabase.from("club_members").select("club_id").eq("profile_id", me.id),
     supabase.from("clubs").select("id, name, emoji, status, review_note").eq("requested_by", me.id).neq("status", "approved"),
   ]);
@@ -35,24 +36,40 @@ async function Clubs({ searchParams }: { searchParams: PageProps<"/clubs">["sear
   for (const r of leaderRows ?? []) if (r.profile) leadersOf.set(r.club_id, [...(leadersOf.get(r.club_id) ?? []), r.profile.full_name]);
   const nextOf = new Map<string, string>();
   for (const e of eventRows ?? []) if (e.club_id && !nextOf.has(e.club_id)) nextOf.set(e.club_id, e.starts_at);
-  const { requested } = await searchParams;
+  const { requested, cat: rawCat, q: rawQ } = await searchParams;
+  const cat = typeof rawCat === "string" && CATS.some(([k]) => k === rawCat) ? rawCat : "";
+  const query = typeof rawQ === "string" ? rawQ.trim().slice(0, 40).toLowerCase() : "";
   const mine = new Set((memberships ?? []).map((m) => m.club_id));
-  const all = (clubs ?? []) as ClubSummary[];
+  const all = ((clubs ?? []) as ClubSummary[]).filter((c) => (!cat || c.category === cat) && (!query || c.name.toLowerCase().includes(query)));
   const joined = all.filter((c) => mine.has(c.id));
   const others = all.filter((c) => !mine.has(c.id));
 
+  const pill = (active: boolean) => `inline-flex shrink-0 items-center gap-2 rounded-full border px-4 py-2.5 text-sm font-medium ${active ? "border-brand-700 bg-brand-700 text-white" : "border-brand-700/10 bg-white/80 text-ink-2 hover:bg-white"}`;
+  const href = (c: string) => `/clubs${c || query ? `?${new URLSearchParams({ ...(c ? { cat: c } : {}), ...(query ? { q: query } : {}) })}` : ""}`;
   return (
-    <div className="space-y-6">
-      <PageHeader
-        title="Clubs" back="/community"
-        action={
-          !me.isSuspended && (
-            <Link href="/clubs/new" className="btn-primary px-3 py-2">
-              <Icon name="plus" className="size-4" /> Request a club
-            </Link>
-          )
-        }
-      />
+    <div className="space-y-5" data-clubs-page data-wide>
+      <section className="relative isolate h-[150px] overflow-hidden rounded-3xl bg-[#e9ead6] lg:h-[180px]" data-banner>
+        {/* eslint-disable-next-line @next/next/no-img-element -- static brand artwork */}
+        <img src="/brand/clubs-hero.png" alt="" width={600} height={180} className="pointer-events-none absolute end-0 bottom-0 -z-10 h-full w-auto max-w-[75%] object-contain object-right-bottom rtl:-scale-x-100" />
+        <div className="px-5 pt-5 lg:px-8 lg:pt-7">
+          <h1 className="font-heading text-[34px] leading-none font-semibold text-brand-900 lg:text-[52px]" data-banner-title>Clubs</h1>
+          <p className="mt-2 max-w-[60%] text-[13px] text-ink-2 lg:mt-3 lg:text-lg">Find your people. Join clubs that match your interests.</p>
+        </div>
+      </section>
+
+      <div className="flex flex-wrap items-center gap-2">
+        <form role="search" className="relative min-w-0 flex-1">
+          <Search className="pointer-events-none absolute start-4 top-1/2 size-5 -translate-y-1/2 text-ink-2" aria-hidden="true" />
+          {cat && <input type="hidden" name="cat" value={cat} />}
+          <input name="q" defaultValue={query} maxLength={40} placeholder="Search clubs…" aria-label="Search clubs" className="input !rounded-full !ps-11" />
+        </form>
+        {!me.isSuspended && <Link href="/clubs/new" className="btn-primary inline-flex items-center gap-1.5 rounded-full px-4 py-2.5"><Plus className="size-4" aria-hidden="true" />Request a club</Link>}
+      </div>
+
+      <nav aria-label="Club categories" className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none]" data-club-filters>
+        <Link href={href("")} aria-current={!cat ? "page" : undefined} className={pill(!cat)}><LayoutGrid className="size-[18px]" aria-hidden="true" />All Clubs</Link>
+        {CATS.map(([k, label, Icon]) => <Link key={k} href={href(k)} aria-current={cat === k ? "page" : undefined} className={pill(cat === k)}><Icon className="size-[18px]" aria-hidden="true" />{label}</Link>)}
+      </nav>
 
       {requested && (
         <p className="rounded-xl bg-brand-50 px-3 py-2 text-sm text-brand-800">
@@ -75,21 +92,21 @@ async function Clubs({ searchParams }: { searchParams: PageProps<"/clubs">["sear
         </section>
       )}
 
-      <section>
-        <h2 className="section-title">My clubs</h2>
-        {joined.length ? (
-          <div className="space-y-2">{joined.map((c) => <ClubCard key={c.id} club={c} joined leaders={leadersOf.get(c.id)} nextAt={nextOf.get(c.id)} />)}</div>
-        ) : (
-          <Empty emoji="🧭" title="You're not in any club yet">Pick one below and tap Join.</Empty>
-        )}
-      </section>
+      {joined.length > 0 && (
+        <section>
+          <h2 className="section-title">My clubs</h2>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">{joined.map((c) => <ClubCard key={c.id} club={c} joined leaders={leadersOf.get(c.id)} nextAt={nextOf.get(c.id)} />)}</div>
+        </section>
+      )}
 
       <section>
-        <h2 className="section-title">Discover</h2>
+        {joined.length > 0 && <h2 className="section-title">Discover</h2>}
         {others.length ? (
-          <div className="space-y-2">{others.map((c) => <ClubCard key={c.id} club={c} leaders={leadersOf.get(c.id)} nextAt={nextOf.get(c.id)} />)}</div>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">{others.map((c) => <ClubCard key={c.id} club={c} canJoin={!me.isSuspended} leaders={leadersOf.get(c.id)} nextAt={nextOf.get(c.id)} />)}</div>
+        ) : joined.length === 0 ? (
+          <EmptyState scene="community" title="No clubs here yet. Be the first to start one!" action={{ href: "/clubs/new", label: "Request a club" }}>Find your people. Join clubs that match your interests.</EmptyState>
         ) : (
-          <Empty emoji="✨" title="You've joined every club!" />
+          <p className="rounded-2xl bg-sage-soft/40 px-4 py-6 text-center text-sm text-ink-2">You&apos;ve joined every club in this list.</p>
         )}
       </section>
     </div>

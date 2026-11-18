@@ -131,7 +131,7 @@ async function login(browser, name, viewport = { width: 1280, height: 850 }) {
     await p.waitForURL('**view=grades**');
     check('The grade leaderboard still works', /Grade 9/.test(await text(p)));
     await go(p, '/home');
-    check('The Home dashboard shows the House Leaderboard', (await p.locator('[data-card=houses] li').count()) === 4);
+    check('The Home dashboard shows the House Leaderboard (top 3 houses)', (await p.locator('[data-card=leaderboard] [data-leader-list=houses] li').count()) === 3);
     await go(p, `/profile/${ID.maya}`);
     check('Profiles show the house and level', /House A/.test(await p.locator('[data-testid=house-chip]').innerText()) && /Level/.test(await text(p)));
     await go(p, '/settings');

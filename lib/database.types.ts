@@ -719,14 +719,14 @@ isOneToOne: false
                   ]
                 },"clubs": {
                   Row: {
-                    "application_question": string,"created_at": string,"description": string,"emoji": string,"id": string,"name": string,"recruiting": string,"requested_by": string | null,"review_note": string | null,"reviewed_at": string | null,"reviewed_by": string | null,"school_id": string,"status": string
+                    "application_question": string,"category": string,"created_at": string,"description": string,"emoji": string,"id": string,"name": string,"recruiting": string,"requested_by": string | null,"review_note": string | null,"reviewed_at": string | null,"reviewed_by": string | null,"school_id": string,"status": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "application_question"?: string,"created_at"?: string,"description"?: string,"emoji"?: string,"id"?: string,"name": string,"recruiting"?: string,"requested_by"?: string | null,"review_note"?: string | null,"reviewed_at"?: string | null,"reviewed_by"?: string | null,"school_id": string,"status"?: string
+                    "application_question"?: string,"category"?: string,"created_at"?: string,"description"?: string,"emoji"?: string,"id"?: string,"name": string,"recruiting"?: string,"requested_by"?: string | null,"review_note"?: string | null,"reviewed_at"?: string | null,"reviewed_by"?: string | null,"school_id": string,"status"?: string
                   }
                   Update: {
-                    "application_question"?: string,"created_at"?: string,"description"?: string,"emoji"?: string,"id"?: string,"name"?: string,"recruiting"?: string,"requested_by"?: string | null,"review_note"?: string | null,"reviewed_at"?: string | null,"reviewed_by"?: string | null,"school_id"?: string,"status"?: string
+                    "application_question"?: string,"category"?: string,"created_at"?: string,"description"?: string,"emoji"?: string,"id"?: string,"name"?: string,"recruiting"?: string,"requested_by"?: string | null,"review_note"?: string | null,"reviewed_at"?: string | null,"reviewed_by"?: string | null,"school_id"?: string,"status"?: string
                   }
                   Relationships: [
                     {
