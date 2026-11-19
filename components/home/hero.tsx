@@ -12,8 +12,11 @@ export async function HomeHero() {
   return (
     <section className="overflow-hidden rounded-3xl" data-banner data-home-hero>
       <h1 className="sr-only" data-banner-title>{t(part)}{locale === "ar" ? "،" : ","} {first}! {t("Keep learning, keep growing")}</h1>
-      {/* eslint-disable-next-line @next/next/no-img-element -- static brand artwork */}
-      <img src="/brand/home-banner.webp" alt="" width={2000} height={750} className="block h-auto w-full" data-home-art fetchPriority="high" />
+      {/* A slim version for computers and tablets, the full picture on phones. */}
+      <picture>
+        <source media="(min-width: 640px)" srcSet="/brand/home-banner-wide.webp" />
+        <img src="/brand/home-banner.webp" alt="" width={2000} height={750} className="block h-auto w-full" data-home-art fetchPriority="high" />
+      </picture>
     </section>
   );
 }
