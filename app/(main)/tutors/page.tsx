@@ -4,18 +4,20 @@ import { redirect } from "next/navigation";
 import { requireMe } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { timeAgo } from "@/lib/time";
-import { TUTOR_SUBJECTS, DAYS, formatLabel } from "@/lib/tutor";
+import { TUTOR_SUBJECTS, formatLabel } from "@/lib/tutor";
 import { getT } from "@/lib/i18n-server";
 import { signImages } from "@/lib/images";
 import { closeStudyBuddy, finishTutoring, respondTutoring } from "@/app/actions/tutoring";
 import { startChat } from "@/app/actions/messages";
+import { Search, Star, Lightbulb, UserPlus } from "lucide-react";
 import { Avatar } from "@/components/avatar";
 import { Empty } from "@/components/empty";
 import { EmptyState } from "@/components/ui/empty-state";
-import { PageHeader } from "@/components/page-header";
+import { SectionTabs } from "@/components/ui/section-tabs";
+import { BooksScene } from "@/components/art/scenes";
 import { PageSkeleton } from "@/components/skeleton";
 import { SubmitButton } from "@/components/submit-button";
-import { StudyBuddyForm } from "./forms";
+import { StudyBuddyForm, ReviewForm } from "./forms";
 
 export const metadata = { title: "Tutors Directory" };
 
@@ -51,69 +53,80 @@ async function Find({ subject, format, q, meId }: { subject: string; format: str
     pending: t("Your tutor application is waiting for review."),
     rejected: t("Your tutor application needs changes."),
   };
+  const { data: statRows } = tutors.length ? await supabase.rpc("tutor_stats", { p_tutors: tutors.map((x) => x.profile_id) }) : { data: [] };
+  const stats = new Map((statRows ?? []).map((r) => [r.tutor_id, r]));
+  const bandText = mine?.approved_at
+    ? <><p className="text-lg font-semibold">{t("You are an approved tutor.")}</p><p className="text-sm text-ink-2">{!mine.active ? t("Your profile is paused.") : t("Keep your profile up to date.")}</p></>
+    : app && app.status !== "approved"
+      ? <><p className="text-lg font-semibold">{t("Your tutor application")}</p><p className="text-sm text-ink-2">{STATUS_TEXT[app.status]}</p></>
+      : <><p className="text-lg font-semibold">{t("Want to become a tutor?")}</p><p className="text-sm text-ink-2">{t("Share your knowledge and help other students!")}</p></>;
+  const bandAction = mine?.approved_at
+    ? { href: "/tutors/me", label: t("My tutor profile") }
+    : app && app.status !== "approved"
+      ? { href: "/tutors/apply", label: app.status === "pending" ? t("See my application") : t("Continue") }
+      : { href: "/tutors/apply", label: t("Apply Now") };
   return (
-    <div className="space-y-3">
-      <div className="card flex flex-wrap items-center justify-between gap-3 p-4">
-        {mine?.approved_at ? (
-          <>
-            <p className="text-sm">{t("You are an approved tutor.")} {!mine.active && <strong>{t("Your profile is paused.")}</strong>}</p>
-            <Link href="/tutors/me" className="btn-secondary">{t("My tutor profile")}</Link>
-          </>
-        ) : app && app.status !== "approved" ? (
-          <>
-            <p className="min-w-0 flex-1 text-sm">{STATUS_TEXT[app.status]}</p>
-            <Link href="/tutors/apply" className="btn-primary">{app.status === "pending" ? t("See my application") : t("Continue")}</Link>
-          </>
-        ) : (
-          <>
-            <p className="min-w-0 flex-1 text-sm text-black/65">{t("Good at a subject? Apply to become an approved tutor.")}</p>
-            <Link href="/tutors/apply" className="btn-primary">{t("Become a Tutor")}</Link>
-          </>
-        )}
-      </div>
-      {reviewer && <Link href="/tutors/review" className="card block p-3 text-sm text-brand-700 underline">{t("Review tutor applications")}</Link>}
-      <form action="/tutors" className="flex gap-2">
-        {subject && <input type="hidden" name="subject" value={subject} />}
+    <div className="space-y-4">
+      <form action="/tutors" role="search" className="flex flex-wrap gap-2">
         {format && <input type="hidden" name="format" value={format} />}
-        <input name="q" defaultValue={q} className="input" placeholder={t("Search by name or subject")} aria-label={t("Search tutors")} />
-        <button className="btn-secondary shrink-0 px-3">{t("Search")}</button>
+        <span className="relative min-w-[200px] flex-1">
+          <Search className="pointer-events-none absolute start-4 top-1/2 size-5 -translate-y-1/2 text-ink-2" aria-hidden="true" />
+          <input name="q" defaultValue={q} className="input !rounded-full !ps-11" placeholder={t("Search for a tutor…")} aria-label={t("Search tutors")} />
+        </span>
+        <select name="subject" defaultValue={subject} aria-label={t("Subject")} className="input !w-auto !rounded-full !pe-9">
+          <option value="">{t("All Subjects")}</option>
+          {TUTOR_SUBJECTS.map((s) => <option key={s} value={s}>{s}</option>)}
+        </select>
+        <button className="btn-primary rounded-full px-6">{t("Search")}</button>
       </form>
-      <div className="flex gap-1.5 overflow-x-auto pb-1">
-        <Link href={link({ subject: "" })} className={`chip shrink-0 ${!subject ? "bg-brand-700 text-white" : ""}`}>{t("All")}</Link>
-        {TUTOR_SUBJECTS.map((s) => (
-          <Link key={s} href={link({ subject: s })} className={`chip shrink-0 ${subject === s ? "bg-brand-700 text-white" : ""}`}>{s}</Link>
-        ))}
-      </div>
       <div className="flex gap-1.5">
         {[["", t("Any format")], ["online", t("Online")], ["in_person", t("In person")]].map(([id, label]) => (
-          <Link key={id} href={link({ format: id })} className={`chip ${format === id ? "bg-brand-700 text-white" : ""}`}>{label}</Link>
+          <Link key={id} href={link({ format: id })} className={`chip px-3.5 py-1.5 ${format === id ? "bg-brand-700 text-white" : "bg-white/80"}`}>{label}</Link>
         ))}
       </div>
       {tutors.length === 0 ? (
         <EmptyState scene="books" title={t("No approved tutors available yet.")} action={{ href: "/tutors/apply", label: t("Become a Tutor") }}>{t("Find students who can help you learn, or share your own knowledge.")}</EmptyState>
       ) : (
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          {tutors.map((x) => (
-            <article key={x.profile_id} className="card flex flex-col gap-2 p-4" data-tutor={x.profile_id}>
-              <div className="flex items-center gap-3">
-                {x.photo_path && photos.get(x.photo_path) ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={photos.get(x.photo_path)!} alt="" className="size-12 rounded-full object-cover" />
-                ) : <Avatar avatar={x.profile!.avatar} />}
-                <div className="min-w-0">
-                  <p className="truncate font-semibold">{x.profile!.full_name}</p>
-                  <p className="text-xs text-black/50">{t("Grade")} {x.profile!.grade} · {t(formatLabel(x.format))}</p>
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+          {tutors.map((x) => {
+            const st = stats.get(x.profile_id);
+            const photo = x.photo_path ? photos.get(x.photo_path) : null;
+            return (
+              <article key={x.profile_id} className="flex gap-4 rounded-3xl border border-brand-700/10 bg-white/85 p-4 shadow-[0_1px_2px_rgba(40,60,40,0.04)]" data-tutor={x.profile_id}>
+                <Link href={`/tutors/${x.profile_id}`} className="shrink-0" aria-label={x.profile!.full_name}>
+                  {photo
+                    // eslint-disable-next-line @next/next/no-img-element -- private signed link
+                    ? <img src={photo} alt="" className="h-36 w-28 rounded-2xl object-cover sm:h-44 sm:w-32" />
+                    : <span className="flex h-36 w-28 items-center justify-center rounded-2xl bg-sage-soft sm:h-44 sm:w-32"><Avatar avatar={x.profile!.avatar} size="xl" /></span>}
+                </Link>
+                <div className="flex min-w-0 flex-1 flex-col">
+                  <p className="flex items-start gap-2">
+                    <span className="min-w-0 flex-1 truncate text-[17px] leading-tight font-semibold">{x.profile!.full_name}</span>
+                    <span className="chip shrink-0 bg-sage-soft/70 text-brand-800">{t(formatLabel(x.format))}</span>
+                  </p>
+                  <p className="mt-1 line-clamp-2 text-sm text-ink-2">{x.subjects.slice(0, 4).join(" • ")}</p>
+                  <p className="mt-1.5 flex items-center gap-1.5 text-sm" data-tutor-rating>
+                    {st && Number(st.reviews) > 0
+                      ? <><Star className="size-4 fill-amber-400 text-amber-500" aria-hidden="true" /><strong>{Number(st.rating_avg).toFixed(1)}</strong><span className="text-ink-2">({st.reviews} {Number(st.reviews) === 1 ? t("review") : t("reviews")})</span></>
+                      : <span className="text-ink-2">{t("No reviews yet")}</span>}
+                  </p>
+                  {st && Number(st.sessions) > 0 && <p className="text-xs text-ink-2">{st.sessions} {Number(st.sessions) === 1 ? t("session") : t("sessions")}</p>}
+                  <div className="mt-auto flex flex-wrap gap-2 pt-3">
+                    <Link href={`/tutors/${x.profile_id}`} className="btn-secondary rounded-full px-4 py-2 text-sm">{t("View Profile")}</Link>
+                    <Link href={`/tutors/${x.profile_id}#request`} className="btn-primary rounded-full px-4 py-2 text-sm">{t("Request Session")} →</Link>
+                  </div>
                 </div>
-              </div>
-              <div className="flex flex-wrap gap-1">{x.subjects.slice(0, 5).map((s) => <span key={s} className="chip bg-brand-50 text-brand-800">{s}</span>)}{x.subjects.length > 5 && <span className="chip">+{x.subjects.length - 5}</span>}</div>
-              {x.about && <p className="line-clamp-3 text-sm text-black/70">{x.about}</p>}
-              {x.qualifications && <p className="line-clamp-2 text-xs text-black/55">🎓 {x.qualifications}</p>}
-              <p className="text-xs text-black/55">🕒 {x.days.length ? x.days.map((d) => DAYS.find((y) => y.id === d)?.label).join(", ") + (x.hours ? ` · ${x.hours}` : "") : x.availability || t("Ask for times")}</p>
-              <Link href={`/tutors/${x.profile_id}`} className="btn-secondary mt-auto w-full">{t("View profile")}</Link>
-            </article>
-          ))}
+              </article>
+            );
+          })}
         </div>
       )}
+      <section className="flex flex-wrap items-center gap-4 rounded-3xl bg-[#e9ead6] p-5" data-tutor-band>
+        <Lightbulb className="size-10 shrink-0 text-amber-500" strokeWidth={1.5} aria-hidden="true" />
+        <div className="min-w-0 flex-1">{bandText}</div>
+        <Link href={bandAction.href} className="btn-primary rounded-full px-6 py-2.5">{bandAction.label} →</Link>
+      </section>
+      {reviewer && <Link href="/tutors/review" className="block rounded-2xl border border-brand-700/10 bg-white/80 p-3 text-sm font-medium text-brand-700 hover:underline">{t("Review tutor applications")}</Link>}
     </div>
   );
 }
@@ -174,6 +187,8 @@ async function Requests({ meId }: { meId: string }) {
     .limit(50);
   const incoming = (data ?? []).filter((r) => r.tutor_id === meId);
   const outgoing = (data ?? []).filter((r) => r.learner_id === meId);
+  const { data: reviewed } = outgoing.length ? await supabase.from("tutor_reviews").select("request_id").eq("reviewer_id", meId).in("request_id", outgoing.map((r) => r.id)) : { data: [] };
+  const done = new Set((reviewed ?? []).map((r) => r.request_id));
 
   return (
     <div className="space-y-5">
@@ -206,6 +221,8 @@ async function Requests({ meId }: { meId: string }) {
           <article key={r.id} className="card space-y-2 p-4 text-sm">
             <p><strong>{r.subject}</strong> <span className="text-black/45">with {r.tutor?.full_name} · {timeAgo(r.created_at)}</span></p>
             <p className="text-xs text-black/55">{STATUS[r.status]}</p>
+            {r.status === "completed" && !done.has(r.id) && <ReviewForm requestId={r.id} />}
+            {r.status === "completed" && done.has(r.id) && <p className="text-xs font-medium text-brand-700">✓ You reviewed this session</p>}
             {(r.status === "accepted" || r.status === "pending") && (
               <div className="flex gap-2">
                 {r.status === "accepted" && (
@@ -239,29 +256,30 @@ async function Tutors({ searchParams }: { searchParams: PageProps<"/tutors">["se
   const format = sp.format === "online" || sp.format === "in_person" ? sp.format : "";
   const q = typeof sp.q === "string" ? sp.q.slice(0, 50) : "";
   const canAct = !me.isSuspended;
+  const { t } = await getT();
+  const { data: myTutor } = await (await createClient()).from("tutor_profiles").select("approved_at").eq("profile_id", me.id).maybeSingle();
+  const tabHref = (id: string) => `/tutors${id === "find" ? "" : `?tab=${id}`}`;
   return (
-    <>
-      <div className="mb-4 flex gap-1 overflow-x-auto rounded-xl bg-black/5 p-1">
-        {TABS.map((t) => (
-          <Link key={t.id} href={`/tutors?tab=${t.id}`} className={`shrink-0 flex-1 rounded-lg px-2 py-1.5 text-center text-sm font-medium ${tab === t.id ? "bg-white shadow-sm" : "text-black/55"}`}>
-            {t.label}
-          </Link>
-        ))}
-      </div>
+    <div className="space-y-5" data-tutors-page data-wide>
+      <section className="relative isolate overflow-hidden rounded-3xl bg-[#e9ead6] px-5 py-6 lg:px-8 lg:py-8" data-banner>
+        <div className="pointer-events-none absolute -end-10 -top-16 -z-10 size-64 rounded-full bg-[#dbe5cc]" aria-hidden="true" />
+        <BooksScene className="pointer-events-none absolute end-4 bottom-0 -z-10 hidden h-full w-auto sm:block" />
+        <h1 className="font-heading text-[34px] leading-none font-semibold text-brand-900 lg:text-[48px]" data-banner-title>{t("Tutors")}</h1>
+        <p className="mt-2 max-w-[28rem] text-[13px] text-ink-2 lg:mt-3 lg:text-base">{t("Get help from experienced tutors in your subjects!")}</p>
+        {!myTutor?.approved_at && <Link href="/tutors/apply" className="btn-primary mt-4 inline-flex items-center gap-2 rounded-full px-5 py-2.5"><UserPlus className="size-4" aria-hidden="true" />{t("Become a Tutor")}</Link>}
+      </section>
+      <SectionTabs label={t("Tutors Directory")} current={tabHref(tab)} items={TABS.map((x) => ({ href: tabHref(x.id), label: t(x.label) }))} />
       {tab === "find" && <Find subject={subject} format={format} q={q} meId={me.id} />}
       {tab === "buddies" && <Buddies meId={me.id} canAct={canAct} />}
       {tab === "requests" && <Requests meId={me.id} />}
-    </>
+    </div>
   );
 }
 
 export default function TutorsPage(props: PageProps<"/tutors">) {
   return (
-    <>
-      <PageHeader title="Tutors Directory" back="/learning-hub" />
-      <Suspense fallback={<PageSkeleton />}>
-        <Tutors searchParams={props.searchParams} />
-      </Suspense>
-    </>
+    <Suspense fallback={<PageSkeleton />}>
+      <Tutors searchParams={props.searchParams} />
+    </Suspense>
   );
 }

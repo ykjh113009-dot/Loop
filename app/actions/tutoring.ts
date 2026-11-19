@@ -99,6 +99,20 @@ export async function finishTutoring(formData: FormData) {
   refresh();
 }
 
+export async function submitTutorReview(_: ActionResult, formData: FormData): Promise<ActionResult> {
+  await requireMe();
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("submit_tutor_review", {
+    p_request: String(formData.get("requestId") ?? ""),
+    p_rating: Number(formData.get("rating") ?? 0),
+    p_comment: String(formData.get("comment") ?? ""),
+  });
+  if (error) return { error: friendlyError(error) };
+  after(dispatchPush);
+  refresh();
+  return { ok: true, message: "Thanks for your review!" };
+}
+
 export async function postStudyBuddy(_: ActionResult, formData: FormData): Promise<ActionResult> {
   const me = await requireMe();
   const subject = String(formData.get("subject") ?? "");

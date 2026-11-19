@@ -3293,6 +3293,44 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"tutor_reviews": {
+                  Row: {
+                    "comment": string,"created_at": string,"id": string,"rating": number,"request_id": string,"reviewer_id": string,"school_id": string,"tutor_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "comment"?: string,"created_at"?: string,"id"?: string,"rating": number,"request_id": string,"reviewer_id": string,"school_id": string,"tutor_id": string
+                  }
+                  Update: {
+                    "comment"?: string,"created_at"?: string,"id"?: string,"rating"?: number,"request_id"?: string,"reviewer_id"?: string,"school_id"?: string,"tutor_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "tutor_reviews_request_id_fkey"
+      columns: ["request_id"]
+isOneToOne: true
+      referencedRelation: "tutoring_requests"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "tutor_reviews_reviewer_id_fkey"
+      columns: ["reviewer_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "tutor_reviews_school_id_fkey"
+      columns: ["school_id"]
+isOneToOne: false
+      referencedRelation: "schools"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "tutor_reviews_tutor_id_fkey"
+      columns: ["tutor_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"tutoring_requests": {
                   Row: {
                     "completed_at": string | null,"created_at": string,"id": string,"learner_id": string,"message": string,"responded_at": string | null,"school_id": string,"status": string,"subject": string,"tutor_id": string
@@ -4186,6 +4224,9 @@ isOneToOne: false
 "submit_challenge":
 { Args: { "p_answers": (string)[],"p_challenge": string,"p_note": string,"p_photo": string,"p_video": string }; Returns: string
                            },
+"submit_tutor_review":
+{ Args: { "p_comment": string,"p_rating": number,"p_request": string }; Returns: undefined
+                           },
 "suspend_user":
 { Args: { "p_days": number,"p_reason": string,"p_user": string }; Returns: undefined
                            },
@@ -4204,6 +4245,11 @@ isOneToOne: false
                            },
 "tutor_doc_viewer":
 { Args: { "p_name": string }; Returns: boolean
+                           },
+"tutor_stats":
+{ Args: { "p_tutors": (string)[] }; Returns: {
+              "rating_avg": number,"reviews": number,"sessions": number,"tutor_id": string
+            }[]
                            },
 "unfriend":
 { Args: { "p_other": string }; Returns: undefined

@@ -161,7 +161,7 @@ async function login(browser, name, viewport = { width: 1280, height: 850 }) {
     await go(layla.p, `/tutors/${ID.maya}`);
     const body = await text(layla.p);
     check('The public profile shows subjects and availability but not private details', /Latin/.test(body) && /Mon/.test(body) && !/Chemistry 96/.test(body) && !/sample\.pdf/.test(body));
-    check('The full profile has a booking option', /Book a session/.test(body));
+    check('The full profile has a booking option', /Request a Session/.test(body));
     await go(p, '/tutors/me');
     check('The approved tutor can update their profile', (await p.locator('textarea[name=intro]').count()) === 1);
     check('An approved tutor cannot open the application again', (await go(p, '/tutors/apply'), p.url().endsWith('/tutors/me')));
