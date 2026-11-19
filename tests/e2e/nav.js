@@ -149,7 +149,7 @@ const LANDING = { Home: '/home', Community: '/clubs', 'School Life': '/school-li
     await dr.locator('[data-nav-category="community"] button').click(); await pg.waitForTimeout(200);
     await dr.locator('a[href="/groups"]').click(); await pg.waitForURL('**/groups'); await pg.waitForTimeout(500);
     check(`Phone ${w}px: choosing a page closes the drawer`, !(await dr.isVisible().catch(() => false)));
-    for (const r of ['/home', '/clubs', '/school-life', '/learning-hub', '/marketplace', '/houses', '/passport', '/groups', '/clubs', '/tutors', '/market', '/more']) {
+    for (const r of ['/home', '/clubs', '/school-life', '/learning-hub', '/marketplace', '/houses', '/passport', '/groups', '/clubs', '/tutors', '/academic-resources', '/academic-resources?view=top', '/market', '/more']) {
       await pg.goto(BASE + r, { waitUntil: 'networkidle' });
       const over = await pg.evaluate((w) => Math.max(document.documentElement.scrollWidth, innerWidth) - w, w);
       if (over > 0) check(`Phone ${w}px ${r}: no sideways scroll`, false, 'over=' + over);
