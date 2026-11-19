@@ -1,113 +1,142 @@
 import { Suspense } from "react";
 import Link from "next/link";
-import { ArrowRight, Landmark, HeartHandshake, IdCard, MapPin, Medal } from "lucide-react";
+import { ArrowRight, CalendarDays, ChevronLeft, ChevronRight, Clock, MapPin, Star, Trophy, ShieldCheck, BarChart3, Users, Heart, IdCard, type LucideIcon } from "lucide-react";
 import { requireMe } from "@/lib/auth";
-import { createClient } from "@/lib/supabase/server";
 import { getT } from "@/lib/i18n-server";
-import { EVENT_FIELDS, type EventSummary } from "@/lib/queries";
-import { houseColor } from "@/lib/house";
-import { categoryOf } from "@/lib/challenges";
-import { DashCard } from "@/components/dashboard/card";
-import { EventCard } from "@/components/event-card";
+import { getMonthEvents, getUpcomingEvents } from "@/lib/dashboard";
+import { localParts } from "@/lib/time";
 import { PageSkeleton } from "@/components/skeleton";
-import { PageBanner } from "@/components/ui/page-banner";
-import { SectionTabs } from "@/components/ui/section-tabs";
-import { EmptyState } from "@/components/ui/empty-state";
 
 export const metadata = { title: "School Life" };
 
-async function SchoolLife() {
-  const me = await requireMe();
-  const { t } = await getT();
-  const supabase = await createClient();
-  const now = new Date().toISOString();
-  const [{ data: events }, { data: challenges }, { data: houses }, { data: myHouse }] = await Promise.all([
-    supabase.from("events").select(EVENT_FIELDS).eq("status", "approved").gt("starts_at", now).order("starts_at").limit(3),
-    supabase.from("challenges").select("id, title, category, points, ends_at").eq("status", "approved").lte("starts_at", now).gt("ends_at", now).order("ends_at").limit(2),
-    supabase.rpc("house_leaderboard", { p_period: "week" }),
-    supabase.rpc("my_house"),
-  ]);
-  const top = Math.max(1, ...(houses ?? []).map((h) => Number(h.points)));
-  const tiles = [
-    { href: "/council", label: "Student Council", text: "Proposals, elections and ideas", icon: Landmark },
-    { href: "/volunteering", label: "Volunteering", text: "Give time, get a certificate", icon: HeartHandshake },
-    { href: "/passport", label: "Loop Passport", text: "Everything you took part in", icon: IdCard },
-    { href: "/leaderboard", label: "Leaderboards", text: "Students, houses and grades", icon: Medal },
-    { href: "/campus", label: "Campus Map & Directory", text: "Find your way around", icon: MapPin },
-  ];
+const TILES: { href: string; title: string; text: string; icon: LucideIcon; soon?: boolean }[] = [
+  { href: "/events", title: "Calendar & Events", text: "School dates, events and registrations.", icon: CalendarDays },
+  { href: "/challenges", title: "Activities & Challenges", text: "Competitions, activities and participation.", icon: Trophy },
+  { href: "/houses", title: "Houses", text: "House identity, points and competitions.", icon: ShieldCheck },
+  { href: "/leaderboard", title: "Leaderboards", text: "Top students, houses and grades.", icon: BarChart3 },
+  { href: "/council", title: "Student Council", text: "Representatives, ideas, voting and updates.", icon: Users },
+  { href: "/volunteering", title: "Volunteering", text: "Opportunities and service records.", icon: Heart },
+  { href: "/passport", title: "Loop Passport", text: "Track your achievements and participation.", icon: IdCard },
+  { href: "/campus", title: "Campus Map", text: "Explore the school campus.", icon: MapPin, soon: true },
+];
+
+const time = new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Hebron", hour: "numeric", minute: "2-digit", hour12: true });
+
+async function SchoolLife({ month }: { month?: string }) {
+  await requireMe();
+  const { t, locale } = await getT();
+  const today = localParts(new Date());
+  // The month shown: ?month=2026-11, or this month.
+  const m = /^(\d{4})-(\d{2})$/.exec(month ?? "");
+  let year = m ? Number(m[1]) : today.year;
+  let mon = m ? Number(m[2]) : today.month;
+  if (mon < 1 || mon > 12 || year < 2000 || year > 2100) { year = today.year; mon = today.month; }
+  const prev = mon === 1 ? { y: year - 1, m: 12 } : { y: year, m: mon - 1 };
+  const next = mon === 12 ? { y: year + 1, m: 1 } : { y: year, m: mon + 1 };
+  const href = (p: { y: number; m: number }) => `/school-life?month=${p.y}-${String(p.m).padStart(2, "0")}`;
+  const [monthEvents, upcoming] = await Promise.all([getMonthEvents(year, mon), getUpcomingEvents()]);
+  const busy = new Set(monthEvents.map((e) => localParts(e.starts_at).day));
+  const firstWeekday = new Date(Date.UTC(year, mon - 1, 1)).getUTCDay(); // 0 = Sunday
+  const days = new Date(Date.UTC(year, mon, 0)).getUTCDate();
+  const cells: (number | null)[] = [...Array.from({ length: firstWeekday }, () => null), ...Array.from({ length: days }, (_, i) => i + 1)];
+  const lang = locale === "ar" ? "ar" : "en-GB";
+  const monthName = new Intl.DateTimeFormat(lang, { timeZone: "UTC", month: "long", year: "numeric" }).format(new Date(Date.UTC(year, mon - 1, 1)));
+  const weekdays = Array.from({ length: 7 }, (_, i) => new Intl.DateTimeFormat(lang, { timeZone: "UTC", weekday: "short" }).format(new Date(Date.UTC(2026, 10, 1 + i))));
+  const isToday = (d: number) => year === today.year && mon === today.month && d === today.day;
+  const shownEvents = upcoming.slice(0, 3);
+  const card = "rounded-3xl border border-brand-700/10 bg-white/85 p-5 shadow-[0_1px_2px_rgba(40,60,40,0.04)]";
 
   return (
-    <div className="space-y-5" data-category-page="school-life">
-      <PageBanner title={t("School Life")} subtitle={t("Get involved. Make an impact.")} note={t("Events, challenges and more await you!")} scene="campus" />
-      <SectionTabs label={t("School Life")} current="" items={[
-        { href: "/events", label: t("Upcoming Events"), icon: "calendar" }, { href: "/challenges", label: t("Challenges"), icon: "trophy" },
-        { href: "/houses", label: t("Houses"), icon: "houses" }, { href: "/council", label: t("Student Council"), icon: "council" },
-        { href: "/volunteering", label: t("Volunteering"), icon: "heart" }, { href: "/leaderboard", label: t("Leaderboards"), icon: "medal" },
-      ]} />
+    <div className="space-y-5" data-category-page="school-life" data-wide>
+      <section className="relative isolate overflow-hidden rounded-3xl bg-[#e9ead6] px-5 py-6 lg:px-8 lg:py-8" data-banner>
+        <div className="pointer-events-none absolute -end-16 -top-24 -z-10 size-72 rounded-full bg-[#dbe5cc]" aria-hidden="true" />
+        <div className="pointer-events-none absolute -bottom-32 end-28 -z-10 h-56 w-[28rem] rounded-[50%] bg-[#d3dfc3]/80" aria-hidden="true" />
+        <h1 className="font-heading text-[34px] leading-none font-semibold text-brand-900 lg:text-[50px]" data-banner-title>{t("School Life")}</h1>
+        <p className="mt-2 max-w-xl text-[13px] text-ink-2 lg:mt-3 lg:text-lg">{t("Get involved. Make an impact. Be part of your school.")}</p>
+      </section>
 
-      <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
-        <div className="space-y-5">
-          <DashCard title={t("Upcoming events")} href="/events" linkLabel={t("See all")}>
-            <p className="mb-3 text-xs text-ink-2">{t("Assemblies, trips, shows and club meetings. Say you're going and we'll remind you.")}</p>
-            {(events ?? []).length === 0 ? (
-              <EmptyState compact scene="campus" title={t("No upcoming events yet")} action={{ href: "/events", label: t("Explore the calendar") }} secondary={{ href: "/events/new", label: t("Suggest an event") }}>
-                {t("When your school or a club plans something, it shows up here.")}
-              </EmptyState>
-            ) : <div className="space-y-2" data-card="events">{(events as unknown as EventSummary[]).map((e) => <EventCard key={e.id} event={e} />)}</div>}
-          </DashCard>
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+        <section className={card} data-card="calendar">
+          <header className="mb-3 flex items-center justify-between gap-2">
+            <h2 className="flex items-center gap-2.5 text-[20px] font-semibold"><CalendarDays className="size-6 text-brand-700" strokeWidth={1.8} aria-hidden="true" />{t("Calendar")}</h2>
+            <div className="flex items-center gap-2 text-[15px]">
+              <span data-calendar-month>{monthName}</span>
+              <Link href={href(prev)} aria-label={t("Previous month")} className="rounded-full p-1.5 hover:bg-sage-soft/60"><ChevronLeft className="size-5 rtl:rotate-180" aria-hidden="true" /></Link>
+              <Link href={href(next)} aria-label={t("Next month")} className="rounded-full p-1.5 hover:bg-sage-soft/60"><ChevronRight className="size-5 rtl:rotate-180" aria-hidden="true" /></Link>
+            </div>
+          </header>
+          <div className="grid grid-cols-7 gap-y-1 text-center text-sm" role="grid" aria-label={monthName}>
+            {weekdays.map((w) => <span key={w} className="pb-2 text-xs text-ink-2" role="columnheader">{w}</span>)}
+            {cells.map((d, i) => d === null ? <span key={`b${i}`} /> : (
+              <span key={d} role="gridcell" className="flex justify-center py-1" data-day={d}>
+                <span className={`relative flex size-9 items-center justify-center rounded-full text-[15px] ${isToday(d) ? "bg-brand-700 font-semibold text-white" : ""}`} data-today={isToday(d) ? "true" : undefined}>
+                  {d}
+                  {busy.has(d) && <span className={`absolute bottom-0.5 size-1.5 rounded-full ${isToday(d) ? "bg-white" : "bg-brand-700"}`} aria-label={t("Has events")} data-busy />}
+                </span>
+              </span>
+            ))}
+          </div>
+        </section>
 
-          <DashCard title={t("This week's challenges")} href="/challenges" linkLabel={t("See all")}>
-            <p className="mb-3 text-xs text-ink-2">{t("Academic, creative, sports and fun challenges. Complete them to earn points.")}</p>
-            {(challenges ?? []).length === 0 ? (
-              <EmptyState compact scene="community" title={t("No challenges are running right now")} action={{ href: "/challenges", label: t("Browse challenges") }} secondary={{ href: "/challenges/new", label: t("Suggest a challenge") }}>
-                {t("New ones start often. Have an idea? Suggest it.")}
-              </EmptyState>
-            ) : (
-              <ul className="space-y-2" data-card="challenges">
-                {(challenges ?? []).map((c) => (
-                  <li key={c.id} className="flex items-center gap-3 rounded-xl bg-brand-50/70 p-3">
-                    <span className="text-2xl" aria-hidden="true">{categoryOf(c.category).emoji}</span>
-                    <span className="min-w-0 flex-1"><span className="block truncate font-semibold">{c.title}</span><span className="text-xs text-ink-2">{t(categoryOf(c.category).label)}{c.points ? ` · +${c.points} ${t("points")}` : ""}</span></span>
-                    <Link href={`/challenges/${c.id}`} className="btn-primary inline-flex items-center gap-1.5 px-3 py-1.5 text-sm">{t("Join Challenge")} <ArrowRight className="size-4 rtl:rotate-180" aria-hidden="true" /></Link>
+        <section className={card} data-card="events">
+          <header className="mb-3 flex items-center justify-between">
+            <h2 className="flex items-center gap-2.5 text-[20px] font-semibold"><Star className="size-6 text-brand-700" strokeWidth={1.8} aria-hidden="true" />{t("Upcoming Events")}</h2>
+            <Link href="/events" className="text-sm font-medium hover:underline">{t("See all")} →</Link>
+          </header>
+          {shownEvents.length === 0 ? (
+            <p className="rounded-2xl bg-sage-soft/40 px-4 py-8 text-center text-sm text-ink-2">{t("No upcoming events yet")}</p>
+          ) : (
+            <ul className="divide-y divide-brand-700/10">
+              {shownEvents.map((e) => {
+                const p = localParts(e.starts_at);
+                const mshort = new Intl.DateTimeFormat(lang, { timeZone: "UTC", month: "short" }).format(new Date(Date.UTC(p.year, p.month - 1, 1))).toUpperCase();
+                return (
+                  <li key={e.id}>
+                    <Link href={`/events/${e.id}`} className="flex items-center gap-4 py-3.5 first:pt-0 last:pb-0">
+                      <span className="flex size-[60px] shrink-0 flex-col items-center justify-center rounded-2xl bg-sage-soft/60 leading-tight" aria-hidden="true">
+                        <span className="text-[11px] text-ink-2">{mshort}</span>
+                        <span className="text-[22px] font-semibold">{p.day}</span>
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate text-[17px] font-semibold">{e.title}</span>
+                        <span className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-0.5 text-[13px] text-ink-2">
+                          <span className="inline-flex items-center gap-1.5"><Clock className="size-4" aria-hidden="true" />{time.format(new Date(e.starts_at))}{e.ends_at ? ` – ${time.format(new Date(e.ends_at))}` : ""}</span>
+                          {e.location && <span className="inline-flex items-center gap-1.5"><MapPin className="size-4" aria-hidden="true" />{e.location}</span>}
+                        </span>
+                      </span>
+                      <ChevronRight className="size-5 shrink-0 text-ink-2 rtl:rotate-180" aria-hidden="true" />
+                    </Link>
                   </li>
-                ))}
-              </ul>
-            )}
-          </DashCard>
-        </div>
-
-        <div className="space-y-5">
-          <DashCard title={t("House points this week")} href="/houses" linkLabel={t("See all")}>
-            {(houses ?? []).length === 0 ? (
-              <EmptyState compact scene="campus" title={t("Houses are not set up yet")} action={me.isAdmin ? { href: "/admin/houses", label: t("Set up houses") } : undefined}>
-                {t("Houses compete together all year. Your school will announce them soon.")}
-              </EmptyState>
-            ) : (
-              <ol className="space-y-2.5" data-card="houses">
-                {(houses ?? []).map((h) => (
-                  <li key={h.house_id} className={`rounded-xl px-2 py-1.5 ${h.house_id === myHouse ? "bg-brand-50" : ""}`}>
-                    <div className="flex items-center gap-2.5"><span className="flex size-9 items-center justify-center rounded-full text-xl" style={{ background: houseColor(h.color) + "26" }}>{h.emoji}</span>
-                      <span className="min-w-0 flex-1 truncate font-semibold">{h.name}</span><span className="text-sm font-semibold tabular-nums">{Number(h.points).toLocaleString("en")}</span></div>
-                    <div className="mt-1.5 h-1.5 rounded-full bg-black/5"><div className="h-1.5 rounded-full" style={{ width: `${Math.max(4, (Number(h.points) / top) * 100)}%`, background: houseColor(h.color) }} /></div>
-                  </li>
-                ))}
-              </ol>
-            )}
-          </DashCard>
-          <DashCard title={t("More in School Life")}>
-            <ul className="grid gap-2">
-              {tiles.map((x) => (
-                <li key={x.href}><Link href={x.href} className="flex items-center gap-3 rounded-xl border border-brand-700/10 bg-white px-3 py-2.5 hover:border-brand-700/25">
-                  <x.icon className="size-5 shrink-0 text-brand-700" strokeWidth={1.8} aria-hidden="true" /><span className="min-w-0 flex-1"><span className="block text-sm font-semibold">{t(x.label)}</span><span className="block truncate text-xs text-ink-2">{t(x.text)}</span></span></Link></li>
-              ))}
+                );
+              })}
             </ul>
-          </DashCard>
-        </div>
+          )}
+        </section>
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4" data-school-tiles>
+        {TILES.map(({ href: to, title, text, icon: Icon, soon }) => (
+          <Link key={to} href={to} className="relative isolate flex min-h-[170px] flex-col overflow-hidden rounded-3xl border border-brand-700/10 bg-white/85 p-5 shadow-[0_1px_2px_rgba(40,60,40,0.04)] hover:bg-white" data-tile={title}>
+            <span className="pointer-events-none absolute -end-8 -top-10 -z-10 size-32 rounded-full bg-sage-soft/60" aria-hidden="true" />
+            {soon && <span className="absolute end-3 top-3 rounded-full bg-sage-soft px-2.5 py-1 text-xs font-medium text-brand-800">{t("Soon")}</span>}
+            <Icon className="size-10 text-brand-800" strokeWidth={1.5} aria-hidden="true" />
+            <h2 className="mt-3 text-[19px] leading-tight font-semibold">{t(title)}</h2>
+            <span className="mt-auto flex items-end justify-between gap-3 pt-2">
+              <span className="text-sm text-ink-2">{t(text)}</span>
+              <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-sage-soft/70 text-brand-900" aria-hidden="true"><ArrowRight className="size-5 rtl:rotate-180" /></span>
+            </span>
+          </Link>
+        ))}
       </div>
     </div>
   );
 }
 
-export default function SchoolLifePage() {
-  return <Suspense fallback={<PageSkeleton />}><SchoolLife /></Suspense>;
+export default function SchoolLifePage(props: PageProps<"/school-life">) {
+  return <Suspense fallback={<PageSkeleton />}><Month searchParams={props.searchParams} /></Suspense>;
+}
+
+async function Month({ searchParams }: { searchParams: PageProps<"/school-life">["searchParams"] }) {
+  const { month } = await searchParams;
+  return <SchoolLife month={typeof month === "string" ? month : undefined} />;
 }
