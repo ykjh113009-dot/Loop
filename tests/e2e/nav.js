@@ -16,12 +16,12 @@ async function signIn(browser, email, viewport, mobile = false) {
 
 const TREE = {
   Home: ['Dashboard'],
-  Community: ['Feed', 'Chats', 'Groups', 'Clubs', 'Student Profiles', 'Skill Exchange', 'Loop Magazine', 'Digital Yearbook'],
+  Community: ['Clubs', 'Groups', 'Chats', 'Polls', 'Saved'],
   'School Life': ['Calendar & Events', 'Activities & Challenges', 'Houses', 'Leaderboards', 'Student Council', 'Volunteering', 'Loop Passport', 'Campus Map & Directory'],
   'Learning Hub': ['Academic Library', 'Tutors Directory'],
   Marketplace: ['Student Marketplace', 'Rewards Shop', 'Top 10 Prizes'],
 };
-const LANDING = { Home: '/home', Community: '/community', 'School Life': '/school-life', 'Learning Hub': '/learning-hub', Marketplace: '/marketplace' };
+const LANDING = { Home: '/home', Community: '/clubs', 'School Life': '/school-life', 'Learning Hub': '/learning-hub', Marketplace: '/marketplace' };
 
 (async () => {
   const browser = await chromium.launch();
@@ -51,7 +51,7 @@ const LANDING = { Home: '/home', Community: '/community', 'School Life': '/schoo
   // active state
   await p.goto(BASE + '/groups', { waitUntil: 'networkidle' });
   const act = await p.locator('[data-sidebar-root] a[aria-current=page]').allInnerTexts();
-  check('Active page is highlighted inside its open category (Groups)', act.some(x => x.includes('Groups')) && (await p.locator('[data-sidebar-root]').innerText()).includes('Student Profiles'), act.join('|'));
+  check('Active page is highlighted inside its open category (Groups)', act.some(x => x.includes('Groups')) && (await p.locator('[data-sidebar-root]').innerText()).includes('Saved'), act.join('|'));
   await p.goto(BASE + '/shop?tab=top10', { waitUntil: 'networkidle' });
   const act2 = await p.locator('[data-sidebar-root] a[aria-current=page]').allInnerTexts();
   check('Top 10 Prizes lives inside Marketplace and is the active item there', act2.length === 1 && act2[0].includes('Top 10 Prizes'), act2.join('|'));
@@ -60,11 +60,11 @@ const LANDING = { Home: '/home', Community: '/community', 'School Life': '/schoo
   await p.goto(BASE + '/home', { waitUntil: 'networkidle' });
   const commBtn = p.locator('[data-sidebar-root] [data-nav-category="community"] button').first();
   const before = await p.locator('[data-sidebar-root]').innerText();
-  check('Community starts closed while on Home', !before.includes('Student Profiles'));
+  check('Community starts closed while on Home', !before.includes('Saved'));
   await commBtn.click(); await p.waitForTimeout(200);
-  check('Clicking the chevron expands Community', (await p.locator('[data-sidebar-root]').innerText()).includes('Student Profiles'));
+  check('Clicking the chevron expands Community', (await p.locator('[data-sidebar-root]').innerText()).includes('Saved'));
   await commBtn.click(); await p.waitForTimeout(200);
-  check('Clicking it again collapses it', !(await p.locator('[data-sidebar-root]').innerText()).includes('Student Profiles'));
+  check('Clicking it again collapses it', !(await p.locator('[data-sidebar-root]').innerText()).includes('Saved'));
 
   // collapse the whole sidebar
   const w0 = await p.locator('[data-sidebar-root]').evaluate(e => e.getBoundingClientRect().width);
@@ -86,6 +86,26 @@ const LANDING = { Home: '/home', Community: '/community', 'School Life': '/schoo
   const mk = await body((await (async () => { await p.goto(BASE + '/marketplace', { waitUntil: 'networkidle' }); return p; })()));
   check('Marketplace page shows the points balance and Top 10 Prizes', /Top 10 Prizes/.test(mk) && /Your Points/.test(mk));
 
+  // Community opens on Clubs; the feed lives on Home
+  await p.goto(BASE + '/home', { waitUntil: 'networkidle' });
+  check('Home shows the community feed with the post box', (await p.locator('[data-card=feed]').count()) === 1 && (await p.locator('#composer textarea').count()) === 1);
+  await p.locator('[data-sidebar-root] [data-nav-category=community] > div > a').first().click();
+  await p.waitForURL('**/clubs', { timeout: 15000 }); await p.waitForSelector('[data-clubs-page]', { timeout: 15000 });
+  check('Clicking Community opens Clubs', p.url().endsWith('/clubs') && (await p.locator('[data-clubs-page]').count()) === 1);
+  for (const [label, href] of [['Clubs', '/clubs'], ['Groups', '/groups'], ['Chats', '/messages'], ['Polls', '/polls'], ['Saved', '/saved']]) {
+    await p.locator(`[data-sidebar-root] [data-nav-category=community] a[href="${href}"]`).last().click();
+    await p.waitForURL('**' + href, { timeout: 15000 }); await p.waitForLoadState('networkidle');
+    const cur = await p.locator('[data-sidebar-root] a[aria-current=page]').allInnerTexts();
+    check(`Community → ${label} opens ${href} and is the active item`, p.url().endsWith(href) && cur.some((x) => x.includes(label)), cur.join('|'));
+  }
+  const noFeed = await p.locator('[data-sidebar-root] [data-nav-category=community]').innerText();
+  check('The Community menu has no Feed, All Posts or other extra items', !/Feed|All Posts|Student Profiles|Skill Exchange|Magazine|Yearbook/.test(noFeed), noFeed.replace(/\s+/g, ' '));
+  await p.locator('[data-sidebar-root] a[href="/home"]').first().click(); await p.waitForURL('**/home'); await p.waitForSelector('[data-card=feed] article[data-post]', { timeout: 15000 }).catch(() => null);
+  check('Returning to Home shows the feed again', (await p.locator('[data-card=feed] article[data-post]').count()) > 0);
+  await p.goto(BASE + '/community?tag=sciencefair', { waitUntil: 'networkidle' });
+  check('Hashtag links still work', p.url().includes('/community?tag=') && !p.url().endsWith('/clubs'));
+  for (const old of ['/skill-exchange', '/magazine', '/yearbook']) { await p.goto(BASE + old, { waitUntil: 'networkidle' }); if (!p.url().endsWith('/clubs')) check(`Old link ${old} redirects`, false, p.url()); }
+
   // Learning Hub is only the Academic Library and the Tutors Directory
   await p.goto(BASE + '/learning-hub', { waitUntil: 'networkidle' });
   const lh = await body(p);
@@ -105,11 +125,6 @@ const LANDING = { Home: '/home', Community: '/community', 'School Life': '/schoo
     check(`${r} opens`, !!resp && resp.status() < 400 && p.url().includes(r.split('?')[0]) && !/Application error|couldn.t load/i.test(await body(p)), p.url().replace(BASE, ''));
   }
 
-  // honest placeholders
-  for (const r of ['/skill-exchange', '/magazine', '/yearbook', '/campus']) {
-    await p.goto(BASE + r, { waitUntil: 'networkidle' });
-    check(`${r} is an honest "Coming soon" page`, (await p.locator('[data-coming-soon]').count()) === 1);
-  }
   // empty states
   const empties = await p.evaluate(() => 0);
   await p.goto(BASE + '/passport', { waitUntil: 'networkidle' });
@@ -127,14 +142,14 @@ const LANDING = { Home: '/home', Community: '/community', 'School Life': '/schoo
     const dr = pg.locator('[data-drawer]');
     check(`Phone ${w}px: the menu opens as a drawer with all five categories`, await dr.isVisible() && (await dr.locator('[data-nav-category]').count()) === 5);
     await dr.locator('[data-nav-category="community"] button').click(); await pg.waitForTimeout(200);
-    check(`Phone ${w}px: a category expands inside the drawer`, (await dr.innerText()).includes('Student Profiles'));
+    check(`Phone ${w}px: a category expands inside the drawer`, (await dr.innerText()).includes('Saved'));
     await pg.keyboard.press('Escape'); await pg.waitForTimeout(300);
     check(`Phone ${w}px: Escape closes the drawer`, !(await dr.isVisible().catch(() => false)));
     await pg.locator('[data-open-menu]').click(); await pg.waitForTimeout(300);
     await dr.locator('[data-nav-category="community"] button').click(); await pg.waitForTimeout(200);
     await dr.locator('a[href="/groups"]').click(); await pg.waitForURL('**/groups'); await pg.waitForTimeout(500);
     check(`Phone ${w}px: choosing a page closes the drawer`, !(await dr.isVisible().catch(() => false)));
-    for (const r of ['/home', '/community', '/school-life', '/learning-hub', '/marketplace', '/houses', '/passport', '/groups', '/clubs', '/tutors', '/market', '/more']) {
+    for (const r of ['/home', '/clubs', '/school-life', '/learning-hub', '/marketplace', '/houses', '/passport', '/groups', '/clubs', '/tutors', '/market', '/more']) {
       await pg.goto(BASE + r, { waitUntil: 'networkidle' });
       const over = await pg.evaluate((w) => Math.max(document.documentElement.scrollWidth, innerWidth) - w, w);
       if (over > 0) check(`Phone ${w}px ${r}: no sideways scroll`, false, 'over=' + over);
@@ -156,7 +171,7 @@ const LANDING = { Home: '/home', Community: '/community', 'School Life': '/schoo
   // Arabic / RTL
   const ar = await signIn(browser, 'demo.layla@pioneers.edu.ps', { width: 1440, height: 900 });
   await ar.ctx.addCookies([{ name: 'loop_locale', value: 'ar', url: BASE }]);
-  await ar.p.goto(BASE + '/community', { waitUntil: 'networkidle' });
+  await ar.p.goto(BASE + '/clubs', { waitUntil: 'networkidle' });
   const dir = await ar.p.evaluate(() => document.documentElement.dir);
   const side = await ar.p.locator('[data-sidebar-root]').innerText();
   check('Arabic: the layout flips to RTL and the sidebar is translated', dir === 'rtl' && /المجتمع/.test(side) && /الحياة المدرسية/.test(side), dir);

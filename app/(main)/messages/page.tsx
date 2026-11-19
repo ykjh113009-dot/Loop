@@ -91,7 +91,7 @@ async function Conversations() {
 export default function MessagesPage() {
   return (
     <>
-      <PageHeader title="Chats" back="/community" action={<Link href="/messages/new" className="btn-secondary px-3 py-2">New group</Link>} />
+      <PageHeader title="Chats" back="/clubs" action={<Link href="/messages/new" className="btn-secondary px-3 py-2">New group</Link>} />
       <Suspense fallback={<PageSkeleton />}>
         <Conversations />
       </Suspense>

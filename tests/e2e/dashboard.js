@@ -24,15 +24,16 @@ async function signIn(browser, email, viewport, mobile = false) {
   const hour = Number(new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Hebron', hour: '2-digit', hour12: false }).format(new Date())) % 24;
   const part = hour < 12 ? 'morning' : hour < 18 ? 'afternoon' : 'evening';
   check(`Greeting is personal and matches the time of day (Good ${part}, Layla!)`, t.includes(`Good ${part},`) && t.includes('Layla!'));
-  check('The banner has the welcome line and the Loop dog artwork', t.includes("Welcome back to Loop. Let's make today count!") && (await p.locator('[data-home-hero] img[data-home-art]').evaluate((i) => i.complete && i.naturalWidth > 0)));
+  check('The banner has the welcome line and the artwork', t.includes('Keep learning, keep growing') && (await p.locator('[data-home-hero] img[data-home-art]').evaluate((i) => i.complete && i.naturalWidth > 0)));
 
   const qa = await p.locator('[data-quick-actions] a').evaluateAll(els => els.map(e => [e.textContent.trim(), e.getAttribute('href')]));
-  check('4 quick actions with the right links', JSON.stringify(qa) === JSON.stringify([['Join a Challenge', '/challenges'], ['Explore Library', '/academic-resources'], ['Check Events', '/events'], ['Marketplace', '/marketplace']]), JSON.stringify(qa));
-  for (const c of ['latest', 'calendar', 'leaderboard', 'resources', 'rewards']) check(`The ${c} card is on the page`, (await p.locator(`[data-card=${c}]`).count()) === 1);
+  check('5 quick actions with the right links', JSON.stringify(qa) === JSON.stringify([['Join a Challenge', '/challenges'], ['Library', '/academic-resources'], ['Events', '/events'], ['Announcements', '/announcements'], ['Marketplace', '/marketplace']]), JSON.stringify(qa));
+  for (const c of ['feed', 'calendar', 'leaderboard']) check(`The ${c} card is on the page`, (await p.locator(`[data-card=${c}]`).count()) === 1);
 
   // real data
   const ann = q("select title from public.announcements order by created_at desc limit 1");
-  check('Latest from Loop shows the newest announcement from the database', ann.length > 0 && t.includes(ann[0]), ann[0]);
+  check('The feed shows the newest announcement from the database', ann.length > 0 && (await p.locator('[data-announcement]').first().innerText()).includes(ann[0]), ann[0]);
+  check('The feed has the post box and the existing posts', (await p.locator('#composer textarea').count()) === 1 && (await p.locator('[data-card=feed] article[data-post]').count()) > 0);
   const ev = q("select title from public.events where status='approved' and starts_at > now() order by starts_at limit 3");
   const cal = await p.locator('[data-card=calendar]').innerText();
   check('My Calendar lists the next events in order with Today/Tomorrow/date labels', ev.length > 0 && ev.every(e => cal.includes(e)) && /Today|Tomorrow|\d{1,2} \w+/.test(cal), ev.join(' / '));
@@ -41,9 +42,8 @@ async function signIn(browser, email, viewport, mobile = false) {
   check('Leaderboard has Houses, Students and Grades tabs', ['Houses', 'Students', 'Grades'].every(x => lb.includes(x)));
   await p.locator('[data-card=leaderboard] [role=tab]', { hasText: 'Grades' }).click(); await p.waitForTimeout(200);
   check('Switching the leaderboard tab shows that list', (await p.locator('[data-leader-list=grades], [data-card=leaderboard] p').count()) > 0);
-  await p.locator('[data-card=resources] [role=tab]', { hasText: 'Recently Added' }).click(); await p.waitForTimeout(200);
-  check('Academic Resources has Top Rated and Recently Added tabs', (await p.locator('[data-card=resources] [role=tab]').count()) === 2);
-  check('Rewards Shop card says Redeem your Loop Points and links to the shop', /Redeem your Loop Points!/.test(t) && (await p.locator('[data-card=rewards] a[href="/shop"]').count()) >= 1);
+  const sc = await p.locator('[data-shortcut]').evaluateAll((els) => els.map((e) => [e.getAttribute('data-shortcut'), e.querySelector('a').getAttribute('href')]));
+  check('Four shortcut cards: Academic Library, Events, Announcements, Marketplace', JSON.stringify(sc) === JSON.stringify([['Academic Library', '/academic-resources'], ['Events', '/events'], ['Announcements', '/announcements'], ['Marketplace', '/marketplace']]), JSON.stringify(sc));
   check('No sideways scroll on the computer', (await p.evaluate(() => document.documentElement.scrollWidth - innerWidth)) <= 0);
 
   // links work

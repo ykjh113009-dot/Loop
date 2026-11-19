@@ -37,14 +37,14 @@ function PostMenu({ post, mine, t }: { post: FeedItem; mine: boolean; t: (s: str
 }
 
 // One post: who, what, photo or poll, and the reaction row.
-export function FeedPostCard({ post, meId, locale = "en", full = false, wide = false }: { post: FeedItem; meId: string; locale?: Locale; full?: boolean; wide?: boolean }) {
+export function FeedPostCard({ post, meId, locale = "en", full = false, wide = false, bare = false }: { post: FeedItem; meId: string; locale?: Locale; full?: boolean; wide?: boolean; bare?: boolean }) {
   const t = makeT(locale);
   const mine = post.author_id === meId;
   const badge = KIND_BADGE[post.kind];
   if (wide) {
     const isPoll = post.kind === "poll";
     return (
-      <article className={`min-w-0 rounded-3xl border border-brand-700/10 p-4 shadow-[0_1px_2px_rgba(40,60,40,0.04)] sm:p-5 ${isPoll ? "bg-sage-soft/50" : "bg-white/85"}`} data-post={post.id}>
+      <article className={bare ? `min-w-0 py-4 ${isPoll ? "rounded-2xl bg-sage-soft/50 px-4" : ""}` : `min-w-0 rounded-3xl border border-brand-700/10 p-4 shadow-[0_1px_2px_rgba(40,60,40,0.04)] sm:p-5 ${isPoll ? "bg-sage-soft/50" : "bg-white/85"}`} data-post={post.id}>
         <div className="flex gap-3.5 sm:gap-4">
           <Link href={`/profile/${post.author_id}`} className="shrink-0">
             <Avatar avatar={post.author?.avatar ?? "a01"} size="md" className="!size-12 sm:!size-14" />

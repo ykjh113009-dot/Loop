@@ -77,7 +77,7 @@ async function Post({ params }: { params: PageProps<"/post/[id]">["params"] }) {
 
   return (
     <div className="mx-auto max-w-2xl space-y-4">
-      <PageHeader title={t("Post")} back="/community" />
+      <PageHeader title={t("Post")} back="/home" />
       <FeedPostCard post={post} meId={me.id} locale={locale} full />
       <section className="card space-y-3 p-4">
         <h2 className="font-semibold">{t("Comments")} <span className="font-normal text-ink-2">({post.comment_count})</span></h2>

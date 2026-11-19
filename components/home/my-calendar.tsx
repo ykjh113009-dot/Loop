@@ -3,13 +3,12 @@ import { CalendarDays } from "lucide-react";
 import { requireMe } from "@/lib/auth";
 import { getT } from "@/lib/i18n-server";
 import { getUpcomingEvents } from "@/lib/dashboard";
-import { localDayKey, formatDate } from "@/lib/time";
+import { localDayKey, localParts, formatDate } from "@/lib/time";
 
-const DOTS = ["bg-brand-700", "bg-sky-500", "bg-violet-400"];
 
 export async function MyCalendar() {
   await requireMe();
-  const { t } = await getT();
+  const { t, locale } = await getT();
   const events = (await getUpcomingEvents()).slice(0, 3);
   const now = new Date();
   const today = localDayKey(now);
@@ -22,21 +21,25 @@ export async function MyCalendar() {
         <h2 className="flex items-center gap-2 text-[17px] font-semibold"><CalendarDays className="size-5 text-brand-700" strokeWidth={1.8} aria-hidden="true" />{t("My Calendar")}</h2>
         <Link href="/events" className="text-xs font-medium text-brand-700 hover:underline">{t("See all")} →</Link>
       </header>
+      <p className="mb-3 text-center text-[17px] font-semibold" data-calendar-month>{new Intl.DateTimeFormat(locale === "ar" ? "ar" : "en-GB", { timeZone: "Asia/Hebron", month: "long", year: "numeric" }).format(now)}</p>
       {events.length === 0 ? (
         <p className="rounded-xl bg-sage-soft/40 px-4 py-6 text-center text-sm text-ink-2">{t("No upcoming events yet")}</p>
       ) : (
-        <ol className="relative space-y-4 ps-5 before:absolute before:inset-y-1 before:start-[5px] before:w-px before:bg-brand-700/15">
-          {events.map((e, i) => (
-            <li key={e.id} className="relative">
-              <span className={`absolute -start-5 top-1 size-[11px] rounded-full ring-4 ring-white ${DOTS[i % 3]}`} aria-hidden="true" />
-              <Link href={`/events/${e.id}`} className="block">
-                <span className="block text-xs font-semibold text-ink-2">{label(e.starts_at)}</span>
-                <span className="block text-[15px] font-semibold">{e.title}</span>
-                <span className="block text-xs text-ink-2">{time.format(new Date(e.starts_at))}{e.ends_at ? ` – ${time.format(new Date(e.ends_at))}` : ""}{e.location ? ` · ${e.location}` : ""}</span>
+        <ul className="space-y-3">
+          {events.map((e) => (
+            <li key={e.id}>
+              <Link href={`/events/${e.id}`} className="flex items-center gap-3.5">
+                <span className="flex size-12 shrink-0 flex-col items-center justify-center rounded-xl bg-sage-soft/70 leading-none" aria-hidden="true">
+                  <span className="text-lg font-semibold text-brand-900">{localParts(e.starts_at).day}</span>
+                </span>
+                <span className="min-w-0">
+                  <span className="block truncate text-[15px] font-semibold">{e.title}</span>
+                  <span className="block truncate text-xs text-ink-2">{label(e.starts_at)} · {time.format(new Date(e.starts_at))}{e.ends_at ? ` – ${time.format(new Date(e.ends_at))}` : ""}{e.location ? ` · ${e.location}` : ""}</span>
+                </span>
               </Link>
             </li>
           ))}
-        </ol>
+        </ul>
       )}
     </section>
   );

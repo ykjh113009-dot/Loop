@@ -23,6 +23,9 @@ const nextConfig: NextConfig = {
       { source: "/opportunities/:path*", destination: "/learning-hub", permanent: false },
       { source: "/mentorship", destination: "/learning-hub", permanent: false },
       { source: "/tawjihi/:path*", destination: "/learning-hub", permanent: false },
+      { source: "/skill-exchange", destination: "/clubs", permanent: false },
+      { source: "/magazine", destination: "/clubs", permanent: false },
+      { source: "/yearbook", destination: "/clubs", permanent: false },
     ];
   },
   async headers() {

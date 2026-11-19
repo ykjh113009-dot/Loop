@@ -14,14 +14,14 @@ const check = (name, ok, info = '') => { results.push(ok); console.log((ok ? 'PA
     const fits = async () => (await p.evaluate((w) => Math.max(document.documentElement.scrollWidth, innerWidth) - w, vp.width)) <= 0;
     const go = async (r) => { await p.goto(BASE + r, { waitUntil: 'networkidle' }); await p.waitForTimeout(300); };
 
-    await go('/community');
-    const tabs = await p.locator('[data-section-tabs] a').allInnerTexts();
-    check(`${label}: feed tabs are All Posts, Chats, Groups, Clubs, Polls, Saved`, JSON.stringify(tabs.map((x) => x.trim())) === JSON.stringify(['All Posts', 'Chats', 'Groups', 'Clubs', 'Polls', 'Saved']), tabs.join(','));
+    await go('/home');
+    check(`${label}: the feed is on Home`, (await p.locator('[data-card=feed]').count()) === 1);
     check(`${label}: the post box has Photo, Question, Achievement, Poll and a Post button`, (await p.locator('#composer').getByRole('button', { name: 'Photo' }).count()) === 1 && (await p.locator('#composer [role=radio]').count()) === 4 && (await p.locator('#composer').getByRole('button', { name: 'Post', exact: true }).count()) === 1);
-    const card = p.locator('article[data-post]').first();
-    check(`${label}: posts are rounded cards with @handle, time, reactions and a save button`, (await card.count()) === 1 && /@\w+/.test(await card.innerText()) && (await card.locator('[data-testid=reaction-count]').count()) === 1 && (await card.getByRole('button', { name: /Save/ }).count()) === 1);
-    check(`${label}: feed fits the screen`, await fits());
-
+    const card = p.locator('[data-card=feed] article[data-post]').first();
+    check(`${label}: posts show @handle, time, reactions and a save button`, (await card.count()) === 1 && /@\w+/.test(await card.innerText()) && (await card.locator('[data-testid=reaction-count]').count()) === 1 && (await card.getByRole('button', { name: /Save/ }).count()) === 1);
+    check(`${label}: Home fits the screen`, await fits());
+    await go('/community');
+    check(`${label}: the old Community address opens Clubs`, p.url().endsWith('/clubs'), p.url());
     await go('/groups');
     check(`${label}: Groups has its banner, tabs and search`, (await p.locator('[data-banner]').count()) === 1 && (await p.locator('[data-section-tabs] a').count()) === 3 && (await p.locator('[data-groups-page] input[name=q]').count()) === 1);
     await go('/groups?tab=mine');

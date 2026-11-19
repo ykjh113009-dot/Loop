@@ -17,26 +17,23 @@ export type NavCategory = { key: string; href: string; label: string; icon: NavI
 export const CATEGORIES: NavCategory[] = [
   {
     key: "home", href: "/home", label: "Home", icon: "home",
-    children: [{ href: "/home", label: "Dashboard", icon: "home" }],
+    children: [{ href: "/home", label: "Dashboard", icon: "home", also: ["/post"] }],
   },
   {
-    key: "community", href: "/community", label: "Community", icon: "users",
+    key: "community", href: "/clubs", label: "Community", icon: "users",
     children: [
-      { href: "/community", label: "Feed", icon: "feed", also: ["/saved", "/post"] },
-      { href: "/messages", label: "Chats", icon: "chat", badge: "messages" },
-      { href: "/groups", label: "Groups", icon: "groups" },
       { href: "/clubs", label: "Clubs", icon: "clubs" },
-      { href: "/people", label: "Student Profiles", icon: "profile", also: ["/profile", "/friends"] },
-      { href: "/skill-exchange", label: "Skill Exchange", icon: "exchange", soon: true },
-      { href: "/magazine", label: "Loop Magazine", icon: "magazine", soon: true },
-      { href: "/yearbook", label: "Digital Yearbook", icon: "yearbook", soon: true },
+      { href: "/groups", label: "Groups", icon: "groups" },
+      { href: "/messages", label: "Chats", icon: "chat", badge: "messages" },
+      { href: "/polls", label: "Polls", icon: "polls" },
+      { href: "/saved", label: "Saved", icon: "saved" },
     ],
   },
   {
     key: "school-life", href: "/school-life", label: "School Life", icon: "calendar",
     children: [
       { href: "/events", label: "Calendar & Events", icon: "calendar" },
-      { href: "/challenges", label: "Activities & Challenges", icon: "trophy", also: ["/polls", "/competitions"] },
+      { href: "/challenges", label: "Activities & Challenges", icon: "trophy", also: ["/competitions"] },
       { href: "/houses", label: "Houses", icon: "houses" },
       { href: "/leaderboard", label: "Leaderboards", icon: "medal" },
       { href: "/council", label: "Student Council", icon: "council", also: ["/suggestions", "/leadership", "/announcements"] },

@@ -65,7 +65,7 @@ async function Clubs({ searchParams }: { searchParams: PageProps<"/clubs">["sear
           {cat && <input type="hidden" name="cat" value={cat} />}
           <input name="q" defaultValue={query} maxLength={40} placeholder="Search clubs…" aria-label="Search clubs" className="input !rounded-full !ps-11" />
         </form>
-        {!me.isSuspended && <Link href="/clubs/new" className="btn-primary inline-flex items-center gap-1.5 rounded-full px-4 py-2.5"><Plus className="size-4" aria-hidden="true" />Request a club</Link>}
+        {me.isStudent && !me.isSuspended && <Link href="/clubs/new" className="btn-primary inline-flex items-center gap-1.5 rounded-full px-4 py-2.5"><Plus className="size-4" aria-hidden="true" />Request a club</Link>}
       </div>
 
       <nav aria-label="Club categories" className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none]" data-club-filters>
@@ -94,23 +94,51 @@ async function Clubs({ searchParams }: { searchParams: PageProps<"/clubs">["sear
         </section>
       )}
 
-      {joined.length > 0 && (
-        <section>
-          <h2 className="section-title">My clubs</h2>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">{joined.map((c) => <ClubCard key={c.id} club={c} imageUrl={c.image_path ? images.get(c.image_path) : null} joined leaders={leadersOf.get(c.id)} nextAt={nextOf.get(c.id)} />)}</div>
-        </section>
-      )}
-
-      <section>
-        {joined.length > 0 && <h2 className="section-title">Discover</h2>}
-        {others.length ? (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">{others.map((c) => <ClubCard key={c.id} club={c} imageUrl={c.image_path ? images.get(c.image_path) : null} canJoin={!me.isSuspended} leaders={leadersOf.get(c.id)} nextAt={nextOf.get(c.id)} />)}</div>
-        ) : joined.length === 0 ? (
-          <EmptyState scene="community" title="No clubs here yet. Be the first to start one!" action={{ href: "/clubs/new", label: "Request a club" }}>Find your people. Join clubs that match your interests.</EmptyState>
-        ) : (
-          <p className="rounded-2xl bg-sage-soft/40 px-4 py-6 text-center text-sm text-ink-2">You&apos;ve joined every club in this list.</p>
-        )}
-      </section>
+      {(() => {
+        const card = (c: ClubSummary, opts: { joined?: boolean; featured?: boolean } = {}) => (
+          <ClubCard key={c.id} club={c} imageUrl={c.image_path ? images.get(c.image_path) : null} joined={opts.joined} featured={opts.featured} canJoin={me.isStudent && !me.isSuspended} leaders={leadersOf.get(c.id)} nextAt={nextOf.get(c.id)} />
+        );
+        const grid = "grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3";
+        const members = (c: ClubSummary) => c.club_members?.[0]?.count ?? 0;
+        const ranked = [...others].sort((x, y) => members(y) - members(x) || x.name.localeCompare(y.name));
+        // With a category or a search, show one simple list of what matches.
+        const filtered = !!(cat || query);
+        const featured = filtered ? [] : ranked.slice(0, 3);
+        const popular = filtered ? [] : ranked.slice(3, 9);
+        const rest = filtered ? ranked : ranked.slice(9);
+        return (
+          <>
+            {featured.length > 0 && (
+              <section data-clubs-section="featured">
+                <h2 className="section-title">Featured Clubs</h2>
+                <div className={grid}>{featured.map((c) => card(c, { featured: true }))}</div>
+              </section>
+            )}
+            {joined.length > 0 && (
+              <section data-clubs-section="mine">
+                <h2 className="section-title">My Clubs</h2>
+                <div className={grid}>{joined.map((c) => card(c, { joined: true }))}</div>
+              </section>
+            )}
+            {popular.length > 0 && (
+              <section data-clubs-section="popular">
+                <h2 className="section-title">Popular Clubs</h2>
+                <div className={grid}>{popular.map((c) => card(c))}</div>
+              </section>
+            )}
+            <section data-clubs-section="discover">
+              {(rest.length > 0 || filtered) && <h2 className="section-title">{filtered ? `${others.length + joined.length} ${others.length + joined.length === 1 ? "club" : "clubs"}` : "Discover Clubs"}</h2>}
+              {rest.length ? (
+                <div className={grid}>{rest.map((c) => card(c))}</div>
+              ) : filtered && others.length === 0 && joined.length === 0 ? (
+                <EmptyState scene="community" title="No clubs match that" action={{ href: "/clubs", label: "See all clubs" }}>Try another category or a different name.</EmptyState>
+              ) : joined.length === 0 && featured.length === 0 ? (
+                <EmptyState scene="community" title="No clubs here yet. Be the first to start one!" action={me.isStudent && !me.isSuspended ? { href: "/clubs/new", label: "Request a club" } : undefined}>Find your people. Join clubs that match your interests.</EmptyState>
+              ) : null}
+            </section>
+          </>
+        );
+      })()}
     </div>
   );
 }

@@ -45,7 +45,7 @@ function PointsPill({ points, label }: { points: number | null; label: string })
 export function ShellChrome({ user, badges, pathname, locale = "en", search = "" }: { user: ShellUser | null; badges: Badges; pathname: string | null; locale?: Locale; search?: string }) {
   const t = makeT(locale);
   const current = pathname ?? "";
-  const showFab = !!user && (current === "/home" || current === "/community");
+  const showFab = !!user && current === "/home";
 
   return (
     <>
@@ -105,7 +105,7 @@ export function ShellChrome({ user, badges, pathname, locale = "en", search = ""
       {/* ---------- phone: floating new post ---------- */}
       {showFab && (
         <Link
-          href={current === "/home" ? "#composer" : "/home#composer"}
+          href="#composer"
           aria-label={t("New post")}
           className="fixed end-4 bottom-[calc(4.75rem+env(safe-area-inset-bottom))] z-30 flex size-14 items-center justify-center rounded-full bg-brand-700 text-white shadow-[0_10px_24px_-8px_rgba(58,82,48,0.8)] active:scale-95 print:hidden lg:hidden"
         >

@@ -60,7 +60,7 @@ async function login(browser, name, viewport = { width: 1280, height: 850 }) {
   }
   {
     const p = maya.p;
-    await go(p, '/community');
+    await go(p, '/home');
     await p.fill('#composer textarea', 'Rule check post');
     await p.locator('#composer').getByRole('button', { name: 'Post', exact: true }).click();
     await waitText(p, /Rule check post/);
@@ -218,7 +218,7 @@ async function login(browser, name, viewport = { width: 1280, height: 850 }) {
     check('Joining public is instant; private needs a request', sql(`select string_agg(status, ',' order by status) from public.group_members where profile_id='${ID.yousef}'`) === 'active,pending');
     await go(p, `/groups/${sql(`select id from public.groups where name='Secret readers'`)}`);
     check('A private group hides its posts from non-members', /This group is private/.test(await text(p)) && !/Private discussion/.test(await text(p)));
-    await go(p, '/community');
+    await go(p, '/home');
     check('Group posts of groups I joined appear in my feed', /Tournament on Friday/.test(await text(p)) && !/Private discussion/.test(await text(p)));
   }
   {

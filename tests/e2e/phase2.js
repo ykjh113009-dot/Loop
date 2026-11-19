@@ -32,7 +32,7 @@ const waitText = (p, re, t = 15000) => p.waitForFunction((s) => new RegExp(s).te
   // ---------- Feed
   {
     const p = layla.p;
-    await go(p, '/community');
+    await go(p, '/home');
     const audience = await p.locator('#composer-audience option').allInnerTexts();
     check('The composer can post to the whole school or a club', /Whole school/.test(audience[0]) && audience.length > 1, audience.join(' | '));
     await p.fill('#composer textarea', 'Science fair on Thursday! #ScienceFair come and see @demomaya');
@@ -46,10 +46,10 @@ const waitText = (p, re, t = 15000) => p.waitForFunction((s) => new RegExp(s).te
     await p.locator('#composer').getByRole('button', { name: 'Post', exact: true }).click();
     await waitText(p, /Best break snack/);
     check('A poll post is created with its choices', sql(`select count(*) from public.post_poll_options o join public.posts p on p.id=o.post_id where p.body='Best break snack?'`) === '2');
-    await go(p, '/community');
+    await go(p, '/home');
     await p.locator('a', { hasText: '#ScienceFair' }).first().click();
-    await p.waitForURL('**/community?tag=sciencefair');
-    check('Tapping a hashtag shows the posts with it', (await p.locator('article[data-post]').count()) === 1 && /#sciencefair/.test(await text(p)));
+    await p.waitForURL('**/community?tag=sciencefair'); await p.locator('article[data-post]:visible').first().waitFor({ timeout: 15000 });
+    check('Tapping a hashtag shows the posts with it', (await p.locator('article[data-post]:visible').count()) === 1 && /#sciencefair/.test(await text(p)));
   }
   const postId = sql(`select id from public.posts where body like 'Science fair%'`);
   const pollId = sql(`select id from public.posts where body='Best break snack?'`);
@@ -57,7 +57,7 @@ const waitText = (p, re, t = 15000) => p.waitForFunction((s) => new RegExp(s).te
     const p = maya.p;
     await go(p, '/notifications');
     check('A mention sends a notification', /mentioned you/.test(await text(p)));
-    await go(p, '/community');
+    await go(p, '/home');
     const card = p.locator(`article[data-post="${postId}"]`);
     await card.getByRole('button', { name: 'Like', exact: true }).click();
     await p.waitForTimeout(1200);
@@ -72,7 +72,7 @@ const waitText = (p, re, t = 15000) => p.waitForFunction((s) => new RegExp(s).te
     await go(p, '/saved');
     check('Saved posts are listed on the Saved page', (await p.locator(`article[data-post="${postId}"]`).count()) === 1);
     const poll = p.locator(`article[data-post="${pollId}"]`);
-    await go(p, '/community');
+    await go(p, '/home');
     await p.locator(`article[data-post="${pollId}"] button`, { hasText: 'Fruit' }).click();
     await waitText(p, /100%/);
     check('Voting in a poll shows the results', /1 vote/.test(await p.locator(`article[data-post="${pollId}"]`).innerText()));
@@ -211,7 +211,7 @@ const waitText = (p, re, t = 15000) => p.waitForFunction((s) => new RegExp(s).te
     const st = await p.evaluate(() => ({ dir: document.documentElement.dir, lang: document.documentElement.lang, nav: document.querySelector('[data-sidebar-root] nav')?.innerText || '' }));
     const body = await text(p);
     check('Arabic switches the page to right-to-left', st.dir === 'rtl' && st.lang === 'ar', JSON.stringify(st).slice(0, 80));
-    check('The menu, greeting and feed are in Arabic', /الرئيسية/.test(st.nav) && /المجتمع/.test(st.nav) && /(صباح|مساء) الخير/.test(body) && /آخر المستجدات من لوب/.test(body));
+    check('The menu, greeting and feed are in Arabic', /الرئيسية/.test(st.nav) && /المجتمع/.test(st.nav) && /(صباح|مساء) الخير/.test(body) && /الخلاصة/.test(body));
     const side = await p.evaluate(() => document.querySelector('[data-sidebar-root]').getBoundingClientRect().left > innerWidth / 2);
     check('In Arabic the sidebar sits on the right', side);
     const bad = [];

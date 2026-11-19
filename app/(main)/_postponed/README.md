@@ -1,6 +1,6 @@
 # Postponed features
 
-University & Opportunities, Mentorship and the Tawjihi corner are postponed for a future version of Loop.
+University & Opportunities, Mentorship, the Tawjihi corner, Skill Exchange, Loop Magazine and the Digital Yearbook are postponed for a future version of Loop.
 Their pages are kept here, in a private folder (a folder starting with `_` is never a route), so nothing is
 rebuilt later. Their database tables, records and server actions are untouched.
 

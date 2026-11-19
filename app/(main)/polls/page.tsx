@@ -48,7 +48,7 @@ async function Polls({ searchParams }: { searchParams: PageProps<"/polls">["sear
           <h2 className="text-[17px] font-semibold">Create a Poll</h2>
           <BarChart3 className="mx-auto size-16 text-brand-700/70" strokeWidth={1.4} aria-hidden="true" />
           <p className="text-sm text-ink-2">Ask your community a question!</p>
-          <Link href={canCreate ? "/polls/new" : "/community#composer"} className="btn-primary w-full justify-center rounded-full py-2.5">{canCreate ? "Create Poll" : "Add a poll to a post"}</Link>
+          <Link href={canCreate ? "/polls/new" : "/home#composer"} className="btn-primary w-full justify-center rounded-full py-2.5">{canCreate ? "Create Poll" : "Add a poll to a post"}</Link>
         </aside>
       </div>
     </div>

@@ -16,7 +16,7 @@ async function signIn(b, name, vp) { const ctx = await b.newContext({ viewport: 
   const maya = await signIn(b, 'Maya Odeh', { width: 1280, height: 900 });
   const p = maya.p;
   await p.waitForSelector('[data-sidebar-root] a[href="/counselor"]', { timeout: 15000 });
-  await p.goto(BASE + '/community', { waitUntil: 'networkidle' });
+  await p.goto(BASE + '/clubs', { waitUntil: 'networkidle' });
   const labels = await p.locator('[data-sidebar-root] a').allInnerTexts();
   check('The sidebar scrolls inside itself (nothing cut off)', (await p.locator('[data-sidebar-root] nav[aria-label=Main]').evaluate((n) => getComputedStyle(n).overflowY)) === 'auto');
   check('Clubs and Groups (under Community), Settings and the counselor are in the sidebar', ['Clubs', 'Groups', 'Settings', 'Talk to the counselor'].every((x) => labels.some((l) => l.trim().startsWith(x))));
