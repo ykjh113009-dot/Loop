@@ -22,11 +22,14 @@ const loaded = (p, sel) => p.locator(sel).first().evaluate((i) => new Promise((r
   check('An admin can add a picture to a subject', sql(`select count(*) from public.study_categories where slug='sat' and image_path is not null`) === '1');
   await go(p, '/academic-resources');
   check('The card shows the photo instead of the icon', (await p.locator('[data-category=sat] [data-subject-photo]').count()) === 1 && (await loaded(p, '[data-category=sat] [data-subject-photo]')));
-  check('Other subjects keep their icon', (await p.locator('[data-category=ap-biology] [data-subject-photo]').count()) === 0);
+  check('Subjects without a picture show a line icon, no emoji', (await p.locator('[data-category=ap-biology] [data-subject-photo]').count()) === 0 && (await p.locator('[data-category=ap-biology] svg').count()) === 1 && !/\p{Extended_Pictographic}/u.test(await p.locator('[data-category=ap-biology]').innerText()));
+  check('The tile is a square the picture fills', await p.locator('[data-category=sat]').evaluate((e) => Math.abs(e.getBoundingClientRect().width - e.getBoundingClientRect().height) < 2) && (await p.locator('[data-category=sat] [data-subject-photo]').evaluate((i) => getComputedStyle(i).objectFit)) === 'cover');
   await go(maya.p, '/academic-resources');
+  await maya.p.locator('[data-section=subjects]').screenshot({ path: '/home/user/pbs-go/shots/subj-tiles.png' });
   check('Students see the photo too', (await maya.p.locator('[data-category=sat] [data-subject-photo]').count()) === 1 && (await loaded(maya.p, '[data-category=sat] [data-subject-photo]')));
   await go(maya.p, '/academic-resources/sat');
-  check('The subject page shows it as a banner', (await maya.p.locator('[data-subject-banner]').count()) === 1);
+  await maya.p.screenshot({ path: '/home/user/pbs-go/shots/subj-page.png' });
+  check('The subject page shows the picture filling its square next to the subject name', (await maya.p.locator('[data-subject-banner]').count()) === 1 && (await maya.p.locator('[data-subject-banner]').evaluate((i) => getComputedStyle(i).objectFit)) === 'cover');
   await go(p, '/academic-resources');
   await p.locator('[data-subject-photos-panel] summary').click();
   await p.locator('[data-subject-photos] li', { hasText: 'SAT' }).getByRole('button', { name: 'Remove' }).click();

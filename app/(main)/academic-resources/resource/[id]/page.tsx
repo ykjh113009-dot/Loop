@@ -1,3 +1,4 @@
+import { TypeIcon } from "@/components/library/type-icon";
 import { Suspense } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -66,17 +67,17 @@ async function Resource({ params }: { params: PageProps<"/academic-resources/res
       {r.visibility !== "visible" && <p className="rounded-xl bg-red-50 p-3 text-sm text-red-800">{t("This resource is hidden from students.")}</p>}
 
       <div className="card flex gap-4 p-4">
-        <div className="flex h-36 w-28 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-sage-soft/50 text-5xl">
+        <div className="flex h-36 w-28 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-sage-soft/50 ">
           {cover
             // eslint-disable-next-line @next/next/no-img-element -- short-lived signed URL
             ? <img src={cover} alt="" className="size-full object-cover" />
-            : type.emoji}
+            : <TypeIcon type={r.type} className="size-12 text-brand-800/80" />}
         </div>
         <div className="min-w-0 flex-1 space-y-2">
           <div className="flex flex-wrap items-center gap-1.5">
             <SourceChip source={r.source} t={t} />
-            <Link href={`/academic-resources/${r.subject?.slug}`} className="chip bg-black/5">{r.subject?.emoji} {r.subject?.name}</Link>
-            <span className="chip bg-black/5">{type.emoji} {t(type.label)}</span>
+            <Link href={`/academic-resources/${r.subject?.slug}`} className="chip bg-black/5">{r.subject?.name}</Link>
+            <span className="chip bg-black/5">{t(type.label)}</span>
           </div>
           <h2 className="text-xl font-bold leading-snug" data-resource-title>{r.title}</h2>
           {r.author && <p className="text-sm text-black/60">{t("By {a}", { a: r.author })}</p>}

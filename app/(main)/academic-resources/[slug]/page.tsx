@@ -1,3 +1,4 @@
+import { SubjectIcon } from "@/components/library/type-icon";
 import { Suspense } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -31,10 +32,18 @@ async function Subject({ params, searchParams }: { params: PageProps<"/academic-
   const covers = await signCovers(supabase, list.map((r) => r.cover_path));
   return (
     <div className="mx-auto max-w-3xl space-y-4">
-      {banner && (
-        // eslint-disable-next-line @next/next/no-img-element -- short-lived signed URL
-        <img src={banner} alt="" className="h-36 w-full rounded-2xl object-cover" data-subject-banner />
-      )}
+      <div className="flex items-center gap-5 rounded-3xl bg-[#e9ead6] p-4 sm:p-5" data-subject-header>
+        <span className="relative flex size-24 shrink-0 items-center justify-center overflow-hidden rounded-3xl bg-gradient-to-br from-sage-soft to-[#dbe5cc] sm:size-32">
+          {banner
+            // eslint-disable-next-line @next/next/no-img-element -- short-lived signed URL
+            ? <img src={banner} alt="" className="absolute inset-0 size-full object-cover" data-subject-banner />
+            : <SubjectIcon slug={slug} className="size-12 text-brand-800/80" />}
+        </span>
+        <div className="min-w-0">
+          <p className="font-heading text-2xl font-semibold text-brand-900 sm:text-3xl">{cat.name}</p>
+          <p className="text-sm text-ink-2">{list.length} {list.length === 1 ? t("resource") : t("resources")}</p>
+        </div>
+      </div>
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex gap-1.5" role="tablist" aria-label={t("Sort")}>
           {(Object.keys(SORTS) as (keyof typeof SORTS)[]).map((k) => (
@@ -54,8 +63,8 @@ async function Subject({ params, searchParams }: { params: PageProps<"/academic-
 async function Title({ params }: { params: PageProps<"/academic-resources/[slug]">["params"] }) {
   const { slug } = await params;
   const supabase = await createClient();
-  const { data: cat } = await supabase.from("study_categories").select("name, emoji").eq("slug", slug).maybeSingle();
-  return <PageHeader title={cat ? `${cat.emoji} ${cat.name}` : "Academic Library"} back="/academic-resources" />;
+  const { data: cat } = await supabase.from("study_categories").select("name").eq("slug", slug).maybeSingle();
+  return <PageHeader title={cat ? cat.name : "Academic Library"} back="/academic-resources" />;
 }
 
 export default function SubjectPage(props: PageProps<"/academic-resources/[slug]">) {

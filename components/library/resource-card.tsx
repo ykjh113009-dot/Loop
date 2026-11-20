@@ -1,3 +1,4 @@
+import { TypeIcon } from "@/components/library/type-icon";
 import Link from "next/link";
 import { Avatar } from "@/components/avatar";
 import { StatRow } from "@/components/library/stars";
@@ -18,7 +19,7 @@ export function ResourceCard({ r, cover, t, extra }: { r: LibraryResource; cover
         {cover
           // eslint-disable-next-line @next/next/no-img-element -- short-lived signed URL
           ? <img src={cover} alt="" className="size-full object-cover" />
-          : <span>{type.emoji}</span>}
+          : <TypeIcon type={r.type} className="size-8 text-brand-800/80" />}
       </Link>
       <div className="min-w-0 flex-1 space-y-1.5">
         <div className="flex flex-wrap items-center gap-1.5">

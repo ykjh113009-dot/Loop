@@ -1,3 +1,4 @@
+import { SubjectIcon } from "@/components/library/type-icon";
 import { Suspense } from "react";
 import Link from "next/link";
 import { requireMe } from "@/lib/auth";
@@ -82,17 +83,25 @@ async function Library({ q, type, view, allSubjects }: { q: string; type: string
   const href = (id: string) => `/academic-resources${id || term ? `?${new URLSearchParams({ ...(id ? { type: id } : {}), ...(term ? { q: term } : {}) })}` : ""}`;
 
   const visibleSubjects = allSubjects ? subjects : subjects.slice(0, 6);
-  const subjectTile = (c: (typeof subjects)[number]) => (
-    <Link key={c.id} href={`/academic-resources/${c.slug}`} className="flex min-h-[112px] flex-col items-center justify-center gap-2 rounded-3xl border border-brand-700/10 bg-white/70 p-3 text-center shadow-[0_1px_2px_rgba(40,60,40,0.04)] hover:bg-white" data-category={c.slug}>
-      <span className="flex size-14 items-center justify-center overflow-hidden rounded-2xl text-4xl">
-        {c.image_path && subjectImages.get(c.image_path)
-          // eslint-disable-next-line @next/next/no-img-element -- short-lived signed URL
-          ? <img src={subjectImages.get(c.image_path)!} alt="" className="size-full object-cover" data-subject-photo />
-          : c.emoji}
-      </span>
-      <span className="text-[15px] font-medium">{c.name}</span>
-    </Link>
-  );
+  const subjectTile = (c: (typeof subjects)[number]) => {
+    const img = c.image_path ? subjectImages.get(c.image_path) : null;
+    return (
+      <Link key={c.id} href={`/academic-resources/${c.slug}`} className="group relative block aspect-square overflow-hidden rounded-3xl border border-brand-700/10 bg-gradient-to-br from-sage-soft to-[#dbe5cc] shadow-[0_1px_2px_rgba(40,60,40,0.04)]" data-category={c.slug}>
+        {img ? (
+          <>
+            {/* eslint-disable-next-line @next/next/no-img-element -- short-lived signed URL */}
+            <img src={img} alt="" className="absolute inset-0 size-full object-cover transition-transform duration-300 group-hover:scale-105" data-subject-photo />
+            <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/65 to-transparent px-3 pt-8 pb-3 text-[15px] font-semibold text-white">{c.name}</span>
+          </>
+        ) : (
+          <>
+            <SubjectIcon slug={c.slug} className="absolute inset-x-0 top-[22%] mx-auto size-12 text-brand-800/80" />
+            <span className="absolute inset-x-0 bottom-0 px-3 pb-3 text-center text-[15px] font-semibold text-brand-900">{c.name}</span>
+          </>
+        )}
+      </Link>
+    );
+  };
   const sectionHead = (icon: React.ReactNode, title: string, link?: { href: string; label: string }) => (
     <div className="mb-3 flex items-center justify-between">
       <h2 className="flex items-center gap-2 text-[19px] font-semibold">{icon}{title}</h2>

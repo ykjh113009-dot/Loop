@@ -1,3 +1,4 @@
+import { TypeIcon } from "@/components/library/type-icon";
 import Link from "next/link";
 import { Star, Eye, Download } from "lucide-react";
 import { LIBRARY_TYPES, type LibraryResource } from "@/lib/library";
@@ -12,11 +13,11 @@ export function ResourceTile({ r, cover, saved, t }: { r: LibraryResource; cover
   const by = r.source === "official" ? (r.author || "Loop") : (r.submitter?.full_name ?? r.author ?? "Loop");
   return (
     <article className="relative flex flex-col gap-2 rounded-3xl border border-brand-700/10 bg-white/85 p-3.5 shadow-[0_1px_2px_rgba(40,60,40,0.04)]" data-resource={r.id}>
-      <Link href={`/academic-resources/resource/${r.id}`} className="flex h-28 w-28 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-sage-soft to-[#dbe5cc] text-4xl after:absolute after:inset-0 after:rounded-3xl" aria-label={r.title}>
+      <Link href={`/academic-resources/resource/${r.id}`} className="flex h-28 w-28 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-sage-soft to-[#dbe5cc] after:absolute after:inset-0 after:rounded-3xl" aria-label={r.title}>
         {cover
           // eslint-disable-next-line @next/next/no-img-element -- short-lived signed URL
           ? <img src={cover} alt="" className="size-full object-cover" />
-          : <span aria-hidden="true">{type.emoji}</span>}
+          : <TypeIcon type={r.type} className="size-10 text-brand-800/80" />}
       </Link>
       <div className="absolute end-2.5 top-2.5"><SaveBookmark id={r.id} saved={saved} label={t("Save to My Library")} savedLabel={t("Saved to My Library")} /></div>
       <div className="min-w-0">

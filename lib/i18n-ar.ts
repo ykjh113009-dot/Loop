@@ -1139,4 +1139,6 @@ export const AR: Record<string, string> = {
   "The picture didn't upload. Try again.": "لم تُرفع الصورة. حاول مجدداً.",
   "Your name comes from your school account.": "اسمك مأخوذ من حساب مدرستك.",
   "Your name comes from your school account. Only your school admin can change your grade ({n}).": "اسمك مأخوذ من حساب مدرستك. وحده مدير المدرسة يستطيع تغيير صفك ({n}).",
+  "resource": "مصدر",
+  "resources": "مصادر",
 };
