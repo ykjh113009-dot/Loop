@@ -166,17 +166,11 @@ async function Library({ q, type, view, allSubjects }: { q: string; type: string
               {recent.length === 0 ? <EmptyState compact scene="books" title={t("Your library is waiting for its first resources.")} action={{ href: "/academic-resources/suggest", label: t("Suggest a Resource") }}>{t("Share a study guide, past paper or notes and help everyone learn.")}</EmptyState> : <div className={grid}>{recent.map(tile)}</div>}
             </section>
           )}
-          <section data-section="subjects" className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1fr)_340px]">
+          <section data-section="subjects">
             <div className="min-w-0">
               {sectionHead(<BookOpen className="size-5 text-brand-700" aria-hidden="true" />, t("Browse by Subject"), subjects.length > 6 ? { href: allSubjects ? "/academic-resources" : "/academic-resources?subjects=all", label: allSubjects ? t("Show fewer") : t("See all subjects") } : undefined)}
-              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4">{visibleSubjects.map(subjectTile)}</div>
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-6">{visibleSubjects.map(subjectTile)}</div>
             </div>
-            <aside className="relative isolate flex flex-col justify-end overflow-hidden rounded-3xl bg-[#e9ead6] p-6 lg:min-h-[250px]" data-promo>
-              <GraduationCap className="pointer-events-none absolute end-6 top-4 -z-10 size-24 text-brand-800/80" strokeWidth={1.3} aria-hidden="true" />
-              <h2 className="font-heading text-[26px] leading-tight font-semibold text-brand-900">{t("Study Smart with Loop")}</h2>
-              <p className="mt-2 text-sm text-ink-2">{t("Your academic resources, all in one place.")}</p>
-              <Link href="/academic-resources?view=recent" className="btn-primary mt-4 w-fit rounded-full px-5 py-2.5">{t("Explore More")} →</Link>
-            </aside>
           </section>
           {me.isAdmin && (
             <details className="rounded-3xl border border-brand-700/10 bg-white/85 p-4" data-subject-photos-panel>

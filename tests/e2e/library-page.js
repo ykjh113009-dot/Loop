@@ -26,7 +26,7 @@ const SCHOOL = '00000000-0000-0000-0000-00000000a001';
   const tile = p.locator('[data-section=recent] [data-resource]', { hasText: 'E2E Tile Notes' }).first();
   const tt = await tile.innerText();
   check('A tile shows title, who shared it, Official label, rating and views (12.4K)', /E2E Tile Notes/.test(tt) && /By Loop Team/.test(tt) && /Official/.test(tt) && /4\.9/.test(tt) && /12\.4K/.test(tt), tt.replace(/\s+/g, ' '));
-  check('Browse by Subject shows subject tiles and the Study Smart card', (await p.locator('[data-category]').count()) >= 6 && (await p.locator('[data-promo]').count()) === 1);
+  check('Browse by Subject shows subject tiles and no promo card', (await p.locator('[data-category]').count()) >= 6 && (await p.locator('[data-promo]').count()) === 0);
   // bookmark
   const id = await tile.getAttribute('data-resource');
   await tile.locator('[data-save-bookmark]').click(); await p.waitForTimeout(1500);
