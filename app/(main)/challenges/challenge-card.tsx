@@ -2,6 +2,7 @@ import Link from "next/link";
 import { categoryOf, challengePhase, kindOf, PHASE } from "@/lib/challenges";
 import { formatShortDate } from "@/lib/time";
 import type { T } from "@/lib/i18n";
+import { Glyph } from "@/components/glyph";
 
 type C = {
   id: string; title: string; emoji: string; points: number; reward_mode: string; kind: string; category: string;
@@ -23,10 +24,10 @@ export function ChallengeCard({ c, t, prizeTop, participants = 0, approved = 0, 
       )}
       <div className="space-y-1.5 p-4">
         <div className="flex items-start gap-3">
-          <span className="text-2xl">{c.emoji}</span>
+          <span className="text-2xl"><Glyph e={c.emoji} /></span>
           <div className="min-w-0 flex-1">
             <h3 className="font-bold">{c.title}</h3>
-            <p className="text-xs text-black/50">{cat.emoji} {t(cat.label)} · {t(kindOf(c.kind).label)}</p>
+            <p className="text-xs text-black/50"><Glyph e={cat.emoji} /> {t(cat.label)} · {t(kindOf(c.kind).label)}</p>
           </div>
           <span className={`chip shrink-0 ${PHASE[phase].cls}`}>{t(PHASE[phase].label)}</span>
         </div>

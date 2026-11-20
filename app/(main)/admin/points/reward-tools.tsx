@@ -6,6 +6,7 @@ import { adjustPoints, reversePoints, setAchievement } from "@/app/actions/rewar
 import { ActionForm } from "@/components/action-form";
 import { Avatar } from "@/components/avatar";
 import { SubmitButton } from "@/components/submit-button";
+import { Glyph } from "@/components/glyph";
 
 type Stats = { points_7d: number; points_30d: number; earners_7d: number; spent_30d: number; adjustments_30d: number; achievements_30d: number; top_reasons: { reason: string; points: number; n: number }[] };
 type Summary = { xp: number; spent: number; balance: number; level: number; level_name: string; streak: number; longest: number };
@@ -122,7 +123,7 @@ export async function RewardTools({ q, profileId, isAdmin }: { q: string; profil
             <li key={b.code}>
               <ActionForm action={setAchievement} className="card flex flex-wrap items-center gap-2 p-3 text-sm">
                 <input type="hidden" name="code" value={b.code} />
-                <span className="min-w-40 flex-1"><strong>{b.emoji} {b.name}</strong><span className="ms-2 text-xs text-black/45">{b.category} · {b.tier} · needs {b.threshold}</span></span>
+                <span className="min-w-40 flex-1"><strong><Glyph e={b.emoji} /> {b.name}</strong><span className="ms-2 text-xs text-black/45">{b.category} · {b.tier} · needs {b.threshold}</span></span>
                 <label className="flex items-center gap-1 text-xs">Bonus <input name="points" type="number" min={0} max={500} defaultValue={b.points_reward} className="input w-16 py-1 text-sm" /></label>
                 <label className="flex items-center gap-1 text-xs"><input type="checkbox" name="active" defaultChecked={b.active} className="size-4 accent-brand-700" /> On</label>
                 <SubmitButton className="btn-secondary px-3 py-1 text-xs" pendingText="…">Save</SubmitButton>

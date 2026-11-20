@@ -7,6 +7,7 @@ import { LayoutGrid, Volleyball, GraduationCap, Laptop, Globe, Heart, Search, Pl
 import { signClubImages } from "@/lib/images";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PageSkeleton } from "@/components/skeleton";
+import { Glyph } from "@/components/glyph";
 
 export const metadata = { title: "Clubs" };
 
@@ -75,7 +76,7 @@ async function Clubs({ searchParams }: { searchParams: PageProps<"/clubs">["sear
 
       {requested && (
         <p className="rounded-xl bg-brand-50 px-3 py-2 text-sm text-brand-800">
-          🎉 Your club request was sent. A moderator will review it and you&apos;ll get a notification.{picture === "failed" ? " The picture didn&apos;t upload. You can add it from the club's Manage page once it is approved." : ""}
+          <Glyph e="🎉" /> Your club request was sent. A moderator will review it and you&apos;ll get a notification.{picture === "failed" ? " The picture didn&apos;t upload. You can add it from the club's Manage page once it is approved." : ""}
         </p>
       )}
 
@@ -85,7 +86,7 @@ async function Clubs({ searchParams }: { searchParams: PageProps<"/clubs">["sear
           <div className="space-y-2">
             {myRequests.map((r) => (
               <div key={r.id} className="card flex items-center gap-3 p-3 text-sm">
-                <span className="text-xl">{r.emoji}</span>
+                <span className="text-xl"><Glyph e={r.emoji} /></span>
                 <span className="flex-1 font-medium">{r.name}</span>
                 <span className="text-xs text-black/50">{STATUS_LABEL[r.status]}{r.review_note ? ` — ${r.review_note}` : ""}</span>
               </div>

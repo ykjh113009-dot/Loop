@@ -7,6 +7,7 @@ import { houseColor } from "@/lib/house";
 import { PageBanner } from "@/components/ui/page-banner";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PageSkeleton } from "@/components/skeleton";
+import { Glyph } from "@/components/glyph";
 
 export const metadata = { title: "Houses" };
 
@@ -36,7 +37,7 @@ async function Houses() {
           {ranked.map((h, i) => (
             <li key={h.house_id} className={`card space-y-3 p-4 ${h.house_id === mine ? "ring-2 ring-brand-600/50" : ""}`}>
               <div className="flex items-center gap-3">
-                <span className="flex size-14 shrink-0 items-center justify-center rounded-2xl text-3xl" style={{ background: houseColor(h.color) + "26" }}>{h.emoji}</span>
+                <span className="flex size-14 shrink-0 items-center justify-center rounded-2xl text-3xl" style={{ background: houseColor(h.color) + "26" }}><Glyph e={h.emoji} /></span>
                 <div className="min-w-0 flex-1">
                   <h2 className="truncate text-lg font-bold">{h.name}</h2>
                   {motto.get(h.house_id) && <p className="truncate text-sm text-ink-2">“{motto.get(h.house_id)}”</p>}

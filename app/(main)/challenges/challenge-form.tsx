@@ -5,6 +5,9 @@ import { saveChallenge } from "@/app/actions/challenges";
 import { PhotoField } from "@/components/photo-field";
 import { CATEGORIES, KINDS, PROOF } from "@/lib/challenges";
 import { makeT, type Locale } from "@/lib/i18n";
+import { Glyph } from "@/components/glyph";
+import { Place } from "@/components/glyph";
+import { IconPicker } from "@/components/icon-picker";
 
 export type ChallengeDraft = {
   id?: string;
@@ -45,15 +48,15 @@ export function ChallengeForm({ draft, schoolId, userId, locale }: { draft: Chal
 
       <section className="card space-y-3 p-4">
         <h2 className="section-title">{t("The idea")}</h2>
-        <div className="grid grid-cols-[5rem_1fr] gap-3">
-          <label className="block"><span className="label">{t("Icon")}</span><input name="emoji" defaultValue={draft.emoji} maxLength={4} className="input text-center text-xl" aria-label={t("Icon")} /></label>
+        <div className="space-y-3">
+          <div><span className="label">{t("Icon")}</span><IconPicker defaultValue={draft.emoji} label={t("Icon")} /></div>
           <label className="block"><span className="label">{t("Title")}</span><input name="title" required minLength={3} maxLength={100} defaultValue={draft.title} className="input" placeholder={t("e.g. School photo hunt")} /></label>
         </div>
         <label className="block"><span className="label">{t("What is it about?")}</span><textarea name="description" rows={3} maxLength={1000} defaultValue={draft.description} className="input resize-none" placeholder={t("Explain the challenge in a few sentences.")} /></label>
         <label className="block"><span className="label">{t("Step-by-step instructions")}</span><textarea name="instructions" rows={4} maxLength={2000} defaultValue={draft.instructions} className="input resize-none" placeholder={t("What should students do, and what counts as finished?")} /></label>
         <div className="grid gap-3 sm:grid-cols-2">
           <label className="block"><span className="label">{t("Category")}</span>
-            <select name="category" defaultValue={draft.category} className="input">{CATEGORIES.map((c) => <option key={c.id} value={c.id}>{c.emoji} {t(c.label)}</option>)}</select>
+            <select name="category" defaultValue={draft.category} className="input">{CATEGORIES.map((c) => <option key={c.id} value={c.id}>{t(c.label)}</option>)}</select>
           </label>
           <fieldset><legend className="label">{t("Type")}</legend>
             {KINDS.map((k) => (
@@ -97,7 +100,7 @@ export function ChallengeForm({ draft, schoolId, userId, locale }: { draft: Chal
           {PROOF.map((p) => (
             <label key={p.id} className="flex items-center gap-2 rounded-xl border border-black/10 px-3 py-2 text-sm has-checked:border-brand-600 has-checked:bg-brand-50">
               <input type="checkbox" name="proof" value={p.id} checked={proof.includes(p.id)} onChange={(e) => setProof((cur) => e.target.checked ? [...cur, p.id] : cur.filter((x) => x !== p.id))} className="size-5 accent-brand-700" />
-              {p.emoji} {t(p.label)}
+              <Glyph e={p.emoji} /> {t(p.label)}
             </label>
           ))}
         </div>
@@ -119,7 +122,7 @@ export function ChallengeForm({ draft, schoolId, userId, locale }: { draft: Chal
           <>
             <div className="grid grid-cols-5 gap-2">
               {[1, 2, 3, 4, 5].map((n) => (
-                <label key={n} className="block"><span className="label">{n === 1 ? "🥇" : n === 2 ? "🥈" : n === 3 ? "🥉" : `#${n}`}</span><input type="number" name={`prize${n}`} min={1} max={300} defaultValue={draft.prizes[n - 1] ?? ""} className="input px-2" aria-label={`${t("Points for place")} ${n}`} /></label>
+                <label key={n} className="block"><span className="label flex items-center gap-1.5"><Place n={n} /> {t("place")}</span><input type="number" name={`prize${n}`} min={1} max={300} defaultValue={draft.prizes[n - 1] ?? ""} className="input px-2" aria-label={`${t("Points for place")} ${n}`} /></label>
               ))}
             </div>
             <p className="text-xs text-black/50">{t("Leave a place empty if there is no prize for it. Prizes above 100 points need an admin.")}</p>

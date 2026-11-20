@@ -316,7 +316,7 @@ async function login(browser, name, viewport = { width: 1280, height: 850 }) {
     await p.locator('details').getByRole('button', { name: 'Post' }).click();
     await waitText(p, /Announcement sent/);
     await p.reload({ waitUntil: 'networkidle' });
-    check('Club announcements are pinned at the top of the club', /📣 Announcement/.test(await p.locator('article').first().innerText()));
+    check('Club announcements are pinned at the top of the club', /Announcement/.test(await p.locator('article').first().innerText()));
   }
   {
     const p = maya.p;

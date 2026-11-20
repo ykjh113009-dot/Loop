@@ -8,6 +8,7 @@ import { Avatar } from "@/components/avatar";
 import { Empty } from "@/components/empty";
 import { PageHeader } from "@/components/page-header";
 import { PageSkeleton } from "@/components/skeleton";
+import { Glyph } from "@/components/glyph";
 
 export const metadata = { title: "Find students" };
 
@@ -62,7 +63,7 @@ async function People({ searchParams }: { searchParams: PageProps<"/people">["se
         ))}
       </div>
       <div className="flex gap-1.5 overflow-x-auto pb-1">
-        {picked && <Link href={link({ interest: null })} className="chip shrink-0 gap-1.5 bg-brand-700 text-white"><InterestIcon slug={picked.slug} className="size-4 shrink-0" />{picked.name} ✕</Link>}
+        {picked && <Link href={link({ interest: null })} className="chip shrink-0 gap-1.5 bg-brand-700 text-white"><InterestIcon slug={picked.slug} className="size-4 shrink-0" />{picked.name} <Glyph e="✕" /></Link>}
         {interests?.filter((i) => i.slug !== interest).map((i) => (
           <Link key={i.id} href={link({ interest: i.slug })} className="chip shrink-0 gap-1.5"><InterestIcon slug={i.slug} className="size-4 shrink-0" />{i.name}</Link>
         ))}

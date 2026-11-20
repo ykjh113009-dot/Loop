@@ -9,6 +9,7 @@ import { PageHeader } from "@/components/page-header";
 import { PageSkeleton } from "@/components/skeleton";
 import { ApplyForm } from "./apply-form";
 import { WithdrawButton } from "./withdraw-button";
+import { Glyph } from "@/components/glyph";
 
 export const metadata = { title: "Become a tutor" };
 
@@ -35,7 +36,7 @@ async function Apply() {
     return (
       <div className="mx-auto max-w-2xl space-y-4">
         <div className="card space-y-2 p-5">
-          <span className="chip bg-amber-50 text-amber-800">⏳ {t("Pending review")}</span>
+          <span className="chip bg-amber-50 text-amber-800"><Glyph e="⏳" /> {t("Pending review")}</span>
           <h2 className="text-lg font-bold">{t("Your application is with the reviewers")}</h2>
           <p className="text-sm text-black/65">{t("Submitted {d}. We will notify you when an admin or the Student Council decides.", { d: formatDateTime(app.submitted_at ?? app.updated_at) })}</p>
           <p className="text-sm text-black/65">{t("Subjects")}: <strong>{[...app.subjects, ...(app.other_subjects ? app.other_subjects.split(/[,\n;]/).map((x: string) => x.trim()).filter(Boolean) : [])].join(", ")}</strong></p>

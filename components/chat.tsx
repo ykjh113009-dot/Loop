@@ -9,6 +9,7 @@ import { ReportButton } from "@/components/report-button";
 import { formatDate, formatTime, localDayKey } from "@/lib/time";
 import type { ChatMessage, ChatPerson, ChatReaction } from "@/lib/chat";
 import { makeT, type Locale } from "@/lib/i18n";
+import { Mic, Paperclip, SmilePlus, Square } from "lucide-react";
 
 const FIELDS = "id, sender_id, body, status, created_at, attachment_path, attachment_kind, attachment_name";
 const EMOJI = ["👍", "❤️", "😂", "😮", "😢", "👏"];
@@ -30,7 +31,7 @@ function Attachment({ message, label }: { message: ChatMessage; label: string })
   }
   if (message.attachment_kind === "audio") return <audio controls src={url} className="max-w-full" aria-label={label} />;
   if (message.attachment_kind === "video") return <video controls src={url} className="max-h-64 rounded-xl" aria-label={label} />;
-  return <a href={url} target="_blank" rel="noreferrer" className="underline">📎 {message.attachment_name ?? label}</a>;
+  return <a href={url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 underline"><Paperclip className="size-4" aria-hidden="true" /> {message.attachment_name ?? label}</a>;
 }
 
 export function Chat({
@@ -259,7 +260,7 @@ export function Chat({
                         ))}
                         {canSend && m.status === "visible" && (
                           <details className="relative">
-                            <summary className="cursor-pointer list-none rounded-full px-1 text-xs text-black/40 opacity-60 group-hover:opacity-100 [&::-webkit-details-marker]:hidden" aria-label={t("React")}>☺</summary>
+                            <summary className="cursor-pointer list-none rounded-full px-1 text-xs text-black/40 opacity-60 group-hover:opacity-100 [&::-webkit-details-marker]:hidden" aria-label={t("React")}><SmilePlus className="size-4" aria-hidden="true" /></summary>
                             <span className="absolute bottom-6 z-10 flex gap-0.5 rounded-full border border-black/10 bg-white p-1 shadow-lg">
                               {EMOJI.map((e) => (
                                 <button key={e} type="button" onClick={(ev) => { react(m.id, e); (ev.currentTarget.closest("details") as HTMLDetailsElement).open = false; }} className="rounded-full px-1 text-lg hover:bg-black/5">{e}</button>
@@ -294,8 +295,8 @@ export function Chat({
           <form onSubmit={send} className="flex gap-2">
             <input ref={fileInput} type="file" hidden accept="image/*,video/mp4,video/webm,audio/*,application/pdf,.docx,.pptx,.xlsx,.txt"
               onChange={(e) => { const f = e.target.files?.[0]; if (f) sendFile(f, f.name); e.target.value = ""; }} />
-            <button type="button" onClick={() => fileInput.current?.click()} disabled={sending} className="btn-secondary px-3" aria-label={t("Send a photo or file")}>📎</button>
-            <button type="button" onClick={toggleRecording} disabled={sending} className={`px-3 ${recording ? "btn-danger" : "btn-secondary"}`} aria-label={recording ? t("Stop and send the voice message") : t("Record a voice message")}>{recording ? "⏹" : "🎤"}</button>
+            <button type="button" onClick={() => fileInput.current?.click()} disabled={sending} className="btn-secondary px-3" aria-label={t("Send a photo or file")}><Paperclip className="size-5" aria-hidden="true" /></button>
+            <button type="button" onClick={toggleRecording} disabled={sending} className={`px-3 ${recording ? "btn-danger" : "btn-secondary"}`} aria-label={recording ? t("Stop and send the voice message") : t("Record a voice message")}>{recording ? <Square className="size-5" aria-hidden="true" /> : <Mic className="size-5" aria-hidden="true" />}</button>
             <input
               value={text}
               onChange={(e) => setText(e.target.value)}

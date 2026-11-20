@@ -7,10 +7,10 @@ import { houseColor } from "@/lib/house";
 import { Avatar } from "@/components/avatar";
 import { PageHeader } from "@/components/page-header";
 import { PageSkeleton } from "@/components/skeleton";
+import { Glyph, Place } from "@/components/glyph";
 
 export const metadata = { title: "Leaderboards" };
 
-const MEDALS = ["🥇", "🥈", "🥉"];
 
 async function Leaderboard({ searchParams }: { searchParams: PageProps<"/leaderboard">["searchParams"] }) {
   const me = await requireMe();
@@ -33,12 +33,12 @@ async function Leaderboard({ searchParams }: { searchParams: PageProps<"/leaderb
     <div className="mx-auto max-w-2xl space-y-4">
       <div className="flex gap-1 rounded-xl bg-black/5 p-1" role="tablist">
         {tabs.map(([id, label]) => (
-          <Link key={id} role="tab" aria-selected={view === id} href={link({ view: id })} className={`flex-1 rounded-lg py-1.5 text-center text-sm font-medium ${view === id ? "bg-white shadow-sm" : "text-black/55"}`}>{label}</Link>
+          <Link key={id} role="tab" aria-selected={view === id} href={link({ view: id })} className={`flex-1 rounded-lg py-1.5 text-center text-sm font-medium ${view === id ? "bg-brand-700 text-white shadow-sm" : "text-black/55 hover:bg-sage-soft/60"}`}>{label}</Link>
         ))}
       </div>
       <div className="flex gap-1 rounded-xl bg-black/5 p-1">
         {[["week", t("This week")], ["all", t("All time")]].map(([id, label]) => (
-          <Link key={id} href={link({ period: id })} className={`flex-1 rounded-lg py-1.5 text-center text-sm font-medium ${period === id ? "bg-white shadow-sm" : "text-black/55"}`}>{label}</Link>
+          <Link key={id} href={link({ period: id })} className={`flex-1 rounded-lg py-1.5 text-center text-sm font-medium ${period === id ? "bg-brand-700 text-white shadow-sm" : "text-black/55 hover:bg-sage-soft/60"}`}>{label}</Link>
         ))}
       </div>
 
@@ -52,7 +52,7 @@ async function Leaderboard({ searchParams }: { searchParams: PageProps<"/leaderb
               return (houses ?? []).map((h, i) => (
                 <li key={h.house_id} data-house={h.name} className={`card p-4 ${h.house_id === myHouse ? "ring-2 ring-brand-600" : ""}`}>
                   <div className="flex items-baseline justify-between gap-2">
-                    <p className="font-bold"><span className="me-1">{MEDALS[i] ?? `${i + 1}.`}</span> {h.emoji} {h.name}
+                    <p className="font-bold"><Place n={i + 1} className="me-1.5 align-middle" /> <Glyph e={h.emoji} /> {h.name}
                       {h.house_id === myHouse && <span className="chip ms-2 bg-brand-50 text-brand-800">{t("Your house")}</span>}
                     </p>
                     <p className="text-sm tabular-nums"><strong>{h.points}</strong> <span className="text-black/50">{t("points")}</span></p>
@@ -78,7 +78,7 @@ async function Leaderboard({ searchParams }: { searchParams: PageProps<"/leaderb
             return rows.map((r, i) => (
               <li key={r.grade} className={`card p-4 ${r.grade === me.grade ? "ring-2 ring-brand-600" : ""}`}>
                 <div className="flex items-baseline justify-between">
-                  <p className="font-bold"><span className="me-1">{MEDALS[i] ?? `${i + 1}.`}</span> {t("Grade {n}", { n: r.grade })}
+                  <p className="font-bold"><Place n={i + 1} className="me-1.5 align-middle" /> {t("Grade {n}", { n: r.grade })}
                     {r.grade === me.grade && <span className="chip ms-2 bg-brand-50 text-brand-800">{t("Your grade")}</span>}</p>
                   <p className="text-sm tabular-nums"><strong>{Number(r.avg_points)}</strong> <span className="text-black/50">{t("points per student")}</span></p>
                 </div>
@@ -105,7 +105,7 @@ async function Leaderboard({ searchParams }: { searchParams: PageProps<"/leaderb
               {(students ?? []).map((s, i) => (
                 <li key={s.profile_id}>
                   <Link href={`/profile/${s.profile_id}`} className={`flex items-center gap-3 px-4 py-2.5 hover:bg-black/[0.02] ${s.profile_id === me.id ? "bg-brand-50/60" : ""}`}>
-                    <span className="w-7 text-center text-sm font-semibold">{MEDALS[i] ?? i + 1}</span>
+                    <Place n={i + 1} />
                     <Avatar avatar={s.avatar} size="sm" />
                     <span className="min-w-0 flex-1">
                       <span className="block truncate text-sm font-medium">{s.full_name}</span>
@@ -124,7 +124,7 @@ async function Leaderboard({ searchParams }: { searchParams: PageProps<"/leaderb
         {view === "grades" ? t("Grades are ranked by average points per student, so small and big grades compete fairly.") : view === "houses" ? t("A house's score is all the points of its students plus competition points.") : ""}
         {period === "week" && ` ${t("The week starts on Sunday.")}`}
       </p>
-      {me.isStudent && <Link href="/competitions" className="btn-primary w-full">🏁 {t("Help your house: join a competition")}</Link>}
+      {me.isStudent && <Link href="/competitions" className="btn-primary w-full"><Glyph e="🏁" /> {t("Help your house: join a competition")}</Link>}
     </div>
   );
 }

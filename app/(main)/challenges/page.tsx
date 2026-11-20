@@ -9,6 +9,7 @@ import { Empty } from "@/components/empty";
 import { PageHeader } from "@/components/page-header";
 import { PageSkeleton } from "@/components/skeleton";
 import { ChallengeCard } from "./challenge-card";
+import { Glyph } from "@/components/glyph";
 
 export const metadata = { title: "Challenges" };
 
@@ -78,7 +79,7 @@ async function Challenges({ searchParams }: { searchParams: PageProps<"/challeng
   return (
     <div className="mx-auto max-w-2xl space-y-4">
       <div className="card flex items-center gap-3 p-4">
-        <span className="text-2xl">🏆</span>
+        <span className="text-2xl"><Glyph e="🏆" /></span>
         <p className="flex-1 text-sm text-black/65">
           {t("You earned")} <strong className="text-brand-800">{earned}</strong> {t("points from challenges.")}{" "}
           <Link href="/points" className="underline">{t("See all my points")}</Link>
@@ -87,22 +88,22 @@ async function Challenges({ searchParams }: { searchParams: PageProps<"/challeng
 
       <div className="flex gap-1 overflow-x-auto rounded-xl bg-black/5 p-1" role="tablist">
         {tabs.map(([id, label]) => (
-          <Link key={id} role="tab" aria-selected={tab === id} href={id === "discover" ? "/challenges" : `/challenges?tab=${id}`} className={`flex-1 rounded-lg px-3 py-1.5 text-center text-sm font-medium whitespace-nowrap ${tab === id ? "bg-white shadow-sm" : "text-black/55"}`}>{label}</Link>
+          <Link key={id} role="tab" aria-selected={tab === id} href={id === "discover" ? "/challenges" : `/challenges?tab=${id}`} className={`flex-1 rounded-lg px-3 py-1.5 text-center text-sm font-medium whitespace-nowrap ${tab === id ? "bg-brand-700 text-white shadow-sm" : "text-black/55 hover:bg-sage-soft/60"}`}>{label}</Link>
         ))}
       </div>
 
       {tab === "discover" && (
         <div className="space-y-2">
           <div className="flex gap-1.5 overflow-x-auto pb-1">
-            <Link href={link({ ...(kind ? { kind: String(kind) } : {}) })} className={`chip whitespace-nowrap ${!category ? "bg-brand-700 text-white" : "bg-black/5"}`}>{t("All")}</Link>
+            <Link href={link({ ...(kind ? { kind: String(kind) } : {}) })} className={`chip whitespace-nowrap ${!category ? "bg-brand-700 text-white" : ""}`}>{t("All")}</Link>
             {CATEGORIES.map((c) => (
-              <Link key={c.id} href={link({ category: c.id, ...(kind ? { kind: String(kind) } : {}) })} className={`chip whitespace-nowrap ${category === c.id ? "bg-brand-700 text-white" : "bg-black/5"}`}>{c.emoji} {t(c.label)}</Link>
+              <Link key={c.id} href={link({ category: c.id, ...(kind ? { kind: String(kind) } : {}) })} className={`chip whitespace-nowrap ${category === c.id ? "bg-brand-700 text-white" : ""}`}><Glyph e={c.emoji} /> {t(c.label)}</Link>
             ))}
           </div>
           <div className="flex gap-1.5 overflow-x-auto pb-1">
-            <Link href={link({ ...(category ? { category: String(category) } : {}) })} className={`chip whitespace-nowrap ${!kind ? "bg-brand-700 text-white" : "bg-black/5"}`}>{t("All types")}</Link>
+            <Link href={link({ ...(category ? { category: String(category) } : {}) })} className={`chip whitespace-nowrap ${!kind ? "bg-brand-700 text-white" : ""}`}>{t("All types")}</Link>
             {KINDS.map((k) => (
-              <Link key={k.id} href={link({ kind: k.id, ...(category ? { category: String(category) } : {}) })} className={`chip whitespace-nowrap ${kind === k.id ? "bg-brand-700 text-white" : "bg-black/5"}`}>{t(k.label)}</Link>
+              <Link key={k.id} href={link({ kind: k.id, ...(category ? { category: String(category) } : {}) })} className={`chip whitespace-nowrap ${kind === k.id ? "bg-brand-700 text-white" : ""}`}>{t(k.label)}</Link>
             ))}
           </div>
         </div>

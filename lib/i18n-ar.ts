@@ -1145,4 +1145,8 @@ export const AR: Record<string, string> = {
   "Your name comes from your school account. Only your school admin can change your grade ({n}).": "اسمك مأخوذ من حساب مدرستك. وحده مدير المدرسة يستطيع تغيير صفك ({n}).",
   "resource": "مصدر",
   "resources": "مصادر",
+  "You're going · Cancel": "ستحضر · إلغاء",
+  "Today counts": "اليوم يُحتسب",
+  "place": "المركز",
+  "Tap the star on an earned badge to show it on your profile ({n}/6).": "اضغط على النجمة في شارة حصلت عليها لعرضها في ملفك الشخصي ({n}/6).",
 };

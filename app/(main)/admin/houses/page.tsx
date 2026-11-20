@@ -10,6 +10,8 @@ import { PageHeader } from "@/components/page-header";
 import { SubmitButton } from "@/components/submit-button";
 import { PageSkeleton } from "@/components/skeleton";
 import { formatDate } from "@/lib/time";
+import { Glyph } from "@/components/glyph";
+import { IconPicker } from "@/components/icon-picker";
 
 export const metadata = { title: "Houses" };
 
@@ -44,13 +46,13 @@ async function Houses() {
             <ul className="space-y-2">
               {(houses ?? []).map((h) => (
                 <li key={h.id} className="rounded-xl border border-black/10 p-3" data-house={h.name}>
-                  <div className="flex flex-wrap items-center gap-2"><span className="size-3 rounded-full" style={{ background: ACCENTS[h.color]?.ring }} /><strong>{h.emoji} {h.name}</strong>{h.motto && <span className="text-xs text-black/50">{h.motto}</span>}
+                  <div className="flex flex-wrap items-center gap-2"><span className="size-3 rounded-full" style={{ background: ACCENTS[h.color]?.ring }} /><strong><Glyph e={h.emoji} /> {h.name}</strong>{h.motto && <span className="text-xs text-black/50">{h.motto}</span>}
                     <ActionForm action={deleteHouse} className="ms-auto"><input type="hidden" name="houseId" value={h.id} /><SubmitButton className="btn-ghost px-2 py-0.5 text-xs text-red-700" pendingText="…">Delete</SubmitButton></ActionForm></div>
                   <div className="mt-2 flex flex-wrap gap-1.5">
                     {(classes ?? []).filter((c) => c.house_id === h.id).map((c) => (
                       <ActionForm key={`${c.grade}${c.section}`} action={removeHouseClass}>
                         <input type="hidden" name="grade" value={c.grade} /><input type="hidden" name="section" value={c.section} />
-                        <button className="chip hover:bg-red-50" title="Remove this class from the house" aria-label={`Remove ${c.grade}${c.section}`}>{c.grade}{c.section} ✕</button>
+                        <button className="chip hover:bg-red-50" title="Remove this class from the house" aria-label={`Remove ${c.grade}${c.section}`}>{c.grade}{c.section} <Glyph e="✕" /></button>
                       </ActionForm>
                     ))}
                     <ActionForm action={addHouseClass} className="flex gap-1">
@@ -63,7 +65,7 @@ async function Houses() {
               ))}
             </ul>
             <ActionForm action={addHouse} className="flex flex-wrap gap-2 border-t border-black/5 pt-3">
-              <input name="emoji" defaultValue="🏠" maxLength={4} aria-label="Icon" className="input w-16 text-center" />
+              <div className="w-full"><IconPicker defaultValue="🏠" /></div>
               <input name="name" required minLength={2} maxLength={40} placeholder="New house name" aria-label="House name" className="input min-w-40 flex-1" />
               <select name="color" className="input w-auto" aria-label="Colour">{Object.entries(ACCENTS).map(([k, a]) => <option key={k} value={k}>{a.name}</option>)}</select>
               <SubmitButton className="btn-primary" pendingText="…">Add house</SubmitButton>
@@ -87,7 +89,7 @@ async function Houses() {
         </ActionForm>
         <ul className="divide-y divide-black/5 text-sm">
           {(comps ?? []).map((c) => (
-            <li key={c.id} className="flex items-center justify-between gap-2 py-2"><Link href={`/competitions/${c.id}`} className="font-medium hover:underline">🏁 {c.name}</Link><span className="text-xs text-black/50">{c.kind === "house" ? "Houses" : "Teams"} · until {formatDate(c.ends_at)}</span></li>
+            <li key={c.id} className="flex items-center justify-between gap-2 py-2"><Link href={`/competitions/${c.id}`} className="font-medium hover:underline"><Glyph e="🏁" /> {c.name}</Link><span className="text-xs text-black/50">{c.kind === "house" ? "Houses" : "Teams"} · until {formatDate(c.ends_at)}</span></li>
           ))}
         </ul>
         <p className="text-xs text-black/50">Open a competition to give points to a team or a house.</p>

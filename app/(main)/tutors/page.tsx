@@ -18,6 +18,7 @@ import { BooksScene } from "@/components/art/scenes";
 import { PageSkeleton } from "@/components/skeleton";
 import { SubmitButton } from "@/components/submit-button";
 import { StudyBuddyForm, ReviewForm } from "./forms";
+import { Glyph } from "@/components/glyph";
 
 export const metadata = { title: "Tutors Directory" };
 
@@ -122,7 +123,7 @@ async function Find({ subject, format, q, meId }: { subject: string; format: str
         </div>
       )}
       <section className="flex flex-wrap items-center gap-4 rounded-3xl bg-[#e9ead6] p-5" data-tutor-band>
-        <Lightbulb className="size-10 shrink-0 text-amber-500" strokeWidth={1.5} aria-hidden="true" />
+        <Lightbulb className="size-10 shrink-0 text-brand-700" strokeWidth={1.5} aria-hidden="true" />
         <div className="min-w-0 flex-1">{bandText}</div>
         <Link href={bandAction.href} className="btn-primary rounded-full px-6 py-2.5">{bandAction.label} →</Link>
       </section>
@@ -161,7 +162,7 @@ async function Buddies({ meId, canAct }: { meId: string; canAct: boolean }) {
           ) : canAct && (
             <form action={startChat}>
               <input type="hidden" name="profileId" value={p.author.id} />
-              <SubmitButton className="btn-secondary px-3 py-1.5 text-xs" pendingText="Opening…">💬 Message</SubmitButton>
+              <SubmitButton className="btn-secondary px-3 py-1.5 text-xs" pendingText="Opening…"><Glyph e="💬" /> Message</SubmitButton>
             </form>
           )}
         </article>
@@ -171,10 +172,10 @@ async function Buddies({ meId, canAct }: { meId: string; canAct: boolean }) {
 }
 
 const STATUS: Record<string, string> = {
-  pending: "⏳ Waiting for an answer",
-  accepted: "✅ Accepted — plan a time in your chat",
+  pending: "Waiting for an answer",
+  accepted: "Accepted — plan a time in your chat",
   declined: "Declined",
-  completed: "🎉 Done",
+  completed: "Done",
   cancelled: "Cancelled",
 };
 
@@ -222,7 +223,7 @@ async function Requests({ meId }: { meId: string }) {
             <p><strong>{r.subject}</strong> <span className="text-black/45">with {r.tutor?.full_name} · {timeAgo(r.created_at)}</span></p>
             <p className="text-xs text-black/55">{STATUS[r.status]}</p>
             {r.status === "completed" && !done.has(r.id) && <ReviewForm requestId={r.id} />}
-            {r.status === "completed" && done.has(r.id) && <p className="text-xs font-medium text-brand-700">✓ You reviewed this session</p>}
+            {r.status === "completed" && done.has(r.id) && <p className="text-xs font-medium text-brand-700"><Glyph e="✓" /> You reviewed this session</p>}
             {(r.status === "accepted" || r.status === "pending") && (
               <div className="flex gap-2">
                 {r.status === "accepted" && (

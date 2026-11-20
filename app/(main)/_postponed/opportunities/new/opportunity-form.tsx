@@ -18,7 +18,7 @@ export function OpportunityForm({ draft, locale }: { draft: OppDraft; locale: Lo
     <form onSubmit={(e) => { e.preventDefault(); const fd = new FormData(e.currentTarget); start(() => action(fd)); }} className="card space-y-4 p-4">
       {draft.id && <input type="hidden" name="id" value={draft.id} />}
       <label className="block"><span className="label">{t("Category")}</span>
-        <select name="category" defaultValue={draft.category} className="input">{OPP_CATEGORIES.map((c) => <option key={c.id} value={c.id}>{c.emoji} {t(c.label)}</option>)}</select>
+        <select name="category" defaultValue={draft.category} className="input">{OPP_CATEGORIES.map((c) => <option key={c.id} value={c.id}>{t(c.label)}</option>)}</select>
       </label>
       <label className="block"><span className="label">{t("Title")}</span><input name="title" required minLength={3} maxLength={120} defaultValue={draft.title} className="input" /></label>
       <label className="block"><span className="label">{t("Organization or university")}</span><input name="organization" maxLength={120} defaultValue={draft.organization} className="input" /></label>

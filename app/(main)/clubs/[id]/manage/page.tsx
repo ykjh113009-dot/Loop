@@ -14,6 +14,7 @@ import { SubmitButton } from "@/components/submit-button";
 import { signClubImages } from "@/lib/images";
 import { ClubImageField } from "./club-image-field";
 import { PageSkeleton } from "@/components/skeleton";
+import { IconPicker } from "@/components/icon-picker";
 
 export const metadata = { title: "Manage club" };
 
@@ -47,7 +48,7 @@ async function Manage({ params, searchParams }: { params: PageProps<"/clubs/[id]
     <div className="space-y-4">
       <div className="flex gap-1 overflow-x-auto rounded-xl bg-black/5 p-1" role="tablist">
         {TABS.map(([k, label]) => (
-          <Link key={k} role="tab" aria-selected={tab === k} href={`/clubs/${cid}/manage?tab=${k}`} className={`shrink-0 flex-1 rounded-lg px-3 py-1.5 text-center text-sm font-medium whitespace-nowrap ${tab === k ? "bg-white shadow-sm" : "text-black/55"}`}>{label}</Link>
+          <Link key={k} role="tab" aria-selected={tab === k} href={`/clubs/${cid}/manage?tab=${k}`} className={`shrink-0 flex-1 rounded-lg px-3 py-1.5 text-center text-sm font-medium whitespace-nowrap ${tab === k ? "bg-brand-700 text-white shadow-sm" : "text-black/55 hover:bg-sage-soft/60"}`}>{label}</Link>
         ))}
       </div>
 
@@ -68,8 +69,8 @@ async function Manage({ params, searchParams }: { params: PageProps<"/clubs/[id]
             <ActionForm action={updateClubSettings} className="card space-y-3 p-4">
               <input type="hidden" name="clubId" value={cid} />
               <h2 className="font-semibold">Club settings</h2>
-              <div className="grid grid-cols-[5rem_1fr] gap-3">
-                <input name="emoji" defaultValue={club.emoji} maxLength={4} className="input text-center text-xl" aria-label="Icon" />
+              <div className="space-y-3">
+                <IconPicker defaultValue={club.emoji} />
                 <select name="recruiting" defaultValue={club.recruiting} className="input" aria-label="How people join">
                   <option value="open">Open: anyone can join</option>
                   <option value="application">By application: you accept members</option>

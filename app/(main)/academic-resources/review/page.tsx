@@ -50,7 +50,7 @@ async function Dashboard({ searchParams }: { searchParams: Promise<{ tab?: strin
       <div className="flex flex-wrap gap-1.5" role="tablist">
         {TABS.map((k) => (
           <Link key={k} href={`/academic-resources/review?tab=${k}`} role="tab" aria-selected={tab === k}
-            className={`rounded-full px-3 py-1 text-xs font-medium ${tab === k ? "bg-brand-700 text-white" : "bg-black/5 text-black/60"}`}>
+            className={`rounded-full px-3 py-1 text-xs font-medium ${tab === k ? "bg-brand-700 text-white" : "border border-black/10 bg-white text-black/65 hover:bg-sage-soft/50"}`}>
             {k === "pending" ? t("Pending") : k === "approved" ? t("Approved") : k === "rejected" ? t("Rejected") : t("Flagged")} ({num[k]})
           </Link>
         ))}

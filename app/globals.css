@@ -74,8 +74,39 @@ body {
     @apply btn text-black/70 hover:bg-black/5;
 }
 
+input[type="checkbox"], input[type="radio"] { accent-color: var(--color-brand-700); }
+
+/* One interaction language for everything that can be chosen: chips, filters, tabs, options.
+   Default: white with a thin grey border. Hover: soft green. Selected: solid forest green with white text and icons.
+   Disabled: muted grey. Put aria-pressed / aria-selected / aria-checked / aria-current on the element, or add chip-on. */
 @utility chip {
-    @apply inline-flex items-center gap-1 rounded-full bg-black/5 px-2.5 py-1 text-xs font-medium text-black/70;
+    @apply inline-flex items-center gap-1 rounded-full border border-black/10 bg-white px-2.5 py-1 text-xs font-medium text-ink-2 transition-colors;
+}
+
+@utility opt {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-full border border-black/10 bg-white px-3.5 py-1.5 text-sm font-medium text-ink-2 transition-colors;
+}
+
+a.chip:hover, button.chip:hover, a.opt:hover, button.opt:hover, label.opt:hover {
+  background-color: color-mix(in srgb, var(--color-sage-soft) 55%, white);
+  border-color: color-mix(in srgb, var(--color-brand-700) 30%, transparent);
+}
+.chip-on, .opt-on,
+.chip[aria-pressed="true"], .chip[aria-selected="true"], .chip[aria-checked="true"], .chip[aria-current="page"],
+.opt[aria-pressed="true"], .opt[aria-selected="true"], .opt[aria-checked="true"], .opt[aria-current="page"],
+.chip.bg-brand-700, .opt.bg-brand-700 {
+  background-color: var(--color-brand-700) !important;
+  border-color: var(--color-brand-700) !important;
+  color: #fff !important;
+}
+a.chip-on:hover, button.chip-on:hover, a.opt-on:hover, button.opt-on:hover,
+a.chip.bg-brand-700:hover, button.chip.bg-brand-700:hover { background-color: var(--color-brand-800) !important; }
+.chip-on svg, .opt-on svg, .chip.bg-brand-700 svg, [aria-pressed="true"].opt svg, [aria-selected="true"].opt svg { color: #fff; }
+button.chip:disabled, button.opt:disabled, .chip[aria-disabled="true"], .opt[aria-disabled="true"] {
+  background-color: color-mix(in srgb, black 4%, white) !important;
+  border-color: color-mix(in srgb, black 6%, white) !important;
+  color: color-mix(in srgb, black 35%, white) !important;
+  cursor: not-allowed;
 }
 
 @utility page-title {

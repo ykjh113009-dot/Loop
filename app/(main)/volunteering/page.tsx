@@ -12,10 +12,11 @@ import { SubmitButton } from "@/components/submit-button";
 import { LogHoursForm } from "./log-form";
 import { ApplyForm, WithdrawButton } from "./volunteer-forms";
 import { Empty } from "@/components/empty";
+import { Glyph } from "@/components/glyph";
 
 export const metadata = { title: "Volunteering" };
 
-const STATUS: Record<string, string> = { pending: "⏳ Waiting", approved: "✅ Approved", rejected: "✕ Not approved" };
+const STATUS: Record<string, string> = { pending: "Waiting", approved: "Approved", rejected: "Not approved" };
 
 async function Hours() {
   const me = await requireMe();
@@ -43,7 +44,7 @@ async function Hours() {
         </div>
       </div>
       {approved > 0 && (
-        <Link href="/volunteering/certificate" className="btn-secondary w-full">📄 Get my certificate</Link>
+        <Link href="/volunteering/certificate" className="btn-secondary w-full"><Glyph e="📄" /> Get my certificate</Link>
       )}
 
       {!me.isSuspended && <LogHoursForm today={localDayKey(new Date())} />}
@@ -118,7 +119,7 @@ async function Hub({ searchParams }: { searchParams: PageProps<"/volunteering">[
             <article key={o.id} className="card space-y-2 p-4 text-sm">
               <h2 className="font-bold">{o.title}</h2>
               <p className="text-xs text-black/50">
-                {o.event ? <Link href={`/events/${o.event.id}`} className="text-brand-700 underline">📅 {o.event.title}</Link> : "💚 " + t("School volunteering")}
+                {o.event ? <Link href={`/events/${o.event.id}`} className="text-brand-700 underline"><Glyph e="📅" /> {o.event.title}</Link> : <><Glyph e="💚" /> {t("School volunteering")}</>}
                 {o.starts_at && ` · ${formatDateTime(o.starts_at)}`}{o.location && ` · ${o.location}`}{o.spots && ` · ${t("{n} spots", { n: o.spots })}`}
               </p>
               {o.description && <p className="whitespace-pre-wrap text-black/75">{o.description}</p>}
@@ -151,7 +152,7 @@ async function Hub({ searchParams }: { searchParams: PageProps<"/volunteering">[
               <span className={`chip shrink-0 ${APP_STATUS[a.status].cls}`}>{t(APP_STATUS[a.status].label)}</span>
             </div>
             <p className="text-xs text-black/50">
-              {a.opportunity?.event && <Link href={`/events/${a.opportunity.event.id}`} className="underline">📅 {a.opportunity.event.title}</Link>}
+              {a.opportunity?.event && <Link href={`/events/${a.opportunity.event.id}`} className="underline"><Glyph e="📅" /> {a.opportunity.event.title}</Link>}
               {a.opportunity?.starts_at && ` · ${formatDateTime(a.opportunity.starts_at)}`}{a.opportunity?.location && ` · ${a.opportunity.location}`}
             </p>
             {a.responsibility && <p className="rounded-xl bg-brand-50 p-3 text-brand-900"><strong>{t("Your role")}:</strong> {a.responsibility}</p>}
@@ -180,7 +181,7 @@ async function Hub({ searchParams }: { searchParams: PageProps<"/volunteering">[
                 <li key={o.id}>
                   <Link href={`/volunteering/manage/${o.id}`} className="card flex items-center gap-3 p-4 text-sm hover:bg-black/[0.02]">
                     <div className="min-w-0 flex-1"><p className="font-semibold">{o.title}</p>
-                      <p className="text-xs text-black/50">{o.event ? `📅 ${o.event.title} · ` : ""}{t("{n} accepted", { n: list.filter((c) => c.status === "accepted" || c.status === "completed").length })}{o.spots ? ` / ${o.spots}` : ""}</p></div>
+                      <p className="text-xs text-black/50">{o.event ? `${o.event.title} · ` : ""}{t("{n} accepted", { n: list.filter((c) => c.status === "accepted" || c.status === "completed").length })}{o.spots ? ` / ${o.spots}` : ""}</p></div>
                     {waiting > 0 && <span className="chip bg-amber-50 text-amber-800">{t("{n} waiting", { n: waiting })}</span>}
                     {o.status !== "open" && <span className="chip bg-black/5 text-black/55">{o.status === "closed" ? t("Closed") : t("Cancelled")}</span>}
                   </Link>
@@ -199,7 +200,7 @@ async function Hub({ searchParams }: { searchParams: PageProps<"/volunteering">[
     <div className="mx-auto max-w-2xl space-y-4">
       <div className="flex gap-1 overflow-x-auto rounded-xl bg-black/5 p-1" role="tablist">
         {tabs.map(([id, label]) => (
-          <Link key={id} role="tab" aria-selected={tab === id} href={id === "browse" ? "/volunteering" : `/volunteering?tab=${id}`} className={`flex-1 rounded-lg px-3 py-1.5 text-center text-sm font-medium whitespace-nowrap ${tab === id ? "bg-white shadow-sm" : "text-black/55"}`}>{label}</Link>
+          <Link key={id} role="tab" aria-selected={tab === id} href={id === "browse" ? "/volunteering" : `/volunteering?tab=${id}`} className={`flex-1 rounded-lg px-3 py-1.5 text-center text-sm font-medium whitespace-nowrap ${tab === id ? "bg-brand-700 text-white shadow-sm" : "text-black/55 hover:bg-sage-soft/60"}`}>{label}</Link>
         ))}
       </div>
       {body}

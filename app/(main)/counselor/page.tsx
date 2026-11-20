@@ -10,6 +10,7 @@ import { PageHeader } from "@/components/page-header";
 import { PageSkeleton } from "@/components/skeleton";
 import { CounselorRequestForm } from "./forms";
 import { COUNSELOR_TOPICS as TOPICS } from "@/lib/labels";
+import { Glyph } from "@/components/glyph";
 
 export const metadata = { title: "Talk to the counselor" };
 
@@ -65,7 +66,7 @@ async function Counselor() {
     <div className="space-y-4">
       <PageHeader title="Talk to the counselor" back="/more" />
       <div className="card space-y-1 p-4 text-sm">
-        <p className="text-base font-semibold">🫶 You don&apos;t have to handle it alone</p>
+        <p className="text-base font-semibold"><Glyph e="🫶" /> You don&apos;t have to handle it alone</p>
         <p className="text-black/65">
           Send a private message to the school counselor. <strong>Only you and the counselor</strong> can read it — not
           your classmates, not the student moderators, not the school admins.

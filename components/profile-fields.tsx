@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { NEW_AVATARS, avatarSrc } from "@/lib/avatars";
+import { Check } from "lucide-react";
+import { Glyph } from "@/components/glyph";
 
 type Interest = { id: number; name: string; emoji: string };
 
@@ -60,11 +62,10 @@ export function ProfileFields({
                 key={i.id}
                 onClick={() => toggle(i.id)}
                 aria-pressed={on}
-                className={`rounded-full border px-3 py-1.5 text-sm transition ${
-                  on ? "border-brand-600 bg-brand-50 font-semibold text-brand-800" : "border-black/10 bg-white text-black/70"
-                }`}
+                className={`opt ${on ? "opt-on font-semibold" : ""}`}
               >
-                {i.emoji} {i.name}
+                {on ? <Check className="size-4" strokeWidth={2.2} aria-hidden="true" /> : null}
+                <Glyph e={i.emoji} /> {i.name}
               </button>
             );
           })}

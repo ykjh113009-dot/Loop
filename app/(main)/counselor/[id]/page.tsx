@@ -10,6 +10,7 @@ import { PageSkeleton } from "@/components/skeleton";
 import { SubmitButton } from "@/components/submit-button";
 import { ReplyForm } from "../forms";
 import { COUNSELOR_TOPICS as TOPICS } from "@/lib/labels";
+import { Glyph } from "@/components/glyph";
 
 async function Thread({ params }: { params: PageProps<"/counselor/[id]">["params"] }) {
   const { id } = await params;
@@ -28,7 +29,7 @@ async function Thread({ params }: { params: PageProps<"/counselor/[id]">["params
     <div className="space-y-4">
       <PageHeader title={isCounselor ? (r.student?.full_name ?? "Student") : "Private conversation"} back="/counselor" />
       <p className="text-xs text-black/50">
-        🔒 {TOPICS[r.topic]}{r.urgent && " · urgent"}{isCounselor && r.student ? ` · grade ${r.student.grade}` : ""} · only the student and the counselor can see this
+        <Glyph e="🔒" /> {TOPICS[r.topic]}{r.urgent && " · urgent"}{isCounselor && r.student ? ` · grade ${r.student.grade}` : ""} · only the student and the counselor can see this
       </p>
       {!isCounselor && <HelpNow />}
       <div className="space-y-2">

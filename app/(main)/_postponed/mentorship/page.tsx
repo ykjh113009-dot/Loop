@@ -8,6 +8,7 @@ import { PageBanner } from "@/components/ui/page-banner";
 import { SectionTabs } from "@/components/ui/section-tabs";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PageSkeleton } from "@/components/skeleton";
+import { Glyph } from "@/components/glyph";
 
 export const metadata = { title: "Mentorship" };
 
@@ -31,7 +32,7 @@ async function Mentorship() {
               <Avatar avatar={m.avatar} size="md" />
               <span className="min-w-0"><span className="block truncate font-semibold">{m.full_name}</span>
                 <span className="block text-xs text-ink-2">{t("Class of {y}", { y: m.alumni_year ?? "" })}</span>
-                {(m.major || m.university) && <span className="mt-1 block text-sm">🎓 {[m.major, m.university].filter(Boolean).join(" · ")}</span>}
+                {(m.major || m.university) && <span className="mt-1 block text-sm"><Glyph e="🎓" /> {[m.major, m.university].filter(Boolean).join(" · ")}</span>}
                 {m.bio && <span className="mt-1 line-clamp-2 block text-xs text-ink-2">{m.bio}</span>}</span></Link></li>
           ))}
         </ul>

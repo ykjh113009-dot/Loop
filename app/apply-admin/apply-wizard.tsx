@@ -6,6 +6,7 @@ import { submitAdminApplication } from "@/app/actions/account";
 import { SubmitButton } from "@/components/submit-button";
 import { FormMessage } from "@/components/form-message";
 import { avatarSrc } from "@/lib/avatars";
+import { Glyph } from "@/components/glyph";
 
 const STEPS = ["Profile", "Role", "Done"] as const;
 const font = { fontFamily: "var(--font-body), system-ui, sans-serif" } as const;
@@ -20,7 +21,7 @@ function Stepper({ step }: { step: number }) {
         <li key={s} className="relative flex flex-1 flex-col items-center gap-1" aria-current={step === i ? "step" : undefined}>
           {i > 0 && <span className={`absolute end-1/2 top-3 h-0.5 w-full ${i <= step ? "bg-brand-700" : "bg-black/10"}`} aria-hidden="true" />}
           <span className={`relative z-10 flex size-6 items-center justify-center rounded-full text-xs font-bold ${i < step ? "bg-brand-700 text-white" : i === step ? "bg-white text-brand-800 ring-2 ring-brand-700" : "bg-white text-black/40 ring-1 ring-black/15"}`}>
-            {i < step ? "✓" : i + 1}
+            {i < step ? <Glyph e="✓" strokeWidth={3} /> : i + 1}
           </span>
           <span className={`text-[11px] ${i <= step ? "font-semibold text-brand-900" : "text-black/45"}`}>{s}</span>
         </li>

@@ -9,6 +9,7 @@ import { PageHeader } from "@/components/page-header";
 import { PageSkeleton } from "@/components/skeleton";
 import { EventForm } from "../../new/event-form";
 import { AttachmentUploader, RemoveAttachment } from "../../attachments";
+import { Glyph } from "@/components/glyph";
 
 export const metadata = { title: "Edit event" };
 
@@ -49,7 +50,7 @@ async function Edit({ params }: { params: PageProps<"/events/[id]/edit">["params
         <ul className="divide-y divide-black/5 text-sm">
           {(files ?? []).map((f) => (
             <li key={f.id} className="flex items-center gap-2 py-2">
-              <span>{f.kind === "pdf" ? "📄" : "🖼️"}</span>
+              <span><Glyph e={f.kind === "pdf" ? "📄" : "🖼️"} /></span>
               <a href={signed.get(f.path)} target="_blank" rel="noreferrer" className="min-w-0 flex-1 truncate text-brand-700 underline">{f.name}</a>
               <RemoveAttachment id={f.id} label={t("Remove")} />
             </li>

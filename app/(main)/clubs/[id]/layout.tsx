@@ -13,6 +13,7 @@ import { SubmitButton } from "@/components/submit-button";
 import { Avatar } from "@/components/avatar";
 import { formatDateTime } from "@/lib/time";
 import { ClubTabs } from "./club-tabs";
+import { Glyph } from "@/components/glyph";
 
 async function ClubHeader({ params }: { params: LayoutProps<"/clubs/[id]">["params"] }) {
   const { id } = await params;
@@ -56,7 +57,7 @@ async function ClubHeader({ params }: { params: LayoutProps<"/clubs/[id]">["para
             ))}
           </div>
         )}
-        {nextEvent && <p className="mt-2 rounded-lg bg-sage-soft/50 px-3 py-2 text-sm" data-club-next>📅 <strong>Next:</strong> {nextEvent.title} · {formatDateTime(nextEvent.starts_at)}</p>}
+        {nextEvent && <p className="mt-2 rounded-lg bg-sage-soft/50 px-3 py-2 text-sm" data-club-next><Glyph e="📅" /> <strong>Next:</strong> {nextEvent.title} · {formatDateTime(nextEvent.starts_at)}</p>}
         {closed ? (
           <p className="mt-3 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-800">
             {club.status === "pending" ? "This club is waiting for a moderator's approval." : "This club is closed."}
@@ -65,12 +66,12 @@ async function ClubHeader({ params }: { params: LayoutProps<"/clubs/[id]">["para
           !me.isSuspended && (
             <div className="mt-3 space-y-2">
               {(isLeader || me.isAdmin) && (
-                <Link href={`/clubs/${club.id}/manage`} className="btn-secondary w-full">⚙️ Manage club</Link>
+                <Link href={`/clubs/${club.id}/manage`} className="btn-secondary w-full"><Glyph e="⚙️" /> Manage club</Link>
               )}
               {isMember ? (
                 <form action={leaveClub}>
                   <input type="hidden" name="clubId" value={club.id} />
-                  <SubmitButton className="btn-secondary w-full" pendingText="Leaving…">✓ Joined · Leave club</SubmitButton>
+                  <SubmitButton className="btn-secondary w-full" pendingText="Leaving…"><Glyph e="✓" /> Joined · Leave club</SubmitButton>
                 </form>
               ) : club.recruiting === "open" ? (
                 <form action={joinClub}>

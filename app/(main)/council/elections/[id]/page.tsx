@@ -12,6 +12,7 @@ import { PageSkeleton } from "@/components/skeleton";
 import { StudentPicker } from "@/components/student-picker";
 import { SubmitButton } from "@/components/submit-button";
 import { Ballot } from "./ballot";
+import { Glyph } from "@/components/glyph";
 
 type Summary = { turnout: number; voted: boolean; results: { candidate_id: string; votes: number }[] | null };
 
@@ -57,7 +58,7 @@ async function Election({ params }: { params: PageProps<"/council/elections/[id]
               <Link href={`/profile/${c.profile.id}`} className="flex items-center gap-3">
                 <Avatar avatar={c.profile.avatar} />
                 <div className="flex-1">
-                  <p className="font-semibold">{c.profile.full_name} {winner && "🏆"}</p>
+                  <p className="font-semibold">{c.profile.full_name} {winner && <Glyph e="🏆" />}</p>
                   <p className="text-xs text-black/50">Grade {c.profile.grade}</p>
                 </div>
               </Link>
@@ -87,7 +88,7 @@ async function Election({ params }: { params: PageProps<"/council/elections/[id]
       </section>
 
       {state === "open" && (
-        s.voted ? <p className="rounded-xl bg-brand-50 px-4 py-3 text-sm text-brand-800">✅ You voted. Results appear when voting closes.</p>
+        s.voted ? <p className="rounded-xl bg-brand-50 px-4 py-3 text-sm text-brand-800"><Glyph e="✅" /> You voted. Results appear when voting closes.</p>
         : eligible && !me.isSuspended ? <Ballot electionId={e.id} candidates={list.filter((c) => c.profile).map((c) => ({ id: c.id, name: c.profile!.full_name }))} />
         : <p className="text-sm text-black/50">This election is for {e.eligible_grades ? `grade ${e.eligible_grades.join(", ")}` : "current students"}.</p>
       )}

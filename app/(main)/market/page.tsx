@@ -9,6 +9,7 @@ import { Icon } from "@/components/icons";
 import { PageHeader } from "@/components/page-header";
 import { MarketSafetyNote } from "@/components/safety-note";
 import { PageSkeleton } from "@/components/skeleton";
+import { Glyph } from "@/components/glyph";
 
 export const metadata = { title: "Buy, sell & swap" };
 
@@ -55,7 +56,7 @@ async function Market({ searchParams }: { searchParams: PageProps<"/market">["se
               <Link key={l.id} href={`/market/${l.id}`} className="card overflow-hidden hover:bg-black/[0.02]">
                 <div className="flex aspect-square items-center justify-center bg-black/5 text-4xl">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  {url ? <img src={url} alt="" loading="lazy" className="h-full w-full object-cover" /> : "📦"}
+                  {url ? <img src={url} alt="" loading="lazy" className="h-full w-full object-cover" /> : <Glyph e="📦" />}
                 </div>
                 <div className="p-2.5">
                   <p className="line-clamp-2 text-sm leading-tight font-medium">{l.title}</p>

@@ -10,6 +10,7 @@ import { Empty } from "@/components/empty";
 import { PageSkeleton } from "@/components/skeleton";
 import { SpaceComposer } from "@/components/space-composer";
 import { getLocale } from "@/lib/i18n-server";
+import { Glyph } from "@/components/glyph";
 
 async function Feed({ params }: { params: PageProps<"/clubs/[id]">["params"] }) {
   const { id } = await params;
@@ -51,7 +52,7 @@ async function Feed({ params }: { params: PageProps<"/clubs/[id]">["params"] }) 
 
       {isLeader && !me.isSuspended && (
         <details className="card p-3">
-          <summary className="cursor-pointer text-sm font-semibold text-brand-700">📣 Send an announcement to every member</summary>
+          <summary className="cursor-pointer text-sm font-semibold text-brand-700"><Glyph e="📣" /> Send an announcement to every member</summary>
           <div className="mt-3"><SpaceComposer type="club" spaceId={club.id} canAnnounce locale={locale} /></div>
         </details>
       )}

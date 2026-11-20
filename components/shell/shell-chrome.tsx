@@ -33,7 +33,7 @@ function PointsPill({ points, label }: { points: number | null; label: string })
   if (points === null) return null;
   return (
     <Link href="/points" aria-label={label} className="inline-flex items-center gap-1.5 rounded-full border border-brand-700/10 bg-white/80 px-3 py-1.5 text-sm font-semibold text-brand-900 hover:bg-white" data-points-pill>
-      <NavIcon name="star" className="size-4 fill-amber-400 text-amber-500" strokeWidth={1.8} />
+      <NavIcon name="star" className="size-4 text-brand-700" strokeWidth={1.8} />
       <span className="tabular-nums">{points.toLocaleString("en")}</span>
       <span className="hidden text-xs font-medium text-ink-2 sm:inline">pts</span>
     </Link>
@@ -123,7 +123,7 @@ export function ShellChrome({ user, badges, pathname, locale = "en", search = ""
                 <Link
                   href={cat.href}
                   aria-current={active ? "page" : undefined}
-                  className={`flex min-h-14 flex-col items-center justify-center gap-0.5 text-[10.5px] font-medium ${active ? "text-brand-700" : "text-ink-2"}`}
+                  className={`m-1 flex min-h-12 flex-col items-center justify-center gap-0.5 rounded-2xl text-[10.5px] font-medium transition-colors ${active ? "bg-brand-700 text-white" : "text-ink-2 hover:bg-sage-soft/50"}`}
                 >
                   <NavIcon name={cat.icon} className="size-[22px]" strokeWidth={active ? 2.2 : 1.8} />
                   <span className="truncate">{t(TAB_LABEL[cat.key])}</span>

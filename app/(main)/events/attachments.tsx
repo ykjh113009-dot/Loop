@@ -5,6 +5,7 @@ import { addEventAttachment, removeEventAttachment } from "@/app/actions/events"
 import { createClient } from "@/lib/supabase/client";
 import { compressImage } from "@/lib/compress-image";
 import { makeT, type Locale } from "@/lib/i18n";
+import { Glyph } from "@/components/glyph";
 
 export function AttachmentUploader({ eventId, schoolId, locale }: { eventId: string; schoolId: string; locale: Locale }) {
   const t = makeT(locale);
@@ -35,7 +36,7 @@ export function AttachmentUploader({ eventId, schoolId, locale }: { eventId: str
 
   return (
     <div>
-      <button type="button" disabled={busy} onClick={() => input.current?.click()} className="btn-secondary">{busy ? "…" : `📎 ${t("Add a photo or PDF")}`}</button>
+      <button type="button" disabled={busy} onClick={() => input.current?.click()} className="btn-secondary">{busy ? "…" : `${t("Add a photo or PDF")}`}</button>
       <input ref={input} type="file" accept="image/*,application/pdf" className="hidden" onChange={(e) => pick(e.target.files?.[0])} />
       {error && <p className="mt-1 text-sm text-red-700">{error}</p>}
     </div>
@@ -47,7 +48,7 @@ export function RemoveAttachment({ id, label }: { id: string; label: string }) {
   return (
     <form action={action} className="inline">
       <input type="hidden" name="id" value={id} />
-      <button disabled={pending} className="text-xs text-black/40 hover:text-red-600" aria-label={label}>✕</button>
+      <button disabled={pending} className="text-xs text-black/40 hover:text-red-600" aria-label={label}><Glyph e="✕" /></button>
       {state?.error && <span className="text-xs text-red-700"> {state.error}</span>}
     </form>
   );

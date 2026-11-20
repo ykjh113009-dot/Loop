@@ -10,6 +10,7 @@ import { Avatar } from "@/components/avatar";
 import { Empty } from "@/components/empty";
 import { PageHeader } from "@/components/page-header";
 import { PageSkeleton } from "@/components/skeleton";
+import { Glyph } from "@/components/glyph";
 
 export const metadata = { title: "Chats" };
 
@@ -66,7 +67,7 @@ async function Conversations() {
           <li key={c.id}>
             <Link href={href} className="flex items-center gap-3 px-4 py-3 hover:bg-black/[0.02]">
               {c.kind !== "direct" ? (
-                c.kind === "group" || c.kind === "groupchat" || c.kind === "eventchat" ? <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-brand-50 text-xl">👥</div> : <ClubIcon emoji={c.club?.emoji ?? "⭐"} url={c.club?.image_path ? clubImages.get(c.club.image_path) : null} className="size-10 text-xl" />
+                c.kind === "group" || c.kind === "groupchat" || c.kind === "eventchat" ? <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-brand-50 text-xl"><Glyph e="👥" /></div> : <ClubIcon emoji={c.club?.emoji ?? "⭐"} url={c.club?.image_path ? clubImages.get(c.club.image_path) : null} className="size-10 text-xl" />
               ) : (
                 <Avatar avatar={other?.avatar ?? "a01"} />
               )}
@@ -76,7 +77,7 @@ async function Conversations() {
                   {c.request && <span className="chip ms-2 bg-amber-50 text-amber-900">{t("Message request")}</span>}
                 </p>
                 <p className={`truncate text-sm ${unread ? "text-black/80" : "text-black/50"}`}>
-                  {last ? `${last.sender_id === me.id ? t("You: ") : ""}${last.body || "📎"}` : t("No messages yet")}
+                  {last ? `${last.sender_id === me.id ? t("You: ") : ""}${last.body || t("Attachment")}` : t("No messages yet")}
                 </p>
               </div>
               <div className="shrink-0 text-end text-xs text-black/40">

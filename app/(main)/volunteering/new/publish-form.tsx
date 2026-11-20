@@ -23,7 +23,7 @@ export function PublishForm({ draft, events, locale }: { draft: OppDraft; events
           <label htmlFor="event_id" className="label">{t("Is it for an event?")}</label>
           <select id="event_id" name="event_id" defaultValue={draft.event_id} className="input">
             <option value="">{t("No, general volunteering")}</option>
-            {events.map((e) => <option key={e.id} value={e.id}>📅 {e.title}</option>)}
+            {events.map((e) => <option key={e.id} value={e.id}>{e.title}</option>)}
           </select>
         </div>
       )}

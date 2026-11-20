@@ -4,6 +4,7 @@ import { joinClub } from "@/app/actions/clubs";
 import { SubmitButton } from "@/components/submit-button";
 import { formatDateTime } from "@/lib/time";
 import { ClubIcon } from "@/components/club-icon";
+import { Glyph } from "@/components/glyph";
 
 export type ClubSummary = {
   id: string;
@@ -28,7 +29,7 @@ export function ClubCard({ club, joined = false, leaders = [], nextAt = null, ca
           {imageUrl
             // eslint-disable-next-line @next/next/no-img-element -- signed private image
             ? <img src={imageUrl} alt="" loading="lazy" className="size-full object-cover" />
-            : <span className="flex size-full items-center justify-center text-5xl">{club.emoji}</span>}
+            : <span className="flex size-full items-center justify-center text-5xl"><Glyph e={club.emoji} /></span>}
           <span className="absolute start-3 top-3 rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-semibold text-brand-800">Featured</span>
         </div>
       )}
@@ -40,13 +41,13 @@ export function ClubCard({ club, joined = false, leaders = [], nextAt = null, ca
           <span className="line-clamp-2 text-sm text-ink-2">{pitch}</span>
         </span>
       </Link>
-      {nextAt && <p className="truncate text-xs font-medium text-brand-700" data-club-next>📅 Next: {formatDateTime(nextAt)}</p>}
+      {nextAt && <p className="truncate text-xs font-medium text-brand-700" data-club-next><Glyph e="📅" /> Next: {formatDateTime(nextAt)}</p>}
       <div className="mt-auto flex items-center gap-3 text-xs text-ink-2">
         <span className="inline-flex shrink-0 items-center gap-1.5"><Users className="size-4" strokeWidth={1.7} aria-hidden="true" />{members} {members === 1 ? "member" : "members"}</span>
         {leaders.length > 0 && <span className="inline-flex min-w-0 items-center gap-1.5 border-s border-brand-700/10 ps-3" data-club-leaders><Crown className="size-4 shrink-0" strokeWidth={1.7} aria-hidden="true" /><span className="truncate">Run by {leaders.join(", ")}</span></span>}
         <span className="relative z-10 ms-auto shrink-0">
           {joined ? (
-            <span className="inline-flex items-center rounded-full bg-sage-soft px-3.5 py-2 text-sm font-semibold text-brand-800">✓ Joined</span>
+            <span className="inline-flex items-center rounded-full bg-sage-soft px-3.5 py-2 text-sm font-semibold text-brand-800"><Glyph e="✓" /> Joined</span>
           ) : !canJoin || club.recruiting === "closed" ? (
             club.recruiting === "closed" ? <span className="text-xs text-ink-2">Not taking members</span> : null
           ) : club.recruiting === "application" ? (

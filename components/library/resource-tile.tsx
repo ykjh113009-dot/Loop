@@ -4,6 +4,7 @@ import { Star, Eye, Download } from "lucide-react";
 import { LIBRARY_TYPES, type LibraryResource } from "@/lib/library";
 import { SaveBookmark } from "@/components/library/save-bookmark";
 import type { T } from "@/lib/i18n";
+import { Glyph } from "@/components/glyph";
 
 const k = (n: number) => (n >= 1000 ? `${(n / 1000).toFixed(1).replace(/\.0$/, "")}K` : String(n));
 
@@ -24,7 +25,7 @@ export function ResourceTile({ r, cover, saved, t }: { r: LibraryResource; cover
         <h3 className="line-clamp-2 text-[16px] leading-snug font-semibold">{r.title}</h3>
         <p className="mt-0.5 truncate text-[13px] text-ink-2">
           {t("By")} {by}
-          {r.source === "official" ? <span className="ms-1.5 rounded-full bg-brand-700 px-1.5 py-0.5 text-[10px] font-semibold text-white" data-source="official">✓ {t("Official")}</span> : <span className="ms-1.5 rounded-full bg-sage-soft/70 px-1.5 py-0.5 text-[10px] font-semibold text-brand-900" data-source="community">{t("Community")}</span>}
+          {r.source === "official" ? <span className="ms-1.5 rounded-full bg-brand-700 px-1.5 py-0.5 text-[10px] font-semibold text-white" data-source="official"><Glyph e="✓" /> {t("Official")}</span> : <span className="ms-1.5 rounded-full bg-sage-soft/70 px-1.5 py-0.5 text-[10px] font-semibold text-brand-900" data-source="community">{t("Community")}</span>}
         </p>
         <p className="truncate text-[12px] text-ink-2">{r.subject?.name} · {t(type.label)}</p>
       </div>

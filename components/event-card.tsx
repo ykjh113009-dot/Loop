@@ -3,6 +3,7 @@ import Link from "next/link";
 import { formatTime, localParts } from "@/lib/time";
 import type { EventSummary } from "@/lib/queries";
 import { eventCategory } from "@/lib/events";
+import { Glyph } from "@/components/glyph";
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
@@ -35,7 +36,7 @@ export function EventCard({ event, going = false }: { event: EventSummary; going
         ) : (
           <>
             <span className="font-semibold text-black/70">{count}</span> <span className="text-black/45">{full ? "· full" : "going"}</span>
-            {going && <span className="mt-0.5 block font-semibold text-brand-700">✓ You</span>}
+            {going && <span className="mt-0.5 block font-semibold text-brand-700"><Glyph e="✓" /> You</span>}
           </>
         )}
       </div>

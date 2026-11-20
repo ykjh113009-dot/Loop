@@ -4,14 +4,15 @@ import { useActionState } from "react";
 import { createGroup } from "@/app/actions/community";
 import { SubmitButton } from "@/components/submit-button";
 import { makeT, type Locale } from "@/lib/i18n";
+import { IconPicker } from "@/components/icon-picker";
 
 export function NewGroupForm({ official, locale }: { official: boolean; locale: Locale }) {
   const t = makeT(locale);
   const [state, action] = useActionState(createGroup, null);
   return (
     <form action={action} className="card space-y-4 p-4">
-      <div className="grid grid-cols-[5rem_1fr] gap-3">
-        <label className="block"><span className="label">{t("Icon")}</span><input name="emoji" defaultValue="👥" maxLength={4} className="input text-center text-xl" aria-label={t("Icon")} /></label>
+      <div className="space-y-4">
+        <div><span className="label">{t("Icon")}</span><IconPicker defaultValue="👥" label={t("Icon")} /></div>
         <label className="block"><span className="label">{t("Group name")}</span><input name="name" required minLength={3} maxLength={60} className="input" placeholder={t("e.g. Photography lovers")} /></label>
       </div>
       <label className="block"><span className="label">{t("What is it about?")}</span><textarea name="description" maxLength={500} rows={3} className="input resize-none" /></label>

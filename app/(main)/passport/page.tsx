@@ -11,6 +11,7 @@ import { DashCard } from "@/components/dashboard/card";
 import { PageBanner } from "@/components/ui/page-banner";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PageSkeleton } from "@/components/skeleton";
+import { Glyph } from "@/components/glyph";
 
 export const metadata = { title: "Loop Passport" };
 
@@ -60,12 +61,12 @@ async function Passport() {
         </DashCard>
         <DashCard title={t("Challenges")} href="/challenges" linkLabel={t("See all")}>
           {challenges.length === 0 ? empty(t("No completed challenges yet"), "/challenges", t("Browse challenges")) : (
-            <ul className="space-y-1 text-sm">{challenges.slice(0, 6).map((c) => <li key={c.id}><Link href={`/challenges/${c.id}`} className="hover:underline">✓ {c.title}</Link></li>)}</ul>
+            <ul className="space-y-1 text-sm">{challenges.slice(0, 6).map((c) => <li key={c.id}><Link href={`/challenges/${c.id}`} className="hover:underline"><Glyph e="✓" /> {c.title}</Link></li>)}</ul>
           )}
         </DashCard>
         <DashCard title={t("Achievements")} href="/points" linkLabel={t("See all")}>
           {earned.length === 0 ? empty(t("No achievements yet"), "/points", t("See what you can unlock")) : (
-            <ul className="flex flex-wrap gap-2">{earned.map((b) => <li key={b.badge!.code} className="chip bg-white shadow-sm">{b.badge!.emoji} {t(b.badge!.name)}</li>)}</ul>
+            <ul className="flex flex-wrap gap-2">{earned.map((b) => <li key={b.badge!.code} className="chip bg-white shadow-sm"><Glyph e={b.badge!.emoji} /> {t(b.badge!.name)}</li>)}</ul>
           )}
         </DashCard>
         <DashCard title={t("Roles and positions")} href="/leadership" linkLabel={t("Manage")}>

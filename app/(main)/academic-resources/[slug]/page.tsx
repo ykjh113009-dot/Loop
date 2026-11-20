@@ -48,7 +48,7 @@ async function Subject({ params, searchParams }: { params: PageProps<"/academic-
         <div className="flex gap-1.5" role="tablist" aria-label={t("Sort")}>
           {(Object.keys(SORTS) as (keyof typeof SORTS)[]).map((k) => (
             <Link key={k} href={`/academic-resources/${slug}?sort=${k}`} role="tab" aria-selected={sort === k}
-              className={`rounded-full px-3 py-1 text-xs font-medium ${sort === k ? "bg-brand-700 text-white" : "bg-black/5 text-black/60"}`}>{t(SORTS[k])}</Link>
+              className={`rounded-full px-3 py-1 text-xs font-medium ${sort === k ? "bg-brand-700 text-white" : "border border-black/10 bg-white text-black/65 hover:bg-sage-soft/50"}`}>{t(SORTS[k])}</Link>
           ))}
         </div>
         <Link href={`/academic-resources/suggest?subject=${cat.id}`} className="btn-secondary text-sm">＋ {t("Suggest a Resource")}</Link>

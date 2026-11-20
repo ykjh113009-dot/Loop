@@ -14,6 +14,7 @@ import { timeAgo } from "@/lib/time";
 import { PageSkeleton } from "@/components/skeleton";
 import { SubmitButton } from "@/components/submit-button";
 import { AskTutorForm } from "../forms";
+import { Glyph } from "@/components/glyph";
 
 export const metadata = { title: "Tutor" };
 
@@ -68,7 +69,7 @@ async function Tutor({ params }: { params: PageProps<"/tutors/[id]">["params"] }
             {canAct && (
               <form action={startChat}>
                 <input type="hidden" name="profileId" value={x.profile.id} />
-                <SubmitButton className="btn-secondary rounded-full px-6 py-3 text-[15px]" pendingText="…">💬 {t("Message")}</SubmitButton>
+                <SubmitButton className="btn-secondary rounded-full px-6 py-3 text-[15px]" pendingText="…"><Glyph e="💬" /> {t("Message")}</SubmitButton>
               </form>
             )}
             {mine && <Link href="/tutors/me" className="btn-primary rounded-full px-6 py-3">{t("Edit my tutor profile")}</Link>}
@@ -104,7 +105,7 @@ async function Tutor({ params }: { params: PageProps<"/tutors/[id]">["params"] }
       )}
 
       <section className={card} data-tutor-reviews>
-        <h2 className="mb-3 flex items-center gap-2 text-lg font-semibold"><Star className="size-5 fill-amber-400 text-amber-500" aria-hidden="true" />{t("Reviews")}</h2>
+        <h2 className="mb-3 flex items-center gap-2 text-lg font-semibold"><Star className="size-5 text-brand-700" aria-hidden="true" />{t("Reviews")}</h2>
         {(reviews ?? []).length === 0 ? (
           <p className="rounded-2xl bg-sage-soft/40 px-4 py-5 text-center text-sm text-ink-2">{t("No reviews yet. Students can review a tutor after a finished session.")}</p>
         ) : (

@@ -9,6 +9,7 @@ import { Avatar } from "@/components/avatar";
 import { PageHeader } from "@/components/page-header";
 import { PageSkeleton } from "@/components/skeleton";
 import { DecisionForm } from "./decision-form";
+import { Glyph } from "@/components/glyph";
 
 export const metadata = { title: "Tutor application" };
 
@@ -68,7 +69,7 @@ async function Review({ params }: { params: PageProps<"/tutors/review/[id]">["pa
           <ul className="divide-y divide-black/5 text-sm">
             {(docs ?? []).map((d) => (
               <li key={d.id} className="flex items-center gap-2 py-2">
-                <span>📄</span>
+                <span><Glyph e="📄" /></span>
                 <a href={signed.get(d.path)} target="_blank" rel="noreferrer" className="min-w-0 flex-1 truncate text-brand-700 underline">{d.name}</a>
                 <span className="chip bg-black/5">{t(DOC_KINDS.find((k) => k.id === d.kind)?.label ?? d.kind)}</span>
               </li>

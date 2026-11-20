@@ -1,11 +1,11 @@
 export const CATEGORIES: Record<string, string> = {
-  books: "📚 Books",
-  uniform: "👕 Uniform",
-  electronics: "🔌 Electronics",
-  sports: "⚽ Sports",
-  art: "🎨 Art",
-  music: "🎵 Music",
-  other: "📦 Other",
+  books: "Books",
+  uniform: "Uniform",
+  electronics: "Electronics",
+  sports: "Sports",
+  art: "Art",
+  music: "Music",
+  other: "Other",
 };
 
 export const CONDITIONS: Record<string, string> = { new: "New", like_new: "Like new", good: "Good", used: "Used" };

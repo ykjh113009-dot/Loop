@@ -8,6 +8,7 @@ import { PhotoField } from "@/components/photo-field";
 import { createClient } from "@/lib/supabase/client";
 import { DAYS, DOC_KINDS, DOC_TYPES, FORMATS, MAX_DOC_MB, TUTOR_SUBJECTS } from "@/lib/tutor";
 import { makeT, type Locale } from "@/lib/i18n";
+import { Glyph } from "@/components/glyph";
 
 export type AppDraft = {
   grade: string; subjects: string[]; other_subjects: string; achievements: string; experience: string; qualifications: string;
@@ -23,7 +24,7 @@ function RemoveDoc({ id, label }: { id: string; label: string }) {
   return (
     <form action={action} className="inline">
       <input type="hidden" name="id" value={id} />
-      <button disabled={pending} className="text-xs text-black/45 hover:text-red-600" aria-label={label}>✕</button>
+      <button disabled={pending} className="text-xs text-black/45 hover:text-red-600" aria-label={label}><Glyph e="✕" /></button>
       {state?.error && <span className="text-xs text-red-700"> {state.error}</span>}
     </form>
   );
@@ -58,7 +59,7 @@ function Uploader({ schoolId, userId, locale }: { schoolId: string; userId: stri
         <select value={kind} onChange={(e) => setKind(e.target.value)} className="input" aria-label={t("Document type")}>
           {DOC_KINDS.map((k) => <option key={k.id} value={k.id}>{t(k.label)}</option>)}
         </select>
-        <button type="button" disabled={busy} onClick={() => input.current?.click()} className="btn-secondary shrink-0">{busy ? "…" : `📎 ${t("Add file")}`}</button>
+        <button type="button" disabled={busy} onClick={() => input.current?.click()} className="btn-secondary shrink-0">{busy ? "…" : `${t("Add file")}`}</button>
       </div>
       <input ref={input} type="file" accept=".pdf,.jpg,.jpeg,.png,.docx,application/pdf,image/jpeg,image/png" className="hidden" onChange={(e) => pick(e.target.files?.[0])} />
       {error && <p role="alert" className="text-sm text-red-700">{error}</p>}
@@ -178,7 +179,7 @@ export function ApplyForm({ initial, docs, user, locale, schoolId, userId, feedb
         <p className="text-sm text-black/60">{t("A CV, certificates or academic records help the reviewers. Only you and the reviewers can open them. PDF, JPG, PNG or Word, up to {n} MB each.", { n: MAX_DOC_MB })}</p>
         <ul className="divide-y divide-black/5 text-sm">
           {docs.map((d) => (
-            <li key={d.id} className="flex items-center gap-2 py-2"><span>📄</span><span className="min-w-0 flex-1 truncate">{d.name}</span><span className="chip bg-black/5">{t(DOC_KINDS.find((k) => k.id === d.kind)?.label ?? d.kind)}</span><RemoveDoc id={d.id} label={t("Remove")} /></li>
+            <li key={d.id} className="flex items-center gap-2 py-2"><span><Glyph e="📄" /></span><span className="min-w-0 flex-1 truncate">{d.name}</span><span className="chip bg-black/5">{t(DOC_KINDS.find((k) => k.id === d.kind)?.label ?? d.kind)}</span><RemoveDoc id={d.id} label={t("Remove")} /></li>
           ))}
           {docs.length === 0 && <li className="py-2 text-black/45">{t("No documents yet.")}</li>}
         </ul>

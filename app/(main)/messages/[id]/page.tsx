@@ -10,6 +10,7 @@ import { Avatar } from "@/components/avatar";
 import { Chat } from "@/components/chat";
 import { Icon } from "@/components/icons";
 import { PageSkeleton } from "@/components/skeleton";
+import { Glyph } from "@/components/glyph";
 
 async function DirectChat({ params }: { params: PageProps<"/messages/[id]">["params"] }) {
   const { id } = await params;
@@ -40,7 +41,7 @@ async function DirectChat({ params }: { params: PageProps<"/messages/[id]">["par
         </Link>
         {group ? (
           <>
-            <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-brand-50">👥</span>
+            <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-brand-50"><Glyph e="👥" /></span>
             <span className="min-w-0 flex-1">
               <span className="block truncate font-semibold">{conversation.title}</span>
               <span className="block truncate text-xs text-black/45">{Object.values(people).map((p) => p.full_name.split(" ")[0]).join(", ")}</span>
@@ -73,8 +74,8 @@ async function DirectChat({ params }: { params: PageProps<"/messages/[id]">["par
       ) : (
         <p className="mb-2 rounded-xl bg-black/[0.03] px-3 py-2 text-center text-xs text-black/50">
           {group
-            ? t("Group chat. If something feels wrong, tap 🚩 on a message.")
-            : t("Private chat. If something feels wrong, tap 🚩 on a message or block this student from their profile.")}
+            ? t("Group chat. If something feels wrong, tap the flag on a message.")
+            : t("Private chat. If something feels wrong, tap the flag on a message or block this student from their profile.")}
         </p>
       )}
       <Chat

@@ -169,7 +169,7 @@ export function ResourceForm({
           <div className="flex gap-2" role="radiogroup">
             {(["file", "link"] as const).map((k) => (
               <button key={k} type="button" role="radio" aria-checked={source === k} onClick={() => setSource(k)}
-                className={`rounded-full px-4 py-1.5 text-sm font-medium ${source === k ? "bg-brand-700 text-white" : "bg-black/5 text-black/60"}`}>
+                className={`rounded-full px-4 py-1.5 text-sm font-medium ${source === k ? "bg-brand-700 text-white" : "border border-black/10 bg-white text-black/65 hover:bg-sage-soft/50"}`}>
                 {k === "file" ? t("Upload a file") : t("External link")}
               </button>
             ))}

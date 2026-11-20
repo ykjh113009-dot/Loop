@@ -5,6 +5,7 @@ import { formatDate } from "@/lib/time";
 import { setTaskStatus } from "@/app/actions/community";
 import { ActionForm } from "@/components/action-form";
 import { PageSkeleton } from "@/components/skeleton";
+import { Glyph } from "@/components/glyph";
 
 async function About({ params }: { params: PageProps<"/clubs/[id]/about">["params"] }) {
   const { id } = await params;
@@ -23,7 +24,7 @@ async function About({ params }: { params: PageProps<"/clubs/[id]/about">["param
   return (
     <div className="space-y-4">
       <section className="card p-4">
-        <h2 className="font-semibold">🏆 Achievements</h2>
+        <h2 className="font-semibold"><Glyph e="🏆" /> Achievements</h2>
         {(achievements ?? []).length === 0 ? <p className="mt-1 text-sm text-black/55">No achievements yet.</p> : (
           <ul className="mt-2 divide-y divide-black/5 text-sm">
             {(achievements ?? []).map((a) => (
@@ -58,7 +59,7 @@ async function About({ params }: { params: PageProps<"/clubs/[id]/about">["param
               <ul className="mt-2 divide-y divide-black/5 text-sm">
                 {(sessions ?? []).map((s) => (
                   <li key={s.id} className="flex items-center justify-between py-2"><span>{s.title}</span>
-                    <span className="text-xs text-black/50">{formatDate(s.held_on)} · {went.has(s.id) ? (went.get(s.id) ? "✓ You were there" : "Absent") : "Not marked"}</span></li>
+                    <span className="text-xs text-black/50">{formatDate(s.held_on)} · {went.has(s.id) ? (went.get(s.id) ? "You were there" : "Absent") : "Not marked"}</span></li>
                 ))}
               </ul>
             )}

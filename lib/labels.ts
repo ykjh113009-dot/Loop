@@ -10,10 +10,10 @@ export const COUNSELOR_TOPICS: Record<string, string> = {
 };
 
 export const SUGGESTION_CATEGORIES: Record<string, string> = {
-  activities: "🎉 Activities",
-  facilities: "🏫 Buildings & facilities",
-  clubs: "🧩 Clubs",
-  events: "📅 Events",
-  app: "📱 Loop app",
-  other: "💬 Other",
+  activities: "Activities",
+  facilities: "Buildings & facilities",
+  clubs: "Clubs",
+  events: "Events",
+  app: "Loop app",
+  other: "Other",
 };

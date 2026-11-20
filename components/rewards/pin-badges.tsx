@@ -3,6 +3,8 @@
 import { useState, useTransition } from "react";
 import { pinBadges } from "@/app/actions/rewards";
 import { makeT, type Locale } from "@/lib/i18n";
+import { Glyph } from "@/components/glyph";
+import { Star } from "lucide-react";
 
 export type Ach = {
   code: string; name: string; emoji: string; description: string; category: string; tier: string; threshold: number; points_reward: number;
@@ -27,15 +29,15 @@ export function AchievementGrid({ items, locale }: { items: Ach[]; locale: Local
 
   return (
     <div className="space-y-2">
-      <p className="text-xs text-black/50">{t("Tap ☆ on an earned badge to show it on your profile ({n}/6).", { n: pinned.length })}</p>
+      <p className="text-xs text-black/50">{t("Tap the star on an earned badge to show it on your profile ({n}/6).", { n: pinned.length })}</p>
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-3" data-achievements>
         {items.map((a) => (
           <div key={a.code} className={`card relative space-y-1 p-3 ${a.unlocked ? "" : "opacity-60"}`} data-achievement={a.code} data-unlocked={a.unlocked}>
             <div className="flex items-start justify-between gap-1">
-              <span className={`text-3xl ${a.unlocked ? "" : "grayscale"}`}>{a.emoji}</span>
+              <span className={`text-3xl ${a.unlocked ? "text-brand-800" : "text-black/35"}`}><Glyph e={a.emoji} /></span>
               {a.unlocked
-                ? <button type="button" onClick={() => toggle(a.code)} disabled={pending} aria-pressed={pinned.includes(a.code)} aria-label={t("Show on my profile")} className={`text-lg leading-none ${pinned.includes(a.code) ? "text-amber-500" : "text-black/25"}`}>{pinned.includes(a.code) ? "★" : "☆"}</button>
-                : <span aria-hidden="true">🔒</span>}
+                ? <button type="button" onClick={() => toggle(a.code)} disabled={pending} aria-pressed={pinned.includes(a.code)} aria-label={t("Show on my profile")} className={`opt size-8 rounded-full p-0 ${pinned.includes(a.code) ? "opt-on" : ""}`}><Star className="size-4" fill={pinned.includes(a.code) ? "currentColor" : "none"} aria-hidden="true" /></button>
+                : <span aria-hidden="true"><Glyph e="🔒" /></span>}
             </div>
             <p className="text-sm leading-tight font-semibold">{t(a.name)}</p>
             <p className="text-[11px] leading-tight text-black/55">{t(a.description)}</p>

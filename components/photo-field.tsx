@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { uploadPhoto } from "@/lib/upload";
 import { Icon } from "@/components/icons";
+import { Glyph } from "@/components/glyph";
 
 // Optional photo for a form: uploads (compressed) as soon as it's picked and
 // puts the stored path in a hidden "image_path" field.
@@ -45,7 +46,7 @@ export function PhotoField({ schoolId, userId, label = "Add a photo" }: { school
               className="absolute top-2 start-2 rounded-full bg-black/60 px-2 text-sm text-white"
               aria-label="Remove photo"
             >
-              ✕
+              <Glyph e="✕" />
             </button>
           )}
           {busy && <span className="absolute inset-0 flex items-center justify-center text-sm font-medium">Uploading…</span>}

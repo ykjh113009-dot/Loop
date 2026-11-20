@@ -10,6 +10,7 @@ import { deleteStudyOpportunity } from "@/app/actions/study";
 import { PageHeader } from "@/components/page-header";
 import { PageSkeleton } from "@/components/skeleton";
 import { SubmitButton } from "@/components/submit-button";
+import { Glyph } from "@/components/glyph";
 
 export const metadata = { title: "Opportunity" };
 
@@ -30,7 +31,7 @@ async function Detail({ params }: { params: PageProps<"/opportunities/[id]">["pa
     <div className="mx-auto max-w-2xl space-y-4">
       <article className="card space-y-4 p-5">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="chip bg-brand-50 text-brand-800">{c.emoji} {t(c.label)}</span>
+          <span className="chip bg-brand-50 text-brand-800"><Glyph e={c.emoji} /> {t(c.label)}</span>
           {o.is_sample && <span className="chip bg-amber-50 text-amber-800">{t("Sample data")}</span>}
         </div>
         <div><h2 className="text-xl font-bold">{o.title}</h2>{o.organization && <p className="text-black/60">{o.organization}</p>}</div>
@@ -39,7 +40,7 @@ async function Detail({ params }: { params: PageProps<"/opportunities/[id]">["pa
         {block(t("Who can apply"), o.eligibility)}
         {block(t("How to apply"), o.instructions)}
         {block(t("More information"), o.extra_info)}
-        {docs.length > 0 && <section><h3 className="section-title">{t("Documents")}</h3><ul className="space-y-1 text-sm">{docs.map((d) => <li key={d.url}><a href={d.url} target="_blank" rel="noreferrer noopener" className="text-brand-700 underline">📎 {d.label}</a></li>)}</ul></section>}
+        {docs.length > 0 && <section><h3 className="section-title">{t("Documents")}</h3><ul className="space-y-1 text-sm">{docs.map((d) => <li key={d.url}><a href={d.url} target="_blank" rel="noreferrer noopener" className="text-brand-700 underline"><Glyph e="📎" /> {d.label}</a></li>)}</ul></section>}
         {o.link && <a href={o.link} target="_blank" rel="noreferrer noopener" className="btn-primary w-full">{t("Open the application page")}</a>}
       </article>
       {manage && (

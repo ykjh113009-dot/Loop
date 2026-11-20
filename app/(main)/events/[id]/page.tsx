@@ -17,6 +17,7 @@ import { PageSkeleton } from "@/components/skeleton";
 import { ApplyForm, WithdrawButton } from "../../volunteering/volunteer-forms";
 import { ManageEvent } from "./manage-event";
 import { AttendeeActions, PostUpdateForm, ProposalDecision } from "./organizer-tools";
+import { Glyph } from "@/components/glyph";
 
 async function EventDetails({ params }: { params: PageProps<"/events/[id]">["params"] }) {
   const { id } = await params;
@@ -88,14 +89,14 @@ async function EventDetails({ params }: { params: PageProps<"/events/[id]">["par
         )}
         <div className="space-y-3 p-4">
           <p className="flex items-center gap-2 text-sm">
-            <span className="chip bg-brand-50 text-brand-800">{cat.emoji} {t(cat.label)}</span>
+            <span className="chip bg-brand-50 text-brand-800"><Glyph e={cat.emoji} /> {t(cat.label)}</span>
             {started && !over && event.status === "approved" && <span className="chip bg-amber-50 text-amber-800">{t("Happening now")}</span>}
           </p>
           <p className="flex items-center gap-2 text-sm"><Icon name="calendar" className="size-4 text-brand-700" /><span className="font-medium">{formatDate(event.starts_at)}</span></p>
           <p className="flex items-center gap-2 text-sm"><Icon name="clock" className="size-4 text-brand-700" />{formatTime(event.starts_at)}{event.ends_at && ` – ${formatTime(event.ends_at)}`}</p>
           {event.location && <p className="flex items-center gap-2 text-sm"><Icon name="pin" className="size-4 text-brand-700" /> {event.location}</p>}
           <p className="text-sm text-black/55">
-            {event.club ? <Link href={`/clubs/${event.club.id}`} className="text-brand-700 hover:underline"><ClubMark club={event.club} className="size-5" /> {event.club.name}</Link> : <>🏫 {t("Whole school")}</>}
+            {event.club ? <Link href={`/clubs/${event.club.id}`} className="text-brand-700 hover:underline"><ClubMark club={event.club} className="size-5" /> {event.club.name}</Link> : <><Glyph e="🏫" /> {t("Whole school")}</>}
           </p>
           {organizers.length > 0 && (
             <p className="text-sm text-black/60">
@@ -120,7 +121,7 @@ async function EventDetails({ params }: { params: PageProps<"/events/[id]">["par
         {waitList.length > 0 && <p className="text-sm text-black/55">{t("{n} on the waiting list", { n: waitList.length })}</p>}
         {open && !over && <p className="text-xs text-black/45">{t("Coming is always optional. If you say you're going, we'll remind you a day and an hour before.")}</p>}
         {chat && (myRsvp === "going" || canManageRow) && (
-          <Link href={`/messages/${chat.id}`} className="btn-secondary w-full">💬 {t("Open the event chat")}</Link>
+          <Link href={`/messages/${chat.id}`} className="btn-secondary w-full"><Glyph e="💬" /> {t("Open the event chat")}</Link>
         )}
       </div>
 
@@ -129,7 +130,7 @@ async function EventDetails({ params }: { params: PageProps<"/events/[id]">["par
           <h2 className="section-title">{t("Updates")}</h2>
           {(updates ?? []).map((u) => (
             <article key={u.id} className="card p-4 text-sm">
-              <p className="font-semibold">{u.kind === "change" ? "✏️" : "📣"} {u.title} <span className="text-xs font-normal text-black/45">· {timeAgo(u.created_at)}</span></p>
+              <p className="font-semibold"><Glyph e={u.kind === "change" ? "✏️" : "📣"} /> {u.title} <span className="text-xs font-normal text-black/45">· {timeAgo(u.created_at)}</span></p>
               {u.body && <p className="mt-1 whitespace-pre-wrap text-black/70">{u.body}</p>}
             </article>
           ))}
@@ -145,7 +146,7 @@ async function EventDetails({ params }: { params: PageProps<"/events/[id]">["par
                 {f.kind === "image" && urlOf.get(f.path) ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={urlOf.get(f.path)} alt="" loading="lazy" className="size-12 rounded-lg object-cover" />
-                ) : <span className="text-2xl">📄</span>}
+                ) : <span className="text-2xl"><Glyph e="📄" /></span>}
                 <span className="min-w-0 flex-1 truncate text-brand-700">{f.name}</span>
               </a>
             ))}
@@ -155,7 +156,7 @@ async function EventDetails({ params }: { params: PageProps<"/events/[id]">["par
 
       {(roles ?? []).length > 0 && (
         <section className="space-y-2">
-          <h2 className="section-title">💚 {t("Volunteer for this event")}</h2>
+          <h2 className="section-title"><Glyph e="💚" /> {t("Volunteer for this event")}</h2>
           {(roles ?? []).map((o) => {
             const app = (myApps ?? []).find((a) => a.opportunity_id === o.id);
             const active = app && app.status !== "withdrawn";
@@ -166,7 +167,7 @@ async function EventDetails({ params }: { params: PageProps<"/events/[id]">["par
                 {o.requirements && <p className="text-black/60"><strong>{t("Needed")}:</strong> {o.requirements}</p>}
                 {active ? (
                   <div className="flex items-center justify-between gap-2">
-                    <span className="chip bg-brand-50 text-brand-800">{app.status === "accepted" ? `✅ ${t("You are in")}` : app.status === "completed" ? `💚 ${t("Done")}` : app.status === "rejected" ? t("Not this time") : `⏳ ${t("Waiting")}`}</span>
+                    <span className="chip bg-brand-50 text-brand-800">{app.status === "accepted" ? `${t("You are in")}` : app.status === "completed" ? `${t("Done")}` : app.status === "rejected" ? t("Not this time") : `${t("Waiting")}`}</span>
                     {(app.status === "pending" || app.status === "accepted") && <WithdrawButton id={app.id} locale={locale} />}
                   </div>
                 ) : o.status === "open" && me.isStudent && o.created_by !== me.id && event.status === "approved" && !over ? (
@@ -184,8 +185,8 @@ async function EventDetails({ params }: { params: PageProps<"/events/[id]">["par
         <section className="space-y-3">
           <h2 className="section-title">{t("For the organizers")}</h2>
           <div className="flex flex-wrap gap-2">
-            <Link href={`/events/${event.id}/edit`} className="btn-primary">✏️ {t("Edit event")}</Link>
-            {event.status === "approved" && <Link href={`/volunteering/new?event=${event.id}`} className="btn-secondary">💚 {t("Add a volunteer role")}</Link>}
+            <Link href={`/events/${event.id}/edit`} className="btn-primary"><Glyph e="✏️" /> {t("Edit event")}</Link>
+            {event.status === "approved" && <Link href={`/volunteering/new?event=${event.id}`} className="btn-secondary"><Glyph e="💚" /> {t("Add a volunteer role")}</Link>}
           </div>
           {event.status === "approved" && (
             <div className="card space-y-3 p-4"><h3 className="font-semibold">{t("Post an update")}</h3><PostUpdateForm eventId={event.id} locale={locale} /></div>

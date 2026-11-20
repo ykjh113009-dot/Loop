@@ -25,6 +25,7 @@ import { timeAgo } from "@/lib/time";
 import { ReportButton } from "@/components/report-button";
 import { SubmitButton } from "@/components/submit-button";
 import { PageSkeleton } from "@/components/skeleton";
+import { Glyph } from "@/components/glyph";
 
 const ROLE_BADGE: Record<string, string | null> = { student: null, moderator: "Moderator", admin: "School admin", super_admin: "Super Admin" };
 
@@ -112,11 +113,11 @@ async function Profile({ params, searchParams }: { params: PageProps<"/profile/[
           <h1 className="mt-2 font-heading text-[30px] leading-tight font-semibold sm:text-[40px]">{profile.full_name}</h1>
           <p className="text-lg text-ink-2 sm:text-xl" dir="ltr">{label}</p>
           {profile.alumni_year && (profile.major || profile.university) && (
-            <p className="text-sm text-black/55">🎓 {[profile.major, profile.university].filter(Boolean).join(" · ")}</p>
+            <p className="text-sm text-black/55"><Glyph e="🎓" /> {[profile.major, profile.university].filter(Boolean).join(" · ")}</p>
           )}
           {(house?.house || (roles ?? []).length > 0) && (
             <div className="mt-2 flex flex-wrap justify-center gap-1.5">
-              {house?.house && <span className="chip bg-sage-soft/70 text-brand-800" data-testid="house-chip">{house.house.emoji} {house.house.name}</span>}
+              {house?.house && <span className="chip bg-sage-soft/70 text-brand-800" data-testid="house-chip"><Glyph e={house.house.emoji} /> {house.house.name}</span>}
               {(roles ?? []).map((r) => <span key={r.id} className="chip bg-sage-soft/70 text-brand-800">{leadershipLabel(r.kind, r.scope, r.club?.name)}</span>)}
             </div>
           )}
@@ -150,7 +151,7 @@ async function Profile({ params, searchParams }: { params: PageProps<"/profile/[
                   friendship ? (
                     <ActionForm action={unfriend}>
                       <input type="hidden" name="profileId" value={profile.id} />
-                      <SubmitButton className="btn-secondary rounded-full" pendingText="…">{t("Friends ✓")}</SubmitButton>
+                      <SubmitButton className="btn-secondary rounded-full" pendingText="…"><Glyph e="✓" /> {t("Friends")}</SubmitButton>
                     </ActionForm>
                   ) : request && request.from_id === me.id ? (
                     <ActionForm action={cancelFriendRequest}>
@@ -171,7 +172,7 @@ async function Profile({ params, searchParams }: { params: PageProps<"/profile/[
                   )
                 )}
                 {profile.role === "counselor" && me.isStudent && (
-                  <Link href="/counselor" className="btn-primary rounded-full">🫶 {t("Talk privately")}</Link>
+                  <Link href="/counselor" className="btn-primary rounded-full"><Glyph e="🫶" /> {t("Talk privately")}</Link>
                 )}
                 {canMessage && (
                   <form action={startChat}>
@@ -228,10 +229,10 @@ async function Profile({ params, searchParams }: { params: PageProps<"/profile/[
           <p className="text-[15px] leading-relaxed whitespace-pre-wrap text-ink">{profile.bio || (isMe ? t("Tell your school a bit about yourself in Edit Profile.") : t("No introduction yet."))}</p>
           {profile.skills.length > 0 && <div className="mt-4"><h3 className="mb-1.5 text-sm font-semibold">{t("Skills and talents")}</h3><div className="flex flex-wrap gap-1.5">{profile.skills.map((x) => <span key={x} className="chip bg-sage-soft/60">{x}</span>)}</div></div>}
           {profile.favorite_subjects.length > 0 && <div className="mt-4"><h3 className="mb-1.5 text-sm font-semibold">{t("Favourite subjects")}</h3><div className="flex flex-wrap gap-1.5">{profile.favorite_subjects.map((x) => <span key={x} className="chip bg-sage-soft/60">{x}</span>)}</div></div>}
-          {earned.length > 0 && <div className="mt-4"><h3 className="mb-1.5 text-sm font-semibold">{t("Badges")}</h3><div className="flex flex-wrap gap-1.5">{earned.map((b) => <span key={b!.code} className="chip bg-white shadow-sm" title={b!.description}>{b!.emoji} {b!.name}</span>)}</div></div>}
+          {earned.length > 0 && <div className="mt-4"><h3 className="mb-1.5 text-sm font-semibold">{t("Badges")}</h3><div className="flex flex-wrap gap-1.5">{earned.map((b) => <span key={b!.code} className="chip bg-white shadow-sm" title={b!.description}><Glyph e={b!.emoji} /> {b!.name}</span>)}</div></div>}
           {tutor?.active && (
             <Link href={`/tutors?subject=${encodeURIComponent(tutor.subjects[0])}`} className="mt-4 block rounded-2xl bg-sage-soft/40 p-3 text-sm">
-              📚 <strong>{t("Peer tutor")}:</strong> {tutor.subjects.join(", ")}{tutor.availability && <span className="text-ink-2"> · {tutor.availability}</span>}
+              <Glyph e="📚" /> <strong>{t("Peer tutor")}:</strong> {tutor.subjects.join(", ")}{tutor.availability && <span className="text-ink-2"> · {tutor.availability}</span>}
             </Link>
           )}
         </section>

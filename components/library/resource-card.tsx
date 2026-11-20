@@ -4,10 +4,11 @@ import { Avatar } from "@/components/avatar";
 import { StatRow } from "@/components/library/stars";
 import { LIBRARY_TYPES, type LibraryResource } from "@/lib/library";
 import type { T } from "@/lib/i18n";
+import { Glyph } from "@/components/glyph";
 
 export function SourceChip({ source, t }: { source: string; t: T }) {
   return source === "official"
-    ? <span className="chip bg-brand-700 text-white" data-source="official">✓ {t("Official")}</span>
+    ? <span className="chip bg-brand-700 text-white" data-source="official"><Glyph e="✓" /> {t("Official")}</span>
     : <span className="chip bg-sage-soft/70 text-brand-900" data-source="community">{t("Community")}</span>;
 }
 

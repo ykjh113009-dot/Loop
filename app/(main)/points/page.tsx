@@ -15,6 +15,7 @@ import { LevelCard, type MyPoints } from "@/components/level-card";
 import { PageHeader } from "@/components/page-header";
 import { SubmitButton } from "@/components/submit-button";
 import { PageSkeleton } from "@/components/skeleton";
+import { Glyph } from "@/components/glyph";
 
 export const metadata = { title: "My points" };
 
@@ -86,8 +87,8 @@ async function Points() {
 
       <section className="card space-y-3 p-4" data-streak>
         <div className="flex items-center justify-between gap-3">
-          <h2 className="font-semibold">🔥 {t("Your streak")}</h2>
-          <span className={`chip ${st.today_active ? "bg-brand-50 text-brand-800" : "bg-amber-50 text-amber-900"}`}>{st.today_active ? t("Today counts ✓") : t("Do one thing today to keep it")}</span>
+          <h2 className="font-semibold"><Glyph e="🔥" /> {t("Your streak")}</h2>
+          <span className={`chip ${st.today_active ? "bg-brand-50 text-brand-800" : "bg-amber-50 text-amber-900"}`}>{st.today_active ? <><Glyph e="✓" /> {t("Today counts")}</> : t("Do one thing today to keep it")}</span>
         </div>
         <div className="grid grid-cols-3 gap-2 text-center">
           <div><p className="text-2xl font-bold tabular-nums" data-testid="streak-current">{st.current}</p><p className="text-xs text-black/50">{t("Current")}</p></div>
@@ -98,7 +99,7 @@ async function Points() {
           {(st.week ?? []).map((d) => <span key={d.day} className={`size-6 rounded-full ${d.active ? "bg-brand-600" : "bg-black/10"}`} title={d.day} />)}
         </div>
         <p className="text-xs text-black/50">{t("A streak day needs you to sign in and do something real, like voting in a poll, saving a resource or joining a challenge. Refreshing does not count.")}</p>
-        <p className="text-xs text-black/50">{t("Milestones")}: {[7, 14, 30, 60, 100].map((m) => <span key={m} className={`me-2 ${st.earned?.includes(m) ? "font-semibold text-brand-700" : ""}`}>{m}{st.earned?.includes(m) ? " ✓" : ""}</span>)}</p>
+        <p className="text-xs text-black/50">{t("Milestones")}: {[7, 14, 30, 60, 100].map((m) => <span key={m} className={`me-2 ${st.earned?.includes(m) ? "font-semibold text-brand-700" : ""}`}>{m}{st.earned?.includes(m) ? <Glyph e="✓" className="ms-0.5" /> : null}</span>)}</p>
       </section>
 
       <section>

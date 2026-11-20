@@ -12,6 +12,7 @@ import { ResourceCard } from "@/components/library/resource-card";
 import { PageBanner } from "@/components/ui/page-banner";
 import { SectionTabs } from "@/components/ui/section-tabs";
 import { EmptyState } from "@/components/ui/empty-state";
+import { Glyph } from "@/components/glyph";
 
 export const metadata = { title: "Learning Hub" };
 
@@ -55,7 +56,7 @@ async function LearningHub() {
             <h3 className="mb-2 text-sm font-semibold">{popular.length ? t("Popular resources") : t("Recently added")}</h3>
             {(subjects ?? []).length > 0 && (
               <div className="mb-3 flex flex-wrap gap-1.5" data-subjects>
-                {(subjects ?? []).map((s) => <Link key={s.id} href={`/academic-resources/${s.slug}`} className="chip bg-white shadow-sm hover:bg-brand-50">{s.emoji} {s.name}</Link>)}
+                {(subjects ?? []).map((s) => <Link key={s.id} href={`/academic-resources/${s.slug}`} className="chip bg-white shadow-sm hover:bg-brand-50"><Glyph e={s.emoji} /> {s.name}</Link>)}
               </div>
             )}
             {shown.length === 0 ? (

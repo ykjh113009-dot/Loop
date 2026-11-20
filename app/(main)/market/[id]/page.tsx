@@ -14,6 +14,7 @@ import { ReportButton } from "@/components/report-button";
 import { MarketSafetyNote } from "@/components/safety-note";
 import { PageSkeleton } from "@/components/skeleton";
 import { SubmitButton } from "@/components/submit-button";
+import { Glyph } from "@/components/glyph";
 
 async function Listing({ params }: { params: PageProps<"/market/[id]">["params"] }) {
   const { id } = await params;
@@ -78,7 +79,7 @@ async function Listing({ params }: { params: PageProps<"/market/[id]">["params"]
         l.status !== "sold" && me.isStudent && !me.isSuspended && (
           <form action={startChat}>
             <input type="hidden" name="profileId" value={l.seller_id} />
-            <SubmitButton className="btn-primary w-full py-3" pendingText="Opening…">💬 Message the seller</SubmitButton>
+            <SubmitButton className="btn-primary w-full py-3" pendingText="Opening…"><Glyph e="💬" /> Message the seller</SubmitButton>
           </form>
         )
       )}

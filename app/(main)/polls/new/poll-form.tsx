@@ -18,8 +18,8 @@ export function PollForm({ clubs, allowSchoolWide, minClose, defaultClose }: {
       <div>
         <label htmlFor="club_id" className="label">Who can vote?</label>
         <select id="club_id" name="club_id" className="input" defaultValue={allowSchoolWide ? "" : clubs[0]?.id}>
-          {allowSchoolWide && <option value="">🏫 The whole school</option>}
-          {clubs.map((c) => <option key={c.id} value={c.id}>{c.emoji} {c.name} members</option>)}
+          {allowSchoolWide && <option value="">The whole school</option>}
+          {clubs.map((c) => <option key={c.id} value={c.id}>{c.name} members</option>)}
         </select>
       </div>
       <div>

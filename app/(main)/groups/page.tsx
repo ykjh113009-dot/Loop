@@ -11,6 +11,7 @@ import { FeatureBanner } from "@/components/ui/feature-banner";
 import { SectionTabs } from "@/components/ui/section-tabs";
 import { SubmitButton } from "@/components/submit-button";
 import { PageSkeleton } from "@/components/skeleton";
+import { Glyph } from "@/components/glyph";
 
 export const metadata = { title: "Groups" };
 
@@ -57,13 +58,13 @@ async function Groups({ searchParams }: { searchParams: PageProps<"/groups">["se
             return (
               <article key={g.id} className="flex flex-col items-center gap-2 rounded-3xl border border-brand-700/10 bg-white/85 p-5 text-center shadow-[0_1px_2px_rgba(40,60,40,0.04)]" data-group={g.name}>
                 <Link href={`/groups/${g.id}`} className="flex flex-col items-center gap-2">
-                  <span className="flex size-16 items-center justify-center rounded-full bg-sage-soft text-3xl" aria-hidden="true">{g.emoji}</span>
+                  <span className="flex size-16 items-center justify-center rounded-full bg-sage-soft text-3xl" aria-hidden="true"><Glyph e={g.emoji} /></span>
                   <span className="text-[17px] font-semibold hover:underline">{g.name}</span>
                 </Link>
                 <p className="flex flex-wrap items-center justify-center gap-1.5 text-xs text-ink-2">
                   <span>{t("{n} members", { n: g.member_count })}</span>
                   {g.kind === "official" && <span className="chip bg-brand-50 text-brand-800">{t("Official")}</span>}
-                  <span className="chip">{g.privacy === "private" ? `🔒 ${t("Private")}` : t("Public")}</span>
+                  <span className="chip">{g.privacy === "private" ? `${t("Private")}` : t("Public")}</span>
                 </p>
                 {g.description && <p className="line-clamp-2 text-sm text-ink-2">{g.description}</p>}
                 <div className="mt-auto w-full pt-2">

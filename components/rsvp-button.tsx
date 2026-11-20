@@ -27,7 +27,7 @@ export function RsvpButton({ eventId, status, goingCount, capacity, disabledReas
           <form action={leave} className="flex-1">
             <input type="hidden" name="id" value={eventId} />
             <button disabled={busy} className="btn-secondary w-full py-3">
-              {busy ? "…" : status === "going" ? t("✓ You're going · Cancel") : t("On the waiting list · Leave")}
+              {busy ? "…" : status === "going" ? t("You're going · Cancel") : t("On the waiting list · Leave")}
             </button>
           </form>
         ) : (

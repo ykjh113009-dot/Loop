@@ -12,6 +12,7 @@ import { ReportButton } from "@/components/report-button";
 import { PageSkeleton } from "@/components/skeleton";
 import { SubmitButton } from "@/components/submit-button";
 import { AnswerForm } from "../forms";
+import { Glyph } from "@/components/glyph";
 
 const PERSON = "id, full_name, avatar, grade, role, alumni_year, university, major" as const;
 
@@ -58,7 +59,7 @@ async function Question({ params }: { params: PageProps<"/tawjihi/[id]">["params
               <div className="min-w-0 flex-1 text-sm">
                 <p>
                   <Link href={`/profile/${a.author_id}`} className="font-semibold">{a.author?.full_name}</Link>
-                  {mentor && <span className="chip ms-1.5 bg-brand-700 px-2 py-0.5 text-[10px] text-white">🎓 Alumni mentor</span>}
+                  {mentor && <span className="chip ms-1.5 bg-brand-700 px-2 py-0.5 text-[10px] text-white"><Glyph e="🎓" /> Alumni mentor</span>}
                 </p>
                 <p className="text-xs text-black/45">
                   {mentor ? [a.author?.major, a.author?.university].filter(Boolean).join(" · ") || personLabel(a.author) : personLabel(a.author)} · {timeAgo(a.created_at)}

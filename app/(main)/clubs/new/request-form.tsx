@@ -8,6 +8,7 @@ import type { ActionResult } from "@/lib/errors";
 import { requestClub } from "@/app/actions/clubs";
 import { SubmitButton } from "@/components/submit-button";
 import { FormMessage } from "@/components/form-message";
+import { Glyph } from "@/components/glyph";
 
 const EMOJIS = ["⭐", "⚽", "🏀", "🤖", "💻", "🎨", "🎵", "🎭", "📚", "🎤", "📷", "🌱", "♟️", "🍳", "🎮", "🤝", "💃", "🔬", "✍️", "🧵"];
 
@@ -57,7 +58,7 @@ export function RequestClubForm({ schoolId }: { schoolId: string }) {
           {preview
             // eslint-disable-next-line @next/next/no-img-element -- local preview
             ? <img src={preview} alt="" className="size-full object-cover" data-picture-preview />
-            : emoji}
+            : <span className="text-brand-800"><Glyph e={emoji} strokeWidth={1.4} /></span>}
         </span>
         <div className="space-y-1.5">
           <p className="label !mb-0">Club picture <span className="font-normal text-black/45">(optional)</span></p>
@@ -80,9 +81,10 @@ export function RequestClubForm({ schoolId }: { schoolId: string }) {
               key={e}
               onClick={() => setEmoji(e)}
               aria-pressed={emoji === e}
-              className={`size-10 rounded-xl text-xl ${emoji === e ? "bg-brand-100 ring-2 ring-brand-600" : "bg-black/5"}`}
+              aria-label={e}
+              className={`opt size-10 rounded-xl p-0 text-xl ${emoji === e ? "opt-on" : ""}`}
             >
-              {e}
+              <Glyph e={e} strokeWidth={1.7} />
             </button>
           ))}
         </div>

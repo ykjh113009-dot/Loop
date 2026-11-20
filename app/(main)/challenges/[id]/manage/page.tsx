@@ -10,6 +10,7 @@ import { formatDateTime, timeAgo } from "@/lib/time";
 import { PageHeader } from "@/components/page-header";
 import { PageSkeleton } from "@/components/skeleton";
 import { CancelForm, EntryDecision, QuickButton, RankForm } from "../../forms";
+import { Glyph } from "@/components/glyph";
 
 export const metadata = { title: "Manage challenge" };
 
@@ -81,7 +82,7 @@ async function Manage({ params }: { params: PageProps<"/challenges/[id]/manage">
   return (
     <div className="mx-auto max-w-2xl space-y-4">
       <Link href={`/challenges/${id}`} className="card flex items-center gap-3 p-4 hover:bg-black/[0.02]">
-        <span className="text-2xl">{c.emoji}</span>
+        <span className="text-2xl"><Glyph e={c.emoji} /></span>
         <div className="min-w-0 flex-1"><p className="font-bold">{c.title}</p><p className="text-xs text-black/50">{t(phase === "active" ? "Active" : phase === "completed" ? "Completed" : phase === "expired" ? "Expired" : phase === "approved" ? "Approved" : phase === "cancelled" ? "Cancelled" : phase === "pending" ? "Pending review" : phase === "rejected" ? "Rejected" : "Draft")} · {formatDateTime(c.ends_at)}</p></div>
       </Link>
 

@@ -5,6 +5,7 @@ import { uploadPhoto } from "@/lib/upload";
 import { createPost } from "@/app/actions/content";
 import { Icon } from "@/components/icons";
 import type { ActionResult } from "@/lib/errors";
+import { Glyph } from "@/components/glyph";
 
 export function PostComposer({ clubId, schoolId, userId }: { clubId: string; schoolId: string; userId: string }) {
   const [body, setBody] = useState("");
@@ -55,7 +56,7 @@ export function PostComposer({ clubId, schoolId, userId }: { clubId: string; sch
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={preview} alt="" className="max-h-48 rounded-xl object-cover" />
           <button type="button" onClick={() => pickFile(null)} className="absolute top-2 start-2 rounded-full bg-black/60 px-2 text-sm text-white">
-            ✕
+            <Glyph e="✕" />
           </button>
         </div>
       )}

@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import { setTop10Prize, setTop10Settings } from "@/app/actions/study";
 import type { ActionResult } from "@/lib/errors";
+import { Glyph } from "@/components/glyph";
 
 function Msg({ state }: { state: ActionResult }) {
   if (state?.error) return <p role="alert" className="text-sm text-red-700">{state.error}</p>;
@@ -30,7 +31,7 @@ export function Top10Forms({ settings, prizes }: { settings: { period: string; r
   const [state, action, pending] = useActionState(setTop10Settings, null);
   return (
     <section className="card space-y-3 p-4" id="top10">
-      <h2 className="font-semibold">🏆 Top 10 prizes</h2>
+      <h2 className="font-semibold"><Glyph e="🏆" /> Top 10 prizes</h2>
       <p className="text-xs text-black/55">Shown inside the Rewards Shop. The ranking is the normal student leaderboard, so there is nothing to keep in sync.</p>
       <form action={action} className="space-y-2">
         <label className="block text-sm"><span className="label">Ranking period</span>

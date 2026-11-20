@@ -7,6 +7,7 @@ import { AdminNav } from "@/components/admin-nav";
 import { PageHeader } from "@/components/page-header";
 import { SubmitButton } from "@/components/submit-button";
 import { PageSkeleton } from "@/components/skeleton";
+import { Glyph } from "@/components/glyph";
 
 export const metadata = { title: "Settings" };
 
@@ -103,7 +104,7 @@ async function Settings() {
             {ours.map((w) => (
               <ActionForm key={w.id} action={removeBlockedWord}>
                 <input type="hidden" name="id" value={w.id} />
-                <button className="chip hover:bg-red-50 hover:text-red-700" title="Remove">{w.word} ✕</button>
+                <button className="chip hover:bg-red-50 hover:text-red-700" title="Remove">{w.word} <Glyph e="✕" /></button>
               </ActionForm>
             ))}
           </div>

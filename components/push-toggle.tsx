@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { removePushSubscription, savePushSubscription } from "@/app/actions/notifications";
+import { Glyph } from "@/components/glyph";
 
 const KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
 
@@ -59,7 +60,7 @@ export function PushToggle() {
   if (state === "unsupported" || state === "loading") return null;
   return (
     <div className="card flex items-center gap-3 p-4">
-      <span className="text-2xl">📲</span>
+      <span className="text-2xl"><Glyph e="📲" /></span>
       <div className="flex-1 text-sm">
         <p className="font-semibold">Alerts on this phone</p>
         <p className="text-black/55">

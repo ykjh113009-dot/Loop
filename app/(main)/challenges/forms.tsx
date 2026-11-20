@@ -1,4 +1,5 @@
 "use client";
+import { Place } from "@/components/glyph";
 
 import { useActionState } from "react";
 import {
@@ -103,7 +104,7 @@ export function RankForm({ id, places, entries, locale }: { id: string; places: 
       <p className="text-xs text-black/55">{t("Points are paid once. Check the entries carefully first.")}</p>
       {Array.from({ length: places }, (_, i) => i + 1).map((n) => (
         <label key={n} className="flex items-center gap-2 text-sm">
-          <span className="w-8 text-center">{n === 1 ? "🥇" : n === 2 ? "🥈" : n === 3 ? "🥉" : `#${n}`}</span>
+          <Place n={n} />
           <select name={`place${n}`} defaultValue="" className="input">
             <option value="">–</option>
             {entries.map((e) => <option key={e.id} value={e.id}>{e.name}</option>)}

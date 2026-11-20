@@ -8,6 +8,8 @@ import { MarkRead } from "@/components/mark-read";
 import { PageHeader } from "@/components/page-header";
 import { PushToggle } from "@/components/push-toggle";
 import { PageSkeleton } from "@/components/skeleton";
+import { Glyph } from "@/components/glyph";
+import { splitTitle } from "@/lib/notif-title";
 
 export const metadata = { title: "Alerts" };
 
@@ -27,11 +29,13 @@ async function Notifications() {
     <ul className="card divide-y divide-black/5">
       <MarkRead />
       {items.map((n) => {
+        const { emoji, text } = splitTitle(n.title);
         const content = (
           <div className="flex gap-3 px-4 py-3">
             <span className={`mt-1.5 size-2 shrink-0 rounded-full ${n.read_at ? "bg-transparent" : "bg-brand-600"}`} />
+            <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-sage-soft text-lg text-brand-800" aria-hidden="true"><Glyph e={emoji ?? "🔔"} strokeWidth={1.6} /></span>
             <div className="min-w-0 flex-1">
-              <p className={n.read_at ? "font-medium" : "font-bold"}>{n.title}</p>
+              <p className={n.read_at ? "font-medium" : "font-bold"}>{text}</p>
               {n.body && <p className="text-sm text-black/60">{n.body}</p>}
             </div>
             <span className="shrink-0 text-xs text-black/40">{timeAgo(n.created_at)}</span>

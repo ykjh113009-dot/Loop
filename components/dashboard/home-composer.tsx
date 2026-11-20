@@ -133,9 +133,9 @@ export function HomeComposer({
           onChange={(e) => setClubId(e.target.value)}
           className="max-w-[40%] truncate rounded-full border border-brand-700/10 bg-white/80 py-1.5 ps-3 pe-7 text-[13px] font-medium outline-none focus:border-brand-600"
         >
-          <option value="">🏫 {t("Whole school")}</option>
+          <option value="">{t("Whole school")}</option>
           {clubs.map((c) => (
-            <option key={c.id} value={c.id}>{c.emoji} {c.name}</option>
+            <option key={c.id} value={c.id}>{c.name}</option>
           ))}
         </select>
         <button

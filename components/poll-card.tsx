@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { formatDateTime } from "@/lib/time";
 import { deletePoll } from "@/app/actions/polls";
 import { VoteForm } from "@/components/vote-form";
+import { Glyph } from "@/components/glyph";
 
 type Poll = {
   id: string;
@@ -25,7 +26,7 @@ export async function PollCard({ poll, canVote, canDelete }: { poll: Poll; canVo
     <article className="space-y-3 rounded-3xl border border-brand-700/10 bg-white/85 p-5 shadow-[0_1px_2px_rgba(40,60,40,0.04)]">
       <div>
         <p className="text-xs text-black/45">
-          {poll.club ? <><ClubMark club={poll.club} /> {poll.club.name}</> : "🏫 Whole school"} · {open ? `closes ${formatDateTime(poll.closes_at)}` : "closed"}
+          {poll.club ? <><ClubMark club={poll.club} /> {poll.club.name}</> : "Whole school"} · {open ? `closes ${formatDateTime(poll.closes_at)}` : "closed"}
         </p>
         <h2 className="text-[17px] font-semibold">{poll.question}</h2>
       </div>
@@ -37,7 +38,7 @@ export async function PollCard({ poll, canVote, canDelete }: { poll: Poll; canVo
             return (
               <li key={i} className="text-sm">
                 <div className="flex justify-between">
-                  <span className={r.mine === i ? "font-semibold" : ""}>{option}{r.mine === i && " ✓"}</span>
+                  <span className={r.mine === i ? "font-semibold" : ""}>{option}{r.mine === i && <Glyph e="✓" className="ms-1" />}</span>
                   <span className="tabular-nums text-black/60">{pct}% ({n})</span>
                 </div>
                 <div className="mt-1 h-2.5 rounded-full bg-black/[0.06]">

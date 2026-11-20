@@ -1,3 +1,4 @@
+import { Glyph } from "@/components/glyph";
 // A club's picture when it has one, otherwise its emoji, in a round sage badge.
 export function ClubIcon({ emoji, url, className = "size-[60px] text-3xl" }: { emoji: string; url?: string | null; className?: string }) {
   return (
@@ -5,7 +6,7 @@ export function ClubIcon({ emoji, url, className = "size-[60px] text-3xl" }: { e
       {url
         // eslint-disable-next-line @next/next/no-img-element -- signed private image
         ? <img src={url} alt="" loading="lazy" className="size-full object-cover" />
-        : emoji}
+        : <Glyph e={emoji} className="text-brand-800" strokeWidth={1.6} />}
     </span>
   );
 }

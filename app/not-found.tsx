@@ -1,9 +1,10 @@
 import Link from "next/link";
+import { Glyph } from "@/components/glyph";
 
 export default function NotFound() {
   return (
     <div className="mx-auto flex min-h-[70dvh] max-w-md flex-col items-center justify-center gap-3 px-5 text-center">
-      <div className="text-4xl">🧭</div>
+      <div className="text-4xl"><Glyph e="🧭" /></div>
       <h1 className="text-xl font-bold">We couldn&apos;t find that</h1>
       <p className="text-black/60">It may have been removed, or you may not have access to it.</p>
       <Link href="/home" className="btn-primary">Go home</Link>

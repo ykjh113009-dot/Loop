@@ -8,6 +8,7 @@ import { PageHeader } from "@/components/page-header";
 import { PageSkeleton } from "@/components/skeleton";
 import { RespondForm, SuggestionForm } from "./forms";
 import { SUGGESTION_CATEGORIES } from "@/lib/labels";
+import { Glyph } from "@/components/glyph";
 
 export const metadata = { title: "Suggestion box" };
 
@@ -15,7 +16,7 @@ const STATUS: Record<string, { label: string; cls: string }> = {
   new: { label: "New", cls: "bg-black/5" },
   reviewing: { label: "Looking at it", cls: "bg-amber-50 text-amber-800" },
   planned: { label: "Planned", cls: "bg-blue-50 text-blue-800" },
-  done: { label: "Done ✓", cls: "bg-brand-50 text-brand-800" },
+  done: { label: "Done", cls: "bg-brand-50 text-brand-800" },
   declined: { label: "Not this time", cls: "bg-black/5 text-black/60" },
 };
 
@@ -40,8 +41,8 @@ async function Suggestions({ searchParams }: { searchParams: PageProps<"/suggest
     <div className="space-y-4">
       {canReview && (
         <div className="flex gap-1 rounded-xl bg-black/5 p-1">
-          <Link href="/suggestions" className={`flex-1 rounded-lg py-1.5 text-center text-sm font-medium ${!inbox ? "bg-white shadow-sm" : "text-black/55"}`}>My ideas</Link>
-          <Link href="/suggestions?tab=inbox" className={`flex-1 rounded-lg py-1.5 text-center text-sm font-medium ${inbox ? "bg-white shadow-sm" : "text-black/55"}`}>Inbox (council)</Link>
+          <Link href="/suggestions" className={`flex-1 rounded-lg py-1.5 text-center text-sm font-medium ${!inbox ? "bg-brand-700 text-white shadow-sm" : "text-black/55 hover:bg-sage-soft/60"}`}>My ideas</Link>
+          <Link href="/suggestions?tab=inbox" className={`flex-1 rounded-lg py-1.5 text-center text-sm font-medium ${inbox ? "bg-brand-700 text-white shadow-sm" : "text-black/55 hover:bg-sage-soft/60"}`}>Inbox (council)</Link>
         </div>
       )}
       {!inbox && !me.isSuspended && <SuggestionForm />}
@@ -56,7 +57,7 @@ async function Suggestions({ searchParams }: { searchParams: PageProps<"/suggest
             </div>
             <p className="mt-1.5 font-semibold">{s.title}</p>
             {s.body && <p className="mt-1 text-sm whitespace-pre-wrap text-black/70">{s.body}</p>}
-            {s.response && !inbox && <p className="mt-2 rounded-lg bg-brand-50 px-3 py-2 text-sm text-brand-900">💬 {s.response}</p>}
+            {s.response && !inbox && <p className="mt-2 rounded-lg bg-brand-50 px-3 py-2 text-sm text-brand-900"><Glyph e="💬" /> {s.response}</p>}
             {inbox && <RespondForm id={s.id} status={s.status} response={s.response} />}
           </article>
         ))

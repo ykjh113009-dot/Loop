@@ -5,6 +5,7 @@ import { createEvent, updateEvent } from "@/app/actions/events";
 import { PhotoField } from "@/components/photo-field";
 import { EVENT_CATEGORIES } from "@/lib/events";
 import { makeT, type Locale } from "@/lib/i18n";
+import { Glyph } from "@/components/glyph";
 
 export type EventDraft = {
   id?: string; title: string; description: string; location: string; category: string; club_id: string;
@@ -25,7 +26,7 @@ function TeamPicker({ people, initial, t }: { people: Person[]; initial: string[
       {ids.map((id) => <input key={id} type="hidden" name="organizers" value={id} />)}
       <div className="flex flex-wrap gap-1.5">
         {chosen.map((p) => (
-          <button key={p.id} type="button" onClick={() => setIds(ids.filter((x) => x !== p.id))} className="chip bg-brand-50 text-brand-900">{p.name} ✕</button>
+          <button key={p.id} type="button" onClick={() => setIds(ids.filter((x) => x !== p.id))} className="chip bg-brand-50 text-brand-900">{p.name} <Glyph e="✕" /></button>
         ))}
       </div>
       {ids.length < 8 && <input value={q} onChange={(e) => setQ(e.target.value)} className="input" placeholder={t("Type a name to add someone")} />}
@@ -56,8 +57,8 @@ export function EventForm({ draft, clubs, direct, minStart, schoolId, userId, lo
         <div>
           <label htmlFor="club_id" className="label">{t("Who is it for?")}</label>
           <select id="club_id" name="club_id" defaultValue={draft.club_id} className="input">
-            <option value="">🏫 {t("The whole school")}</option>
-            {clubs.map((c) => <option key={c.id} value={c.id}>{c.emoji} {c.name}</option>)}
+            <option value="">{t("The whole school")}</option>
+            {clubs.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
           </select>
         </div>
       )}
@@ -69,7 +70,7 @@ export function EventForm({ draft, clubs, direct, minStart, schoolId, userId, lo
       <div>
         <label htmlFor="category" className="label">{t("Category")}</label>
         <select id="category" name="category" defaultValue={draft.category} className="input">
-          {EVENT_CATEGORIES.map((c) => <option key={c.id} value={c.id}>{c.emoji} {t(c.label)}</option>)}
+          {EVENT_CATEGORIES.map((c) => <option key={c.id} value={c.id}>{t(c.label)}</option>)}
         </select>
       </div>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">

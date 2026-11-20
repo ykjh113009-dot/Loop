@@ -14,6 +14,7 @@ import { ReportButton } from "@/components/report-button";
 import { SubmitButton } from "@/components/submit-button";
 import { EntryForm } from "../entry-form";
 import { JoinButton, QuickButton } from "../forms";
+import { Glyph, Place } from "@/components/glyph";
 
 export const metadata = { title: "Challenge" };
 
@@ -57,10 +58,10 @@ async function Challenge({ params }: { params: PageProps<"/challenges/[id]">["pa
         )}
         <div className="space-y-3 p-4">
           <div className="flex items-start gap-3">
-            <span className="text-3xl">{c.emoji}</span>
+            <span className="text-3xl"><Glyph e={c.emoji} /></span>
             <div className="min-w-0 flex-1">
               <h2 className="text-xl font-bold">{c.title}</h2>
-              <p className="text-xs text-black/50">{cat.emoji} {t(cat.label)} · {t(kindOf(c.kind).label)} · {t("by {name}", { name: c.creator?.full_name ?? t("a former student") })}</p>
+              <p className="text-xs text-black/50"><Glyph e={cat.emoji} /> {t(cat.label)} · {t(kindOf(c.kind).label)} · {t("by {name}", { name: c.creator?.full_name ?? t("a former student") })}</p>
             </div>
             <span className={`chip shrink-0 ${PHASE[phase].cls}`}>{t(PHASE[phase].label)}</span>
           </div>
@@ -77,11 +78,11 @@ async function Challenge({ params }: { params: PageProps<"/challenges/[id]">["pa
           </dl>
           {c.reward_mode === "ranked" && (
             <ul className="space-y-1 text-sm">
-              {(prizes ?? []).map((p) => <li key={p.place}>{p.place === 1 ? "🥇" : p.place === 2 ? "🥈" : p.place === 3 ? "🥉" : `#${p.place}`} {t("+{n} points", { n: p.points })}</li>)}
+              {(prizes ?? []).map((p) => <li key={p.place}><Place n={p.place} /> {t("+{n} points", { n: p.points })}</li>)}
               {c.points > 0 && <li className="text-black/55">{t("Everyone approved also gets +{n} points", { n: c.points })}</li>}
             </ul>
           )}
-          {c.audience !== "school" && <p className="text-xs text-black/55">👥 {c.audience === "grade" ? t("For grade {g}", { g: c.audience_grade ?? "" }) : t("For class {g}{s}", { g: c.audience_grade ?? "", s: c.audience_section ?? "" })}</p>}
+          {c.audience !== "school" && <p className="text-xs text-black/55"><Glyph e="👥" /> {c.audience === "grade" ? t("For grade {g}", { g: c.audience_grade ?? "" }) : t("For class {g}{s}", { g: c.audience_grade ?? "", s: c.audience_section ?? "" })}</p>}
         </div>
       </article>
 
@@ -95,7 +96,7 @@ async function Challenge({ params }: { params: PageProps<"/challenges/[id]">["pa
       <section className="card p-4 text-sm">
         <h3 className="font-bold">{t("What you need to send")}</h3>
         <ul className="mt-1 space-y-0.5">
-          {PROOF.filter((p) => c.proof_kinds.includes(p.id)).map((p) => <li key={p.id}>{p.emoji} {t(p.label)}</li>)}
+          {PROOF.filter((p) => c.proof_kinds.includes(p.id)).map((p) => <li key={p.id}><Glyph e={p.emoji} /> {t(p.label)}</li>)}
         </ul>
         {c.proof_kinds.includes("answers") && (
           <ol className="mt-2 list-decimal ps-5 text-black/70">{c.questions.map((q, i) => <li key={i}>{q}</li>)}</ol>
@@ -169,7 +170,7 @@ async function Challenge({ params }: { params: PageProps<"/challenges/[id]">["pa
         <section className="card p-4 text-sm">
           <h3 className="font-bold">{t("Winners")}</h3>
           <ol className="mt-1 space-y-1">
-            {(winners ?? []).map((w) => <li key={w.placement}>{w.placement === 1 ? "🥇" : w.placement === 2 ? "🥈" : w.placement === 3 ? "🥉" : `#${w.placement}`} {w.student?.full_name}</li>)}
+            {(winners ?? []).map((w) => <li key={w.placement}>{w.placement ? <Place n={w.placement} /> : null} {w.student?.full_name}</li>)}
           </ol>
         </section>
       )}

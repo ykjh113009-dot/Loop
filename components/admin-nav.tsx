@@ -20,7 +20,7 @@ export function AdminNav({ current }: { current: string }) {
         <Link
           key={l.href}
           href={l.href}
-          className={`shrink-0 flex-1 rounded-lg px-3 py-1.5 text-center text-sm font-medium whitespace-nowrap ${current === l.href ? "bg-white shadow-sm" : "text-black/55"}`}
+          className={`shrink-0 flex-1 rounded-lg px-3 py-1.5 text-center text-sm font-medium whitespace-nowrap ${current === l.href ? "bg-brand-700 text-white shadow-sm" : "text-black/55 hover:bg-sage-soft/60"}`}
         >
           {l.label}
         </Link>

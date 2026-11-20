@@ -86,7 +86,7 @@ async function login(browser, name, viewport = { width: 1280, height: 850 }) {
     await p.getByRole('button', { name: 'Join this challenge' }).click();
     await waitText(p, /Send your proof/).catch(async () => { console.log('JOIN PAGE:', (await text(p)).slice(-400)); throw new Error('join failed'); });
     await p.setInputFiles('input[type=file]', PROOF);
-    await waitText(p, /✓ proof/, 20000);
+    await waitText(p, /proof\.png/, 20000);
     await p.fill('textarea[name=note]', 'Here I am next to the old tree!');
     await p.getByRole('button', { name: 'Send my proof' }).click();
     await waitText(p, /Submitted/);

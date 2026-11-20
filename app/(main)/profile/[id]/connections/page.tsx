@@ -42,7 +42,7 @@ async function Connections({ params, searchParams }: { params: PageProps<"/profi
       <PageHeader title={t("Connections")} back={`/profile/${id}`} />
       <div className="mb-4 flex gap-1 rounded-xl bg-black/5 p-1">
         {tabs.map(([key, label]) => (
-          <Link key={key} href={`/profile/${id}/connections?tab=${key}`} className={`flex-1 rounded-lg px-3 py-1.5 text-center text-sm font-medium ${tab === key ? "bg-white shadow-sm" : "text-black/55"}`}>
+          <Link key={key} href={`/profile/${id}/connections?tab=${key}`} className={`flex-1 rounded-lg px-3 py-1.5 text-center text-sm font-medium ${tab === key ? "bg-brand-700 text-white shadow-sm" : "text-black/55 hover:bg-sage-soft/60"}`}>
             {label}
           </Link>
         ))}

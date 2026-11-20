@@ -10,6 +10,7 @@ import { Empty } from "@/components/empty";
 import { PageHeader } from "@/components/page-header";
 import { SubmitButton } from "@/components/submit-button";
 import { PageSkeleton } from "@/components/skeleton";
+import { Glyph } from "@/components/glyph";
 
 export const metadata = { title: "Moderation" };
 
@@ -18,9 +19,9 @@ const REASONS: Record<string, string> = {
   harassment: "Harassment",
   inappropriate: "Inappropriate",
   spam: "Spam",
-  self_harm: "⚠️ Someone may need help",
+  self_harm: "Someone may need help",
   other: "Other",
-  filter: "🤖 Bad-word filter",
+  filter: "Bad-word filter",
 };
 const TARGETS: Record<string, string> = {
   post: "Post",
@@ -205,7 +206,7 @@ async function Approvals() {
           <h2 className="section-title">Club requests</h2>
           {clubs.map((c) => (
             <article key={c.id} className="card space-y-2 p-4">
-              <p className="font-semibold">{c.emoji} {c.name}</p>
+              <p className="font-semibold"><Glyph e={c.emoji} /> {c.name}</p>
               <p className="text-sm whitespace-pre-wrap text-black/70">{c.description}</p>
               <p className="text-xs text-black/45">
                 Requested by {c.requester?.full_name} (grade {c.requester?.grade}) · {timeAgo(c.created_at)}
@@ -222,7 +223,7 @@ async function Approvals() {
             <article key={e.id} className="card space-y-2 p-4">
               <Link href={`/events/${e.id}`} className="font-semibold hover:underline">{e.title}</Link>
               <p className="text-sm text-black/70">
-                {formatDateTime(e.starts_at)}{e.location && ` · ${e.location}`} · {e.club?.emoji} {e.club?.name}
+                {formatDateTime(e.starts_at)}{e.location && ` · ${e.location}`} · <Glyph e={e.club?.emoji} /> {e.club?.name}
               </p>
               {e.description && <p className="text-sm whitespace-pre-wrap text-black/60">{e.description}</p>}
               <p className="text-xs text-black/45">Suggested by {e.creator?.full_name}</p>
@@ -238,7 +239,7 @@ async function Approvals() {
             {submissions.map((x) => (
               <li key={x.id}>
                 <Link href={`/challenges/${x.challenge?.id}/manage`} className="flex items-center gap-2 px-4 py-3 hover:bg-black/[0.02]">
-                  <span>{x.challenge?.emoji}</span>
+                  <span><Glyph e={x.challenge?.emoji} /></span>
                   <span className="min-w-0 flex-1"><strong>{x.student?.full_name}</strong> <span className="text-black/45">(grade {x.student?.grade}) · {x.challenge?.title}</span></span>
                   <span className="text-xs text-black/45">{timeAgo(x.created_at)}</span>
                 </Link>
@@ -331,7 +332,7 @@ async function Moderation({ searchParams }: { searchParams: PageProps<"/moderati
           <Link
             key={t.id}
             href={`/moderation?tab=${t.id}`}
-            className={`flex-1 rounded-lg py-1.5 text-center text-sm font-medium ${tab === t.id ? "bg-white shadow-sm" : "text-black/55"}`}
+            className={`flex-1 rounded-lg py-1.5 text-center text-sm font-medium ${tab === t.id ? "bg-brand-700 text-white shadow-sm" : "text-black/55 hover:bg-sage-soft/60"}`}
           >
             {t.label}
           </Link>

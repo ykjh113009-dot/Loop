@@ -5,6 +5,7 @@ import { reviewLibrary } from "@/app/actions/library";
 import { FormMessage } from "@/components/form-message";
 import { makeT, type Locale } from "@/lib/i18n";
 import type { ActionResult } from "@/lib/errors";
+import { Glyph } from "@/components/glyph";
 
 export function ReviewForm({ id, hasFile, locale }: { id: string; hasFile: boolean; locale: Locale }) {
   const t = makeT(locale);
@@ -36,8 +37,8 @@ export function ReviewForm({ id, hasFile, locale }: { id: string; hasFile: boole
       )}
       <FormMessage state={result} />
       <div className="flex flex-wrap gap-2">
-        <button name="decision" value="approve" disabled={pending} className="btn-primary" data-approve>✓ {t("Approve")}</button>
-        <button name="decision" value="reject" disabled={pending} className="btn-danger" data-reject>✕ {t("Reject")}</button>
+        <button name="decision" value="approve" disabled={pending} className="btn-primary" data-approve><Glyph e="✓" /> {t("Approve")}</button>
+        <button name="decision" value="reject" disabled={pending} className="btn-danger" data-reject><Glyph e="✕" /> {t("Reject")}</button>
       </div>
     </form>
   );

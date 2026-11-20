@@ -10,6 +10,7 @@ import { formatDateTime, timeAgo } from "@/lib/time";
 import { PageHeader } from "@/components/page-header";
 import { PageSkeleton } from "@/components/skeleton";
 import { IdeaDecision } from "../forms";
+import { Glyph } from "@/components/glyph";
 
 export const metadata = { title: "Review challenges" };
 
@@ -47,7 +48,7 @@ async function Review({ searchParams }: { searchParams: PageProps<"/challenges/r
     <div className="mx-auto max-w-2xl space-y-4">
       <div className="flex gap-1 overflow-x-auto rounded-xl bg-black/5 p-1" role="tablist">
         {tabs.map(([id, label]) => (
-          <Link key={id} role="tab" aria-selected={tab === id} href={`/challenges/review?tab=${id}`} className={`flex-1 rounded-lg px-3 py-1.5 text-center text-sm font-medium whitespace-nowrap ${tab === id ? "bg-white shadow-sm" : "text-black/55"}`}>{label}</Link>
+          <Link key={id} role="tab" aria-selected={tab === id} href={`/challenges/review?tab=${id}`} className={`flex-1 rounded-lg px-3 py-1.5 text-center text-sm font-medium whitespace-nowrap ${tab === id ? "bg-brand-700 text-white shadow-sm" : "text-black/55 hover:bg-sage-soft/60"}`}>{label}</Link>
         ))}
       </div>
 
@@ -58,17 +59,17 @@ async function Review({ searchParams }: { searchParams: PageProps<"/challenges/r
             <img src={covers.get(c.cover_path)!} alt="" className="h-32 w-full rounded-xl object-cover" />
           )}
           <div>
-            <h2 className="text-base font-bold">{c.emoji} {c.title}</h2>
-            <p className="text-xs text-black/50">{t("by {name}", { name: c.creator?.full_name ?? "?" })} · {categoryOf(c.category).emoji} {t(categoryOf(c.category).label)} · {t(kindOf(c.kind).label)}</p>
+            <h2 className="text-base font-bold"><Glyph e={c.emoji} /> {c.title}</h2>
+            <p className="text-xs text-black/50">{t("by {name}", { name: c.creator?.full_name ?? "?" })} · <Glyph e={categoryOf(c.category).emoji} /> {t(categoryOf(c.category).label)} · {t(kindOf(c.kind).label)}</p>
           </div>
           <p className="whitespace-pre-wrap text-black/75">{c.description}</p>
           {c.instructions && <p className="whitespace-pre-wrap text-black/65"><strong>{t("What to do")}:</strong> {c.instructions}</p>}
           {c.rules && <p className="whitespace-pre-wrap text-black/65"><strong>{t("Rules")}:</strong> {c.rules}</p>}
           <ul className="space-y-0.5 text-xs text-black/60">
-            <li>🏆 {c.reward_mode === "ranked" ? (prizes ?? []).filter((p) => p.challenge_id === c.id).map((p) => `#${p.place}: ${p.points}`).join(" · ") + (c.points ? ` · ${t("taking part")}: ${c.points}` : "") : t("+{n} points", { n: c.points })}</li>
-            <li>📅 {formatDateTime(c.starts_at)} → {formatDateTime(c.ends_at)}</li>
-            <li>📝 {PROOF.filter((p) => c.proof_kinds.includes(p.id)).map((p) => t(p.label)).join(", ")}</li>
-            <li>👥 {c.audience === "school" ? t("Whole school") : c.audience === "grade" ? t("Grade {g}", { g: c.audience_grade ?? "" }) : t("Class {g}{s}", { g: c.audience_grade ?? "", s: c.audience_section ?? "" })}{c.max_participants ? ` · ${t("max {n} students", { n: c.max_participants })}` : ""}</li>
+            <li><Glyph e="🏆" /> {c.reward_mode === "ranked" ? (prizes ?? []).filter((p) => p.challenge_id === c.id).map((p) => `#${p.place}: ${p.points}`).join(" · ") + (c.points ? ` · ${t("taking part")}: ${c.points}` : "") : t("+{n} points", { n: c.points })}</li>
+            <li><Glyph e="📅" /> {formatDateTime(c.starts_at)} → {formatDateTime(c.ends_at)}</li>
+            <li><Glyph e="📝" /> {PROOF.filter((p) => c.proof_kinds.includes(p.id)).map((p) => t(p.label)).join(", ")}</li>
+            <li><Glyph e="👥" /> {c.audience === "school" ? t("Whole school") : c.audience === "grade" ? t("Grade {g}", { g: c.audience_grade ?? "" }) : t("Class {g}{s}", { g: c.audience_grade ?? "", s: c.audience_section ?? "" })}{c.max_participants ? ` · ${t("max {n} students", { n: c.max_participants })}` : ""}</li>
           </ul>
           {govern ? <IdeaDecision id={c.id} locale={locale} /> : <p className="text-xs text-black/50">{t("Only the Student Council and admins can approve ideas.")}</p>}
         </article>
@@ -78,7 +79,7 @@ async function Review({ searchParams }: { searchParams: PageProps<"/challenges/r
         <ul className="card divide-y divide-black/5 text-sm">
           {(waiting ?? []).map((e) => (
             <li key={e.id}><Link href={`/challenges/${e.challenge?.id}/manage`} className="flex items-center gap-2 px-4 py-3 hover:bg-black/[0.02]">
-              <span>{e.challenge?.emoji}</span>
+              <span><Glyph e={e.challenge?.emoji} /></span>
               <span className="min-w-0 flex-1"><strong>{e.student?.full_name}</strong> <span className="text-black/50">· {e.challenge?.title}</span></span>
               <span className="text-xs text-black/45">{timeAgo(e.created_at)}</span>
             </Link></li>

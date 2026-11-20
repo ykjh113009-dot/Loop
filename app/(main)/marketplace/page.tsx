@@ -11,6 +11,7 @@ import { PageSkeleton } from "@/components/skeleton";
 import { PageBanner } from "@/components/ui/page-banner";
 import { SectionTabs } from "@/components/ui/section-tabs";
 import { EmptyState } from "@/components/ui/empty-state";
+import { Glyph } from "@/components/glyph";
 
 export const metadata = { title: "Marketplace" };
 
@@ -52,7 +53,7 @@ async function Marketplace() {
                     {img
                       // eslint-disable-next-line @next/next/no-img-element -- private signed link
                       ? <img src={img} alt="" className="size-full object-cover" />
-                      : <span className="text-3xl" aria-hidden="true">🛍️</span>}
+                      : <span className="text-3xl" aria-hidden="true"><Glyph e="🛍️" /></span>}
                   </div>
                   <div className="space-y-1 p-2.5"><p className="truncate text-sm font-semibold">{l.title}</p><p className="text-sm font-bold text-brand-700">{price(l)}</p>
                     {seller && <p className="flex items-center gap-1.5 truncate text-xs text-ink-2"><Avatar avatar={seller.avatar} size="xs" />{seller.full_name}</p>}</div>
@@ -67,7 +68,7 @@ async function Marketplace() {
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
         <section className="card relative overflow-hidden p-5" data-card="points">
           <div className="relative z-10 max-w-full space-y-2">
-            <h2 className="flex items-center gap-1.5 text-[15px] font-semibold"><Star className="size-4 fill-amber-400 text-amber-500" strokeWidth={1.8} aria-hidden="true" />{t("Your Points")}</h2>
+            <h2 className="flex items-center gap-1.5 text-[15px] font-semibold"><Star className="size-4 text-brand-700" strokeWidth={1.8} aria-hidden="true" />{t("Your Points")}</h2>
             {balance !== null ? <p className="font-heading text-3xl font-semibold tabular-nums" data-testid="mk-balance">{balance.toLocaleString("en")} <span className="text-base font-medium text-ink-2">{t("pts")}</span></p> : <p className="text-sm text-ink-2">{t("Points are for current students.")}</p>}
             {(rewards ?? []).length > 0 && <p className="text-xs text-ink-2">{t("Rewards from {n} points", { n: Number(rewards![0].cost) })}</p>}
             <Link href="/shop" className="btn-primary inline-flex items-center gap-1.5 px-4 py-2 text-sm">{t("Visit Rewards Shop")} <ArrowRight className="size-4 rtl:rotate-180" aria-hidden="true" /></Link>
@@ -82,7 +83,7 @@ async function Marketplace() {
           ) : (
             <ul className="space-y-2" data-card="prizes">
               {(prizes ?? []).map((p) => (
-                <li key={p.place} className="flex items-center gap-3 rounded-xl bg-brand-50/70 px-3 py-2"><Crown className="size-5 shrink-0 text-amber-500" strokeWidth={1.8} aria-hidden="true" /><span className="w-6 text-sm font-bold tabular-nums text-brand-800">#{p.place}</span><span className="min-w-0 flex-1 truncate text-sm font-semibold">{p.title}</span></li>
+                <li key={p.place} className="flex items-center gap-3 rounded-xl bg-brand-50/70 px-3 py-2"><Crown className="size-5 shrink-0 text-brand-700" strokeWidth={1.8} aria-hidden="true" /><span className="w-6 text-sm font-bold tabular-nums text-brand-800">#{p.place}</span><span className="min-w-0 flex-1 truncate text-sm font-semibold">{p.title}</span></li>
               ))}
             </ul>
           )}
@@ -98,7 +99,7 @@ async function Marketplace() {
                 <li key={r.id}><Link href="/shop" className="flex items-center gap-3 rounded-xl border border-brand-700/10 bg-white p-2.5 hover:border-brand-700/25">
                   <span className="flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-sage-soft/50 text-2xl">{img
                     // eslint-disable-next-line @next/next/no-img-element -- private signed link
-                    ? <img src={img} alt="" className="size-full object-cover" /> : "🎁"}</span>
+                    ? <img src={img} alt="" className="size-full object-cover" /> : <Glyph e="🎁" />}</span>
                   <span className="min-w-0"><span className="block truncate text-sm font-semibold">{r.name}</span><span className="text-xs text-ink-2">{Number(r.cost).toLocaleString("en")} {t("points")}</span></span></Link></li>
               );
             })}

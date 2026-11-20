@@ -14,6 +14,7 @@ import { SourceChip } from "@/components/library/resource-card";
 import { ViewTracker } from "@/components/library/view-tracker";
 import { LIBRARY_TYPES, RESOURCE_COLUMNS, STATUS_LABEL, signCovers, type LibraryResource } from "@/lib/library";
 import { DeleteButton, FlagForm, RateForm, ResolveFlagForm, RestoreButton, SaveButton } from "./forms";
+import { Glyph } from "@/components/glyph";
 
 type Rating = { stars: number; review: string | null; updated_at: string; profile_id: string; author: { full_name: string; avatar: string } | null };
 
@@ -95,11 +96,11 @@ async function Resource({ params }: { params: PageProps<"/academic-resources/res
       {r.description && <p className="whitespace-pre-wrap text-sm leading-relaxed text-black/75">{r.description}</p>}
 
       <div className="flex flex-wrap items-start gap-2">
-        {r.file_name && isPdfOrImage && <Link href={`/academic-resources/resource/${r.id}/read`} className="btn-primary" data-read>📖 {t("Read in Loop")}</Link>}
-        {r.file_name && r.downloadable && <a href={`/api/library/${r.id}/file?kind=download`} className="btn-secondary" data-download>⬇ {t("Download")}</a>}
-        {r.link_url && <a href={r.link_url} target="_blank" rel="noopener noreferrer nofollow" className="btn-primary" data-open-link>↗ {t("Open Resource")}</a>}
+        {r.file_name && isPdfOrImage && <Link href={`/academic-resources/resource/${r.id}/read`} className="btn-primary" data-read><Glyph e="📖" /> {t("Read in Loop")}</Link>}
+        {r.file_name && r.downloadable && <a href={`/api/library/${r.id}/file?kind=download`} className="btn-secondary" data-download><Glyph e="⬇" /> {t("Download")}</a>}
+        {r.link_url && <a href={r.link_url} target="_blank" rel="noopener noreferrer nofollow" className="btn-primary" data-open-link><Glyph e="↗" /> {t("Open Resource")}</a>}
         {isPublic && <SaveButton id={r.id} saved={!!saved} locale={locale} />}
-        {canEdit && <Link href={`/academic-resources/resource/${r.id}/edit`} className="btn-ghost text-sm" data-edit>✏️ {t("Edit")}</Link>}
+        {canEdit && <Link href={`/academic-resources/resource/${r.id}/edit`} className="btn-ghost text-sm" data-edit><Glyph e="✏️" /> {t("Edit")}</Link>}
         {canEdit && <DeleteButton id={r.id} locale={locale} warn={t("Delete this resource? It will disappear from the library.")} />}
       </div>
       {r.link_url && <p className="text-xs text-black/45">{t("This opens on another website. Loop is not responsible for what is there.")}</p>}
@@ -144,7 +145,7 @@ async function Resource({ params }: { params: PageProps<"/academic-resources/res
 
       {canReview && (
         <section className="card space-y-4 border-amber-200 p-4" data-section="reviewer">
-          <h2 className="section-title">🛡️ {t("Reviewer tools (internal)")}</h2>
+          <h2 className="section-title"><Glyph e="🛡️" /> {t("Reviewer tools (internal)")}</h2>
           {r.visibility === "hidden" && <RestoreButton id={r.id} locale={locale} />}
           {r.deleted_at == null && <FlagForm id={r.id} locale={locale} />}
           {flags.length > 0 && (

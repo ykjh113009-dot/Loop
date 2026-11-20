@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { Glyph } from "@/components/glyph";
 
 export type LeaderRow = { id: string; name: string; value: number; color?: string | null; badge?: string; me?: boolean };
 
@@ -25,7 +26,7 @@ export function LeaderTabs({ tabs, labels }: { tabs: { key: string; label: strin
           {tab.rows.map((r, i) => (
             <li key={r.id} className={`flex items-center gap-3 rounded-xl px-2 py-2 text-sm ${r.me ? "bg-sage-soft/50" : ""}`}>
               <span className="w-4 text-xs font-semibold text-ink-2">{i + 1}</span>
-              <span className="flex size-7 shrink-0 items-center justify-center rounded-lg text-sm" style={{ background: r.color ? r.color + "26" : "#e9efe0" }} aria-hidden="true">{r.badge ?? "•"}</span>
+              <span className="flex size-7 shrink-0 items-center justify-center rounded-lg text-sm" style={{ background: r.color ? r.color + "26" : "#e9efe0" }} aria-hidden="true">{r.badge && /\p{Extended_Pictographic}/u.test(r.badge) ? <Glyph e={r.badge} className="text-brand-800" /> : r.badge ?? "•"}</span>
               <span className="flex-1 truncate font-medium">{r.name}</span>
               <span className="font-semibold tabular-nums">{r.value.toLocaleString("en")}</span>
             </li>

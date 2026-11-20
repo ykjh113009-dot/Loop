@@ -12,6 +12,7 @@ import { Empty } from "@/components/empty";
 import { Icon } from "@/components/icons";
 import { PageHeader } from "@/components/page-header";
 import { PageSkeleton } from "@/components/skeleton";
+import { Glyph } from "@/components/glyph";
 
 export const metadata = { title: "Events" };
 
@@ -113,7 +114,7 @@ async function Events({ searchParams }: { searchParams: PageProps<"/events">["se
 
       <div className="flex gap-1 rounded-xl bg-black/5 p-1" role="tablist">
         {views.map(([id, label]) => (
-          <Link key={id} role="tab" aria-selected={view === id} href={link({ view: id })} className={`flex-1 rounded-lg py-1.5 text-center text-sm font-medium ${view === id ? "bg-white shadow-sm" : "text-black/55"}`}>{label}</Link>
+          <Link key={id} role="tab" aria-selected={view === id} href={link({ view: id })} className={`flex-1 rounded-lg py-1.5 text-center text-sm font-medium ${view === id ? "bg-brand-700 text-white shadow-sm" : "text-black/55 hover:bg-sage-soft/60"}`}>{label}</Link>
         ))}
       </div>
 
@@ -125,11 +126,11 @@ async function Events({ searchParams }: { searchParams: PageProps<"/events">["se
         <button className="btn-secondary shrink-0 px-3">{t("Search")}</button>
       </form>
       <div className="flex gap-1.5 overflow-x-auto pb-1">
-        <Link href={link({ category: null })} className={`chip whitespace-nowrap ${!category ? "bg-brand-700 text-white" : "bg-black/5"}`}>{t("All")}</Link>
+        <Link href={link({ category: null })} className={`chip whitespace-nowrap ${!category ? "bg-brand-700 text-white" : ""}`}>{t("All")}</Link>
         {EVENT_CATEGORIES.map((c) => (
-          <Link key={c.id} href={link({ category: c.id })} className={`chip whitespace-nowrap ${category === c.id ? "bg-brand-700 text-white" : "bg-black/5"}`}>{c.emoji} {t(c.label)}</Link>
+          <Link key={c.id} href={link({ category: c.id })} className={`chip whitespace-nowrap ${category === c.id ? "bg-brand-700 text-white" : ""}`}><Glyph e={c.emoji} /> {t(c.label)}</Link>
         ))}
-        <Link href={link({ mine: mine ? null : "1" })} className={`chip whitespace-nowrap ${mine ? "bg-brand-700 text-white" : "bg-black/5"}`}>✓ {t("I'm going")}</Link>
+        <Link href={link({ mine: mine ? null : "1" })} className={`chip whitespace-nowrap ${mine ? "bg-brand-700 text-white" : ""}`}><Glyph e="✓" /> {t("I'm going")}</Link>
       </div>
 
       {view === "month" && <MonthCalendar year={year} month={month} todayKey={todayKey} eventDays={eventDays} extra={extra} />}

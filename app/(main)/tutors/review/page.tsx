@@ -36,7 +36,7 @@ async function Queue({ searchParams }: { searchParams: PageProps<"/tutors/review
     <div className="mx-auto max-w-2xl space-y-4">
       <div className="flex gap-1 rounded-xl bg-black/5 p-1" role="tablist">
         {[["pending", t("Pending Review")], ["decided", t("Decided")]].map(([id, label]) => (
-          <Link key={id} role="tab" aria-selected={tab === id} href={`/tutors/review?tab=${id}`} className={`flex-1 rounded-lg py-1.5 text-center text-sm font-medium ${tab === id ? "bg-white shadow-sm" : "text-black/55"}`}>{label}</Link>
+          <Link key={id} role="tab" aria-selected={tab === id} href={`/tutors/review?tab=${id}`} className={`flex-1 rounded-lg py-1.5 text-center text-sm font-medium ${tab === id ? "bg-brand-700 text-white shadow-sm" : "text-black/55 hover:bg-sage-soft/60"}`}>{label}</Link>
         ))}
       </div>
       {(data ?? []).length === 0 ? <Empty emoji="🧑‍🏫" title={tab === "pending" ? t("No applications are waiting") : t("Nothing decided yet")} /> : (

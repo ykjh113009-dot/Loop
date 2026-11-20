@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { connectRealtime, createClient } from "@/lib/supabase/client";
+import { Glyph } from "@/components/glyph";
+import { splitTitle } from "@/lib/notif-title";
 
 type Toast = { id: string; title: string; body?: string; link: string; big?: boolean };
 const KINDS = new Set(["points", "badge", "level_up", "streak"]);
@@ -27,7 +29,7 @@ export function RewardToasts({ userId }: { userId: string }) {
     try { if (sessionStorage.getItem(key)) return; sessionStorage.setItem(key, "1"); } catch { /* private mode: still safe, the database dedupes */ }
     supabase.rpc("record_login").then(({ data }) => {
       const r = data as { first_today?: boolean; points?: number } | null;
-      if (r?.first_today && (r.points ?? 0) > 0) push({ id: `login-${key}`, title: `🐶 +${r.points} Loop Points`, body: "Daily login", link: "/points" });
+      if (r?.first_today && (r.points ?? 0) > 0) push({ id: `login-${key}`, title: `+${r.points} Loop Points`, body: "Daily login", link: "/points" });
     }, () => {});
   }, [userId]);
 
@@ -54,7 +56,7 @@ export function RewardToasts({ userId }: { userId: string }) {
       {toasts.map((t) => (
         <Link key={t.id} href={t.link} className={`pointer-events-auto flex max-w-sm items-center gap-3 rounded-2xl border border-brand-700/10 bg-white px-4 py-3 shadow-lg ${t.big ? "ring-2 ring-sage" : ""}`} data-reward-toast>
           <span className="min-w-0">
-            <span className="block text-sm font-semibold">{t.title}</span>
+            <span className="flex items-center gap-1.5 text-sm font-semibold">{splitTitle(t.title).emoji && <Glyph e={splitTitle(t.title).emoji} />}{splitTitle(t.title).text}</span>
             {t.body && <span className="block truncate text-xs text-black/55">{t.body}</span>}
           </span>
         </Link>

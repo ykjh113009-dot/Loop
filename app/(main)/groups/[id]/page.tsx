@@ -15,6 +15,8 @@ import { ReportButton } from "@/components/report-button";
 import { SpaceComposer } from "@/components/space-composer";
 import { SubmitButton } from "@/components/submit-button";
 import { PageSkeleton } from "@/components/skeleton";
+import { Glyph } from "@/components/glyph";
+import { IconPicker } from "@/components/icon-picker";
 
 export const metadata = { title: "Group" };
 
@@ -55,12 +57,12 @@ async function Group({ params, searchParams }: { params: PageProps<"/groups/[id]
     <div className="mx-auto max-w-3xl space-y-4">
       <section className="card p-4">
         <div className="flex items-start gap-3">
-          <span className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-brand-50 text-3xl">{g.emoji}</span>
+          <span className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-brand-50 text-3xl"><Glyph e={g.emoji} /></span>
           <div className="min-w-0 flex-1">
             <h1 className="truncate text-xl font-bold">{g.name}</h1>
             <p className="mt-0.5 flex flex-wrap items-center gap-1.5 text-xs text-black/55">
               {g.kind === "official" && <span className="chip bg-brand-50 text-brand-800">{t("Official")}</span>}
-              <span className="chip">{g.privacy === "private" ? `🔒 ${t("Private")}` : t("Public")}</span>
+              <span className="chip">{g.privacy === "private" ? `${t("Private")}` : t("Public")}</span>
               <span>{t("{n} members", { n: g.member_count })}</span>
               {g.status === "archived" && <span className="chip bg-red-50 text-red-800">{t("Closed")}</span>}
             </p>
@@ -69,7 +71,7 @@ async function Group({ params, searchParams }: { params: PageProps<"/groups/[id]
         </div>
         {g.description && <p className="mt-3 text-sm whitespace-pre-wrap text-black/75">{g.description}</p>}
         <div className="mt-3 flex flex-wrap gap-2">
-          {member && chat && <Link href={`/messages/${chat.id}`} className="btn-secondary">💬 {t("Group chat")}</Link>}
+          {member && chat && <Link href={`/messages/${chat.id}`} className="btn-secondary"><Glyph e="💬" /> {t("Group chat")}</Link>}
           {member && !owner && (
             <form action={leaveGroup}><input type="hidden" name="groupId" value={g.id} /><button className="btn-ghost">{t("Leave")}</button></form>
           )}
@@ -82,7 +84,7 @@ async function Group({ params, searchParams }: { params: PageProps<"/groups/[id]
 
       <div className="flex gap-1 rounded-xl bg-black/5 p-1" role="tablist">
         {tabs.map(([key, label]) => (
-          <Link key={key} role="tab" aria-selected={tab === key} href={`/groups/${id}?tab=${key}`} className={`flex-1 rounded-lg px-3 py-1.5 text-center text-sm font-medium ${tab === key ? "bg-white shadow-sm" : "text-black/55"}`}>{label}</Link>
+          <Link key={key} role="tab" aria-selected={tab === key} href={`/groups/${id}?tab=${key}`} className={`flex-1 rounded-lg px-3 py-1.5 text-center text-sm font-medium ${tab === key ? "bg-brand-700 text-white shadow-sm" : "text-black/55 hover:bg-sage-soft/60"}`}>{label}</Link>
         ))}
       </div>
 
@@ -156,8 +158,8 @@ async function Group({ params, searchParams }: { params: PageProps<"/groups/[id]
           <ActionForm action={updateGroup} className="card space-y-3 p-4">
             <input type="hidden" name="groupId" value={g.id} />
             <h2 className="font-semibold">{t("Group details")}</h2>
-            <div className="grid grid-cols-[5rem_1fr] gap-3">
-              <input name="emoji" defaultValue={g.emoji} maxLength={4} className="input text-center text-xl" aria-label={t("Icon")} />
+            <div className="space-y-3">
+              <IconPicker defaultValue={g.emoji} label={t("Icon")} />
               <input name="name" defaultValue={g.name} required minLength={3} maxLength={60} className="input" aria-label={t("Group name")} />
             </div>
             <textarea name="description" defaultValue={g.description} maxLength={500} rows={3} className="input resize-none" aria-label={t("What is it about?")} />

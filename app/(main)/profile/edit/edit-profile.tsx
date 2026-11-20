@@ -12,6 +12,7 @@ import { InterestIcon } from "@/components/interest-icon";
 import { NEW_AVATARS, avatarSrc } from "@/lib/avatars";
 import { makeT, type Locale } from "@/lib/i18n";
 import type { ActionResult } from "@/lib/errors";
+import { Glyph } from "@/components/glyph";
 
 const DEFAULT_COVER = "/brand/default-cover.webp";
 const IMAGE_TYPES = "image/jpeg,image/png,image/webp";
@@ -115,7 +116,7 @@ export function EditProfile(props: {
         <section className="p-5 sm:p-6" data-section="interests">
           <header className="mb-4 flex items-start justify-between gap-3">
             <div>
-              <h2 className="flex items-center gap-2.5 text-[20px] font-semibold"><span aria-hidden="true">★</span>{t("What are you into?")}</h2>
+              <h2 className="flex items-center gap-2.5 text-[20px] font-semibold"><span aria-hidden="true"><Glyph e="★" /></span>{t("What are you into?")}</h2>
               <p className="mt-0.5 text-sm text-ink-2">{t("Select up to 10 interests")}</p>
             </div>
             <span className="text-sm text-ink-2 tabular-nums" aria-live="polite" data-interest-count>{picked.length}/10</span>

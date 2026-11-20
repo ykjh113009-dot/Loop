@@ -5,6 +5,7 @@ import { deleteLibraryResource, flagLibrary, rateLibrary, resolveLibraryFlag, re
 import { FormMessage } from "@/components/form-message";
 import { LineIcon } from "@/components/line-icon";
 import { makeT, type Locale } from "@/lib/i18n";
+import { Glyph } from "@/components/glyph";
 
 export function SaveButton({ id, saved, locale }: { id: string; saved: boolean; locale: Locale }) {
   const t = makeT(locale);
@@ -55,7 +56,7 @@ export function FlagForm({ id, locale }: { id: string; locale: Locale }) {
     <form action={action} className="space-y-2">
       <input type="hidden" name="id" value={id} />
       <textarea name="reason" className="input min-h-16" minLength={3} maxLength={500} required placeholder={t("Internal reason for the flag (only reviewers see this)")} aria-label={t("Reason")} />
-      <button disabled={pending} className="btn-secondary text-sm">🚩 {t("Flag for review")}</button>
+      <button disabled={pending} className="btn-secondary text-sm"><Glyph e="🚩" /> {t("Flag for review")}</button>
       <FormMessage state={state} />
     </form>
   );

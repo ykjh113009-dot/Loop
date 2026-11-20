@@ -10,13 +10,14 @@ import { ActionForm } from "@/components/action-form";
 import { PageHeader } from "@/components/page-header";
 import { SubmitButton } from "@/components/submit-button";
 import { PageSkeleton } from "@/components/skeleton";
+import { Glyph } from "@/components/glyph";
 
 export const metadata = { title: "Leadership dashboard" };
 
 function Tool({ href, icon, title, text, count }: { href: string; icon: string; title: string; text: string; count?: number }) {
   return (
     <Link href={href} className="card flex items-center gap-3 p-4 hover:bg-black/[0.02]">
-      <span className="text-2xl">{icon}</span>
+      <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-sage-soft text-xl text-brand-800"><Glyph e={icon} strokeWidth={1.6} /></span>
       <span className="min-w-0 flex-1"><span className="block font-semibold">{title}</span><span className="block text-sm text-black/55">{text}</span></span>
       {count ? <span className="rounded-full bg-red-600 px-2 text-xs leading-5 font-bold text-white">{count}</span> : null}
     </Link>
@@ -60,7 +61,7 @@ async function Dashboard() {
   if (list.length === 0 && !me.isAdmin) {
     return (
       <div className="card space-y-2 p-5 text-center">
-        <p className="text-3xl">🎖️</p>
+        <p className="text-3xl"><Glyph e="🎖️" /></p>
         <h2 className="font-semibold">{t("You do not have a leadership role yet")}</h2>
         <p className="text-sm text-black/60">{t("Class representatives, club leaders, council members and school staff get their tools here. You can ask for a role.")}</p>
         <Link href="/leadership" className="btn-primary">{t("Ask for a role")}</Link>

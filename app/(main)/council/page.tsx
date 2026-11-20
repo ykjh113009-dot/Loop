@@ -13,6 +13,7 @@ import { PageSkeleton } from "@/components/skeleton";
 import { StudentPicker } from "@/components/student-picker";
 import { SubmitButton } from "@/components/submit-button";
 import { ContactForm, DeletePost, InfoForm, PostForm, ReplyForm } from "./council-forms";
+import { Glyph } from "@/components/glyph";
 
 export const metadata = { title: "Student council" };
 
@@ -44,9 +45,9 @@ async function Council() {
       {(info?.about || info?.contact_email || info?.office || info?.meeting_info) && (
         <section className="card space-y-1.5 p-4 text-sm">
           {info.about && <p className="whitespace-pre-wrap">{info.about}</p>}
-          {info.office && <p className="text-black/65">📍 {info.office}</p>}
-          {info.meeting_info && <p className="text-black/65">🕒 {info.meeting_info}</p>}
-          {info.contact_email && <p><a href={`mailto:${info.contact_email}`} className="text-brand-700 underline">✉️ {info.contact_email}</a></p>}
+          {info.office && <p className="text-black/65"><Glyph e="📍" /> {info.office}</p>}
+          {info.meeting_info && <p className="text-black/65"><Glyph e="🕒" /> {info.meeting_info}</p>}
+          {info.contact_email && <p><a href={`mailto:${info.contact_email}`} className="text-brand-700 underline"><Glyph e="✉️" /> {info.contact_email}</a></p>}
         </section>
       )}
 
@@ -55,7 +56,7 @@ async function Council() {
         {(posts ?? []).length === 0 ? <Empty emoji="🗳️" title={t("Nothing posted yet")} /> : (posts ?? []).map((p) => (
           <article key={p.id} className="card space-y-1.5 p-4 text-sm">
             <div className="flex items-start gap-2">
-              <p className="min-w-0 flex-1 font-semibold">{KIND[p.kind as keyof typeof KIND][0]} {p.title}{p.pinned && <span className="chip ms-2 bg-amber-50 text-amber-800">📌</span>}</p>
+              <p className="min-w-0 flex-1 font-semibold"><Glyph e={KIND[p.kind as keyof typeof KIND][0]} /> {p.title}{p.pinned && <span className="chip ms-2 bg-amber-50 text-amber-800"><Glyph e="📌" /></span>}</p>
               {p.status && <span className={`chip shrink-0 ${p.status === "done" ? "bg-brand-50 text-brand-800" : "bg-sky-50 text-sky-800"}`}>{t(STATUS[p.status as keyof typeof STATUS])}</span>}
             </div>
             {p.body && <p className="whitespace-pre-wrap text-black/75">{p.body}</p>}
@@ -121,7 +122,7 @@ async function Council() {
             ))}
           </ul>
         )}
-        <Link href="/suggestions" className="btn-secondary mt-3 w-full">💡 Send the council a suggestion</Link>
+        <Link href="/suggestions" className="btn-secondary mt-3 w-full"><Glyph e="💡" /> Send the council a suggestion</Link>
       </section>
 
       <section className="space-y-2">
@@ -130,7 +131,7 @@ async function Council() {
           const state = e.opens_at > now ? "upcoming" : e.closes_at > now ? "open" : "closed";
           return (
             <Link key={e.id} href={`/council/elections/${e.id}`} className="card flex items-center gap-3 p-4 hover:bg-black/[0.02]">
-              <span className="text-2xl">🗳️</span>
+              <span className="text-2xl"><Glyph e="🗳️" /></span>
               <div className="min-w-0 flex-1">
                 <p className="font-semibold">{e.title}</p>
                 <p className="text-xs text-black/50">

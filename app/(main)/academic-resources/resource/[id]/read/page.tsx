@@ -6,6 +6,7 @@ import { getT } from "@/lib/i18n-server";
 import { PageHeader } from "@/components/page-header";
 import { PageSkeleton } from "@/components/skeleton";
 import { ViewTracker } from "@/components/library/view-tracker";
+import { Glyph } from "@/components/glyph";
 
 async function Reader({ params, searchParams }: { params: PageProps<"/academic-resources/resource/[id]/read">["params"]; searchParams: Promise<{ rev?: string }> }) {
   const { id } = await params;
@@ -25,7 +26,7 @@ async function Reader({ params, searchParams }: { params: PageProps<"/academic-r
       {!rev && r?.published_at && r.submitter_id !== me.id && <ViewTracker id={id} />}
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="min-w-0 truncate text-sm font-semibold">{r?.title}</p>
-        <a href={src} target="_blank" rel="noopener noreferrer" className="btn-ghost text-sm">↗ {t("Open in a new tab")}</a>
+        <a href={src} target="_blank" rel="noopener noreferrer" className="btn-ghost text-sm"><Glyph e="↗" /> {t("Open in a new tab")}</a>
       </div>
       {isImage
         // eslint-disable-next-line @next/next/no-img-element -- private file served through the library route

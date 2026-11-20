@@ -109,7 +109,7 @@ export async function castVote(_: ActionResult, formData: FormData): Promise<Act
   if (error?.code === "23505") return { error: "You already voted." };
   if (error) return { error: "You can't vote in this election (it may be closed or for other grades)." };
   refresh();
-  return { message: "Thank you for voting! 🗳️ Your vote is secret." };
+  return { message: "Thank you for voting! Your vote is secret." };
 }
 
 // ---- Council hub: posts, contact info, messages from students ------------------------

@@ -7,6 +7,7 @@ import { formatDate } from "@/lib/time";
 import { Empty } from "@/components/empty";
 import { PageHeader } from "@/components/page-header";
 import { PageSkeleton } from "@/components/skeleton";
+import { Glyph } from "@/components/glyph";
 
 export const metadata = { title: "Competitions" };
 
@@ -20,7 +21,7 @@ async function Competitions() {
   const past = (data ?? []).filter((c) => c.ends_at < now);
   const card = (c: NonNullable<typeof data>[number]) => (
     <Link key={c.id} href={`/competitions/${c.id}`} className="card block p-4 hover:bg-black/[0.02]">
-      <p className="flex items-center gap-2 font-semibold">🏁 {c.name}<span className="chip bg-brand-50 text-brand-800">{c.kind === "house" ? t("Houses") : t("Teams")}</span></p>
+      <p className="flex items-center gap-2 font-semibold"><Glyph e="🏁" /> {c.name}<span className="chip bg-brand-50 text-brand-800">{c.kind === "house" ? t("Houses") : t("Teams")}</span></p>
       {c.description && <p className="mt-1 line-clamp-2 text-sm text-black/60">{c.description}</p>}
       <p className="mt-1 text-xs text-black/45">{formatDate(c.starts_at)} → {formatDate(c.ends_at)}</p>
     </Link>

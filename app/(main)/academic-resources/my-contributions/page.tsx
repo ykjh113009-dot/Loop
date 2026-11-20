@@ -45,7 +45,7 @@ async function Contributions({ searchParams }: { searchParams: Promise<{ status?
       <div className="flex flex-wrap gap-1.5" role="tablist">
         {TABS.map((k) => (
           <Link key={k} href={`/academic-resources/my-contributions${k === "all" ? "" : `?status=${k}`}`} role="tab" aria-selected={tab === k}
-            className={`rounded-full px-3 py-1 text-xs font-medium ${tab === k ? "bg-brand-700 text-white" : "bg-black/5 text-black/60"}`}>
+            className={`rounded-full px-3 py-1 text-xs font-medium ${tab === k ? "bg-brand-700 text-white" : "border border-black/10 bg-white text-black/65 hover:bg-sage-soft/50"}`}>
             {k === "all" ? t("All") : t(STATUS_LABEL[k])} ({count(k)})
           </Link>
         ))}

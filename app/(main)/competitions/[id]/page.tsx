@@ -10,6 +10,7 @@ import { ActionForm } from "@/components/action-form";
 import { PageHeader } from "@/components/page-header";
 import { SubmitButton } from "@/components/submit-button";
 import { PageSkeleton } from "@/components/skeleton";
+import { Glyph } from "@/components/glyph";
 
 export const metadata = { title: "Competition" };
 
@@ -36,7 +37,7 @@ async function Competition({ params }: { params: PageProps<"/competitions/[id]">
   return (
     <div className="mx-auto max-w-2xl space-y-4">
       <section className="card p-4">
-        <h1 className="text-xl font-bold">🏁 {c.name}</h1>
+        <h1 className="text-xl font-bold"><Glyph e="🏁" /> {c.name}</h1>
         <p className="mt-1 text-xs text-black/50">{c.kind === "house" ? t("House competition") : t("Team competition (up to {n} per team)", { n: c.team_size })} · {formatDate(c.starts_at)} → {formatDate(c.ends_at)}</p>
         {c.description && <p className="mt-2 text-sm whitespace-pre-wrap text-black/75">{c.description}</p>}
       </section>
@@ -84,7 +85,7 @@ async function Competition({ params }: { params: PageProps<"/competitions/[id]">
         <ul className="card divide-y divide-black/5 text-sm">
           {(houses ?? []).map((h) => (
             <li key={h.id} className="flex flex-wrap items-center gap-2 px-4 py-2">
-              <span className="min-w-0 flex-1">{h.emoji} {h.name}</span>
+              <span className="min-w-0 flex-1"><Glyph e={h.emoji} /> {h.name}</span>
               <strong className="tabular-nums">{total("house_id", h.id)}</strong>
               {staff && (
                 <ActionForm action={awardCompetition} className="flex gap-1.5">

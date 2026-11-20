@@ -17,10 +17,10 @@ export function PostForm({ locale }: { locale: Locale }) {
   return (
     <form action={action} key={state?.message ? "done" : "form"} className="space-y-2">
       <select name="kind" defaultValue="announcement" className="input" aria-label={t("What are you posting?")}>
-        <option value="announcement">📢 {t("Announcement (tells the whole school)")}</option>
-        <option value="update">📰 {t("Update")}</option>
-        <option value="initiative">🌱 {t("Initiative")}</option>
-        <option value="activity">🎈 {t("Activity")}</option>
+        <option value="announcement">{t("Announcement (tells the whole school)")}</option>
+        <option value="update">{t("Update")}</option>
+        <option value="initiative">{t("Initiative")}</option>
+        <option value="activity">{t("Activity")}</option>
       </select>
       <input name="title" required minLength={3} maxLength={100} className="input" placeholder={t("Title")} />
       <textarea name="body" rows={3} maxLength={2000} className="input resize-none" placeholder={t("Details")} />

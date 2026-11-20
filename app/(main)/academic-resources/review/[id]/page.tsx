@@ -10,6 +10,7 @@ import { PageSkeleton } from "@/components/skeleton";
 import { Avatar } from "@/components/avatar";
 import { LIBRARY_TYPES, STATUS_LABEL, signCovers } from "@/lib/library";
 import { ReviewForm } from "../review-form";
+import { Glyph } from "@/components/glyph";
 
 async function Detail({ params }: { params: PageProps<"/academic-resources/review/[id]">["params"] }) {
   const { id } = await params;
@@ -75,10 +76,10 @@ async function Detail({ params }: { params: PageProps<"/academic-resources/revie
         </dl>
         <div className="flex flex-wrap gap-2 pt-1">
           {rv.file_path && (rv.file_mime === "application/pdf" || rv.file_mime?.startsWith("image/")) && (
-            <Link href={`/academic-resources/resource/${rv.resource_id}/read?rev=${rv.id}`} className="btn-secondary text-sm" data-preview>👁 {t("Preview file")}</Link>
+            <Link href={`/academic-resources/resource/${rv.resource_id}/read?rev=${rv.id}`} className="btn-secondary text-sm" data-preview><Glyph e="👁" /> {t("Preview file")}</Link>
           )}
-          {rv.file_path && <a href={`/api/library/${rv.resource_id}/file?kind=download&rev=${rv.id}`} className="btn-ghost text-sm">⬇ {t("Download file")}</a>}
-          {rv.link_url && <a href={rv.link_url} target="_blank" rel="noopener noreferrer nofollow" className="btn-secondary text-sm" data-open-link>↗ {t("Open link")}</a>}
+          {rv.file_path && <a href={`/api/library/${rv.resource_id}/file?kind=download&rev=${rv.id}`} className="btn-ghost text-sm"><Glyph e="⬇" /> {t("Download file")}</a>}
+          {rv.link_url && <a href={rv.link_url} target="_blank" rel="noopener noreferrer nofollow" className="btn-secondary text-sm" data-open-link><Glyph e="↗" /> {t("Open link")}</a>}
         </div>
       </section>
 

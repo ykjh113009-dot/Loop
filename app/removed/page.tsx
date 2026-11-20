@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { signOut } from "@/app/actions/auth";
 import { reactivateAccount } from "@/app/actions/social";
 import { getMe } from "@/lib/auth";
+import { Glyph } from "@/components/glyph";
 
 export const metadata = { title: "Account paused" };
 
@@ -12,7 +13,7 @@ async function Body() {
   const self = !!me?.self_deactivated;
   return (
     <>
-      <div className="text-4xl">{self ? "⏸️" : "🔒"}</div>
+      <div className="text-4xl">{self ? <Glyph e="⏸️" /> : <Glyph e="🔒" />}</div>
       <h1 className="text-xl font-bold">{self ? "Your account is deactivated" : "This account has been removed"}</h1>
       <p className="text-black/60">
         {self

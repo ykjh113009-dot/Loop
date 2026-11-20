@@ -16,7 +16,7 @@ export function ListingForm({ schoolId, userId }: { schoolId: string; userId: st
       <fieldset>
         <legend className="label">I want to</legend>
         <div className="grid grid-cols-3 gap-2">
-          {[["sell", "💰 Sell"], ["swap", "🔄 Swap"], ["free", "🎁 Give away"]].map(([value, label]) => (
+          {[["sell", "Sell"], ["swap", "Swap"], ["free", "Give away"]].map(([value, label]) => (
             <label key={value} className="cursor-pointer">
               <input type="radio" name="kind" value={value} checked={kind === value} onChange={() => setKind(value)} className="peer sr-only" />
               <span className="block rounded-xl border border-black/10 bg-white py-2.5 text-center text-sm font-medium peer-checked:border-brand-600 peer-checked:bg-brand-50 peer-checked:text-brand-800">{label}</span>

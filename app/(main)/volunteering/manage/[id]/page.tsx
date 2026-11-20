@@ -8,6 +8,7 @@ import { formatDateTime, timeAgo } from "@/lib/time";
 import { PageHeader } from "@/components/page-header";
 import { PageSkeleton } from "@/components/skeleton";
 import { AssignmentForm, CompleteForm, ReviewApplication, StatusButtons } from "../../volunteer-forms";
+import { Glyph } from "@/components/glyph";
 
 export const metadata = { title: "Manage volunteers" };
 
@@ -36,7 +37,7 @@ async function Manage({ params }: { params: PageProps<"/volunteering/manage/[id]
       <article className="card space-y-2 p-4 text-sm">
         <h2 className="text-lg font-bold">{o.title}</h2>
         <p className="text-xs text-black/50">
-          {o.event && <Link href={`/events/${o.event.id}`} className="underline">📅 {o.event.title}</Link>}
+          {o.event && <Link href={`/events/${o.event.id}`} className="underline"><Glyph e="📅" /> {o.event.title}</Link>}
           {o.starts_at && ` · ${formatDateTime(o.starts_at)}`}{o.location && ` · ${o.location}`}
           {` · ${t("{a} of {b} spots taken", { a: accepted.length + done.length, b: o.spots ?? "∞" })}`}
         </p>

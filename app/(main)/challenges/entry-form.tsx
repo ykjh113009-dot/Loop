@@ -4,6 +4,7 @@ import { useActionState, useRef, useState, useTransition } from "react";
 import { submitEntry } from "@/app/actions/challenges";
 import { uploadProof } from "@/lib/upload";
 import { makeT, type Locale } from "@/lib/i18n";
+import { Glyph } from "@/components/glyph";
 
 type Ids = { schoolId: string; challengeId: string; userId: string };
 
@@ -35,7 +36,7 @@ function ProofFile({ kind, ids, name, label }: { kind: "photo" | "video"; ids: I
     <div>
       <input type="hidden" name={name} value={path} />
       <button type="button" onClick={() => input.current?.click()} disabled={busy} className={`btn-secondary w-full justify-start ${path ? "border-brand-600 bg-brand-50" : ""}`}>
-        {kind === "photo" ? "📷" : "🎬"} {busy ? "…" : path ? `✓ ${fileName}` : label}
+        <Glyph e={path && !busy ? "✓" : kind === "photo" ? "📷" : "🎬"} /> {busy ? "…" : path ? fileName : label}
       </button>
       <input ref={input} type="file" accept={kind === "photo" ? "image/*" : "video/mp4,video/webm,video/quicktime"} className="hidden" onChange={(e) => pick(e.target.files?.[0])} />
       {error && <p className="mt-1 text-sm text-red-700">{error}</p>}

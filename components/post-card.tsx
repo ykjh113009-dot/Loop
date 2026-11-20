@@ -5,12 +5,13 @@ import { deletePost } from "@/app/actions/content";
 import { timeAgo } from "@/lib/time";
 import { personLabel } from "@/lib/people";
 import type { FeedPost } from "@/lib/queries";
+import { Glyph } from "@/components/glyph";
 
 export function PostCard({ post, meId, showClub = true }: { post: FeedPost; meId: string; showClub?: boolean }) {
   const mine = post.author_id === meId;
   return (
     <article className={`card p-4 ${post.kind === "announcement" ? "border-brand-600/40 bg-brand-50/50" : ""}`}>
-      {post.kind === "announcement" && <p className="mb-2 text-xs font-semibold text-brand-800">📣 Announcement</p>}
+      {post.kind === "announcement" && <p className="mb-2 text-xs font-semibold text-brand-800"><Glyph e="📣" /> Announcement</p>}
       <header className="flex items-start gap-3">
         <Link href={`/profile/${post.author_id}`}>
           <Avatar avatar={post.author?.avatar ?? "a01"} />
@@ -22,7 +23,7 @@ export function PostCard({ post, meId, showClub = true }: { post: FeedPost; meId
           <span className="text-black/45"> · {personLabel(post.author)} · {timeAgo(post.created_at)}</span>
           {showClub && post.club && (
             <Link href={`/clubs/${post.club.id}`} className="block truncate text-xs text-brand-700 hover:underline">
-              {post.club.emoji} {post.club.name}
+              <Glyph e={post.club.emoji} /> {post.club.name}
             </Link>
           )}
         </div>
