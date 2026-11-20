@@ -1,3 +1,5 @@
+import { ClubIcon } from "@/components/club-icon";
+import { signClubImages } from "@/lib/images";
 import { Suspense } from "react";
 import Link from "next/link";
 import { requireMe } from "@/lib/auth";
@@ -21,9 +23,10 @@ async function Results({ searchParams }: { searchParams: PageProps<"/search">["s
   const supabase = await createClient();
   const [{ data: people }, { data: clubs }, { data: events }] = await Promise.all([
     supabase.from("profiles").select("id, full_name, avatar, grade, role, alumni_year").is("deactivated_at", null).ilike("full_name", like).order("full_name").limit(8),
-    supabase.from("clubs").select("id, name, emoji, description").eq("status", "approved").ilike("name", like).order("name").limit(8),
+    supabase.from("clubs").select("id, name, emoji, description, image_path").eq("status", "approved").ilike("name", like).order("name").limit(8),
     supabase.from("events").select("id, title, starts_at, ends_at, location").eq("status", "approved").ilike("title", like).order("starts_at", { ascending: false }).limit(8),
   ]);
+  const clubImages = await signClubImages(supabase, (clubs ?? []).map((c) => c.image_path));
   const none = !people?.length && !clubs?.length && !events?.length;
   if (none) return <Empty emoji="🔎" title={`Nothing found for "${q}"`}>Try a different spelling.</Empty>;
 
@@ -54,7 +57,7 @@ async function Results({ searchParams }: { searchParams: PageProps<"/search">["s
             {clubs.map((c) => (
               <li key={c.id}>
                 <Link href={`/clubs/${c.id}`} className="flex items-center gap-3 px-4 py-3 hover:bg-brand-50">
-                  <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-sage-soft/70 text-xl">{c.emoji}</span>
+                  <ClubIcon emoji={c.emoji} url={c.image_path ? clubImages.get(c.image_path) : null} className="size-10 text-xl" />
                   <span className="min-w-0 flex-1">
                     <span className="block truncate font-medium">{c.name}</span>
                     <span className="block truncate text-xs text-ink-2">{c.description}</span>

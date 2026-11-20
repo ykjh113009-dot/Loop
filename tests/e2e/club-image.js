@@ -38,6 +38,15 @@ async function signIn(b, email, vp = { width: 1440, height: 900 }) {
   check('The club card on the list shows the picture', (await p.locator('[data-club="Robotics Club"] img').evaluate((i) => i.complete && i.naturalWidth > 0)));
   await p.goto(`${BASE}/clubs/${CLUB}`, { waitUntil: 'networkidle' });
   check('The club page header shows the picture', (await p.locator('main img[src*="club-images"], img[src*="/storage/"]').first().evaluate((i) => i.complete && i.naturalWidth > 0)));
+  const imgOk = (loc) => loc.first().evaluate((i) => i.complete && i.naturalWidth > 0);
+  await p.goto(`${BASE}/profile/00000000-0000-0000-0000-0000000000a3`, { waitUntil: 'networkidle' });
+  check('The club shows its picture on the profile', await imgOk(p.locator('[data-card=clubs] a[href$="00000000-0000-0000-0000-00000000c001"] img')));
+  await p.goto(BASE + '/messages', { waitUntil: 'networkidle' });
+  check('The club chat shows the club picture in the Chats list', await imgOk(p.locator('a[href$="/chat"] img')));
+  await p.goto(BASE + '/passport', { waitUntil: 'networkidle' });
+  check('The club shows its picture in the Loop Passport', await imgOk(p.locator('a[href$="00000000-0000-0000-0000-00000000c001"] img')));
+  await p.goto(BASE + '/search?q=Robotics', { waitUntil: 'networkidle' });
+  check('The club shows its picture in search results', await imgOk(p.locator('a[href$="00000000-0000-0000-0000-00000000c001"] img')));
   await layla.ctx.close();
 
   // a plain student sees it but cannot manage it

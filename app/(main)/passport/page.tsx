@@ -1,3 +1,5 @@
+import { ClubIcon } from "@/components/club-icon";
+import { signClubImages } from "@/lib/images";
 import { Suspense } from "react";
 import Link from "next/link";
 import { requireMe } from "@/lib/auth";
@@ -18,7 +20,7 @@ async function Passport() {
   if (!me.isStudent) return <EmptyState scene="books" title={t("The Passport is for current students")}>{t("Alumni and staff do not collect a Passport.")}</EmptyState>;
   const supabase = await createClient();
   const [{ data: clubs }, { data: rsvps }, { data: vol }, { data: subs }, { data: badges }, { data: roles }] = await Promise.all([
-    supabase.from("club_members").select("joined_at, club:clubs(id, name, emoji, status)").eq("profile_id", me.id),
+    supabase.from("club_members").select("joined_at, club:clubs(id, name, emoji, status, image_path)").eq("profile_id", me.id),
     supabase.from("event_rsvps").select("event:events(id, title, starts_at, status)").eq("profile_id", me.id).limit(50),
     supabase.rpc("volunteer_history", { p_profile: me.id }),
     supabase.from("challenge_submissions").select("challenge:challenges(id, title)").eq("profile_id", me.id).eq("status", "approved").limit(50),
@@ -26,6 +28,7 @@ async function Passport() {
     supabase.from("leadership_roles").select("id, kind, scope, club:clubs(name)").eq("profile_id", me.id),
   ]);
   const myClubs = (clubs ?? []).filter((c) => c.club && c.club.status === "approved");
+  const clubImages = await signClubImages(supabase, myClubs.map((c) => c.club!.image_path));
   const events = (rsvps ?? []).map((r) => r.event).filter((e): e is NonNullable<typeof e> => !!e && e.status !== "cancelled").sort((a, b) => b.starts_at.localeCompare(a.starts_at));
   const hours = (vol ?? []).reduce((a, v) => a + Number(v.hours), 0);
   const challenges = (subs ?? []).map((s) => s.challenge).filter((c): c is NonNullable<typeof c> => !!c);
@@ -42,7 +45,7 @@ async function Passport() {
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
         <DashCard title={t("Clubs")} href="/clubs" linkLabel={t("See all")}>
           {myClubs.length === 0 ? empty(t("You have not joined a club yet"), "/clubs", t("Find a club")) : (
-            <ul className="flex flex-wrap gap-2">{myClubs.map((c) => <li key={c.club!.id}><Link href={`/clubs/${c.club!.id}`} className="chip bg-white shadow-sm">{c.club!.emoji} {c.club!.name}</Link></li>)}</ul>
+            <ul className="flex flex-wrap gap-2">{myClubs.map((c) => <li key={c.club!.id}><Link href={`/clubs/${c.club!.id}`} className="chip gap-1.5 bg-white shadow-sm"><ClubIcon emoji={c.club!.emoji} url={c.club!.image_path ? clubImages.get(c.club!.image_path) : null} className="size-5 text-xs" />{c.club!.name}</Link></li>)}</ul>
           )}
         </DashCard>
         <DashCard title={t("Events")} href="/events" linkLabel={t("See all")}>

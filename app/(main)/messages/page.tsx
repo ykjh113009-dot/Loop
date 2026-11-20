@@ -1,3 +1,5 @@
+import { ClubIcon } from "@/components/club-icon";
+import { signClubImages } from "@/lib/images";
 import { Suspense } from "react";
 import Link from "next/link";
 import { requireMe } from "@/lib/auth";
@@ -17,7 +19,7 @@ async function Conversations() {
   const { t } = await getT();
   const { data: mine } = await supabase
     .from("conversation_members")
-    .select("last_read_at, accepted_at, conversation:conversations(id, kind, title, last_message_at, club:clubs(id, name, emoji))")
+    .select("last_read_at, accepted_at, conversation:conversations(id, kind, title, last_message_at, club:clubs(id, name, emoji, image_path))")
     .eq("profile_id", me.id);
 
   const conversations = (mine ?? [])
@@ -25,6 +27,7 @@ async function Conversations() {
     .map((m) => ({ ...m.conversation!, lastRead: m.last_read_at, request: !m.accepted_at }))
     .sort((a, b) => (b.last_message_at ?? "").localeCompare(a.last_message_at ?? ""));
   const ids = conversations.map((c) => c.id);
+  const clubImages = await signClubImages(supabase, conversations.map((c) => c.club?.image_path ?? null));
 
   const [{ data: others }, { data: latest }] = await Promise.all([
     supabase
@@ -63,7 +66,7 @@ async function Conversations() {
           <li key={c.id}>
             <Link href={href} className="flex items-center gap-3 px-4 py-3 hover:bg-black/[0.02]">
               {c.kind !== "direct" ? (
-                <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-brand-50 text-xl">{c.kind === "group" || c.kind === "groupchat" || c.kind === "eventchat" ? "👥" : c.club?.emoji}</div>
+                c.kind === "group" || c.kind === "groupchat" || c.kind === "eventchat" ? <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-brand-50 text-xl">👥</div> : <ClubIcon emoji={c.club?.emoji ?? "⭐"} url={c.club?.image_path ? clubImages.get(c.club.image_path) : null} className="size-10 text-xl" />
               ) : (
                 <Avatar avatar={other?.avatar ?? "a01"} />
               )}

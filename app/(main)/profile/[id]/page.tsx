@@ -1,3 +1,5 @@
+import { ClubIcon } from "@/components/club-icon";
+import { signClubImages } from "@/lib/images";
 import { InterestIcon } from "@/components/interest-icon";
 import { Suspense } from "react";
 import { toggleFollow, sendFriendRequest, unfriend, cancelFriendRequest, respondFriendRequest } from "@/app/actions/social";
@@ -45,7 +47,7 @@ async function Profile({ params, searchParams }: { params: PageProps<"/profile/[
       .eq("id", id)
       .maybeSingle(),
     supabase.from("profile_interests").select("interest:interests(slug, name, emoji)").eq("profile_id", id),
-    supabase.from("club_members").select("role, club:clubs(id, name, emoji, status)").eq("profile_id", id),
+    supabase.from("club_members").select("role, club:clubs(id, name, emoji, status, image_path)").eq("profile_id", id),
     supabase.from("blocks").select("blocked_id").eq("blocker_id", me.id).eq("blocked_id", id).maybeSingle(),
     supabase.from("profile_badges").select("earned_at, badge:badges(code, name, emoji, description, sort)").eq("profile_id", id).eq("pinned", true),
     supabase.from("tutor_profiles").select("subjects, availability, active").eq("profile_id", id).maybeSingle(),
@@ -85,6 +87,7 @@ async function Profile({ params, searchParams }: { params: PageProps<"/profile/[
   const connections = (friendsA ?? 0) + (friendsB ?? 0);
   const activity = posts.slice(0, 3);
   const approvedClubs = (clubs ?? []).filter((c) => c.club?.status === "approved");
+  const clubImages = await signClubImages(supabase, approvedClubs.map((c) => c.club!.image_path));
   const levelNo = lvl ? (lvl as unknown as { level: number }).level : null;
   const card = "rounded-3xl border border-brand-700/10 bg-white/85 p-5 shadow-[0_1px_2px_rgba(40,60,40,0.04)]";
   return (
@@ -267,8 +270,8 @@ async function Profile({ params, searchParams }: { params: PageProps<"/profile/[
           {approvedClubs.length ? (
             <div className="flex flex-wrap gap-2">
               {approvedClubs.map((c) => (
-                <Link key={c.club!.id} href={`/clubs/${c.club!.id}`} className="chip bg-sage-soft/60 px-3.5 py-1.5 text-sm">
-                  {c.club!.emoji} {c.club!.name}{c.role === "leader" && ` · ${t("Leader")}`}
+                <Link key={c.club!.id} href={`/clubs/${c.club!.id}`} className="chip gap-1.5 bg-sage-soft/60 px-3.5 py-1.5 text-sm">
+                  <ClubIcon emoji={c.club!.emoji} url={c.club!.image_path ? clubImages.get(c.club!.image_path) : null} className="size-5 text-xs" />{c.club!.name}{c.role === "leader" && ` · ${t("Leader")}`}
                 </Link>
               ))}
             </div>
