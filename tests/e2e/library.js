@@ -32,7 +32,7 @@ async function fillForm(p, v) {
     await p.fill('input[name=link_url]', v.link);
   } else if (v.file) {
     await p.locator('[data-file-input]').setInputFiles(v.file);
-    await waitText(p, /📎/);
+    await waitText(p, /sample\.pdf/);
     if (v.rights !== false) await p.locator('input[name=rights_confirmed]').check();
     if (v.downloadable) await p.locator('input[name=downloadable]').check();
   }
@@ -154,7 +154,7 @@ async function fillForm(p, v) {
 
     await go(p, '/academic-resources/my-contributions');
     t = await text(p);
-    check('The student sees Approved and the points earned', /Approved/.test(t) && /Points earned/.test(t) && /⭐ 20/.test(t), t.slice(0, 200));
+    check('The student sees Approved and the points earned', /Approved/.test(t) && /Points earned/.test(t) && /(?:^|\s)20\b/.test(t), t.slice(0, 200));
     check('Points were added to the ledger once', sql(`select count(*) from public.points_ledger where profile_id='${ID.maya}' and reason='library_resource'`) === '1');
     await go(p, '/academic-resources/my-contributions?status=approved');
     check('The status tabs filter the list', (await p.locator('[data-contribution=approved]').count()) === 1);

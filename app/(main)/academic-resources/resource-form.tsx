@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, useTransition } from "react";
+import { ImagePlus, Paperclip, Upload } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { compressImage } from "@/lib/compress-image";
 import { makeT, type Locale } from "@/lib/i18n";
@@ -175,10 +176,14 @@ export function ResourceForm({
           </div>
           {source === "file" ? (
             <div className="space-y-2">
-              <input type="file" accept=".pdf,.docx,.pptx,.xlsx,.txt,.jpg,.jpeg,.png,.webp" onChange={(e) => pickFile(e.target.files?.[0])} className="block w-full text-sm" data-file-input />
+              <label className="btn-secondary inline-flex w-fit cursor-pointer items-center gap-2 rounded-full px-5 py-2.5 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-brand-600">
+                <Upload className="size-4" aria-hidden="true" />
+                <span>{file.name ? t("Choose a different file") : t("Choose a file")}</span>
+                <input type="file" accept=".pdf,.docx,.pptx,.xlsx,.txt,.jpg,.jpeg,.png,.webp" onChange={(e) => { pickFile(e.target.files?.[0]); e.target.value = ""; }} className="sr-only" data-file-input />
+              </label>
               <p className="text-xs text-black/50">{t("PDF, Word, PowerPoint, Excel, text or image. Up to {n} MB.", { n: MAX_MB })}</p>
               {busy === "file" && <p className="text-sm text-black/60">{t("Uploading…")}</p>}
-              {file.name && busy !== "file" && <p className="rounded-xl bg-brand-50 px-3 py-2 text-sm text-brand-800">📎 {file.name}</p>}
+              {file.name && busy !== "file" && <p className="flex items-center gap-2 rounded-xl bg-brand-50 px-3 py-2 text-sm text-brand-800"><Paperclip className="size-4 shrink-0" aria-hidden="true" /><span className="min-w-0 truncate">{file.name}</span></p>}
               {!file.path && official && initial?.file_name && <p className="text-xs text-black/50">{t("Current file: {n}. Upload a new one to replace it.", { n: initial.file_name })}</p>}
               <label className="flex items-start gap-2 text-sm">
                 <input type="checkbox" name="downloadable" defaultChecked={initial?.downloadable ?? official} className="mt-1" />
@@ -206,10 +211,14 @@ export function ResourceForm({
               {cover.url
                 // eslint-disable-next-line @next/next/no-img-element -- local preview
                 ? <img src={cover.url} alt="" className="size-full object-cover" />
-                : "📘"}
+                : <ImagePlus className="size-6 text-brand-700/70" strokeWidth={1.5} aria-hidden="true" />}
             </div>
             <div className="space-y-1">
-              <input type="file" accept="image/*" onChange={(e) => pickCover(e.target.files?.[0])} className="block w-full text-sm" data-cover-input />
+              <label className="btn-secondary inline-flex w-fit cursor-pointer items-center gap-2 rounded-full px-5 py-2.5 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-brand-600">
+                <ImagePlus className="size-4" aria-hidden="true" />
+                <span>{cover.path ? t("Choose a different picture") : t("Choose a picture")}</span>
+                <input type="file" accept="image/*" onChange={(e) => { pickCover(e.target.files?.[0]); e.target.value = ""; }} className="sr-only" data-cover-input />
+              </label>
               {busy === "cover" && <p className="text-xs text-black/60">{t("Uploading…")}</p>}
               {cover.path && <button type="button" onClick={() => setCover({ path: "", url: "" })} className="text-xs text-black/50 underline">{t("Remove cover")}</button>}
             </div>
