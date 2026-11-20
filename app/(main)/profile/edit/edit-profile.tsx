@@ -125,7 +125,7 @@ export function EditProfile(props: {
               return (
                 <button key={i.id} type="button" aria-pressed={on} onClick={() => toggle(i.id)}
                   className={`inline-flex items-center gap-1.5 rounded-full border px-4 py-2 text-[15px] font-medium transition ${on ? "border-brand-700 bg-brand-700 text-white" : "border-black/15 bg-white text-black/70 hover:border-black/30"}`}>
-                  {on && <Check className="size-4" strokeWidth={3} aria-hidden="true" />}{i.emoji} {i.name}
+                  {on && <Check className="size-4" strokeWidth={3} aria-hidden="true" />}{i.name}
                 </button>
               );
             })}
