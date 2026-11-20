@@ -80,7 +80,7 @@ const LAYLA = '00000000-0000-0000-0000-0000000000a3';
   const before = await p.locator('[data-interests] [aria-pressed=true]').count();
   const target = p.locator('[data-interests] button').filter({ hasText: 'Basketball' });
   await target.click();
-  check('Selecting an interest turns it forest green with a checkmark', (await p.locator('[data-interests] [aria-pressed=true]').count()) === before + 1 && (await target.locator('svg').count()) === 1 && /bg-brand-700/.test(await target.getAttribute('class')));
+  check('Selecting an interest turns it forest green with a checkmark', (await p.locator('[data-interests] [aria-pressed=true]').count()) === before + 1 && (await target.locator('svg').count()) === 2 && /bg-brand-700/.test(await target.getAttribute('class')));
   check('The interest counter updates', (await p.locator('[data-interest-count]').innerText()).trim() === `${before + 1}/10`);
   await p.locator('#ep-bio').fill('I enjoy robotics and chess.');
   check('The About you counter counts characters', /27 \/ 200/.test(await p.locator('[data-bio-count]').innerText()));

@@ -49,7 +49,7 @@ async function signIn(b, name, vp) {
   check('The bio counter works', /24\/200/.test(await text(p)));
   await p.locator('[data-next]').click();
   await p.waitForSelector('[data-step=interests]');
-  check('Interests are text chips', (await p.locator('[data-interests] button').count()) >= 5 && (await p.locator('[data-interests] svg').count()) === 0);
+  check('Interests are chips with one outline icon each and no emoji', (await p.locator('[data-interests] button').count()) >= 5 && (await p.locator('[data-interests] button').evaluateAll((bs) => bs.every((b) => b.querySelectorAll('svg').length === 1 && !/\p{Extended_Pictographic}/u.test(b.innerText)))));
   await p.screenshot({ path: SHOTS + 'onb-3-interests-desktop.png' });
   for (let i = 0; i < 3; i++) await p.locator('[data-interests] button').nth(i).click();
   await p.locator('[data-finish]').click();
