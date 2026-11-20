@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { completeOnboarding } from "@/app/actions/profile";
 import { Confetti } from "@/components/confetti";
+import { InterestIcon } from "@/components/interest-icon";
 import { NEW_AVATARS, avatarSrc } from "@/lib/avatars";
 import { uploadPhoto } from "@/lib/upload";
 import { makeT, type Locale } from "@/lib/i18n";
@@ -39,7 +40,7 @@ export function WelcomeWizard({
 }: {
   locale: Locale; after?: string; schoolId: string; userId: string; name: string; email: string; schoolName: string; grades: number[];
   fixedGrade: number | null; fixedSection: string | null; noClassReason: "counselor" | "alumni" | null;
-  interests: { id: number; name: string }[];
+  interests: { id: number; slug: string; name: string }[];
 }) {
   const t = makeT(locale);
   const router = useRouter();
@@ -266,7 +267,7 @@ export function WelcomeWizard({
                     <button key={i.id} type="button" aria-pressed={on}
                       onClick={() => setPicked((p) => (p.includes(i.id) ? p.filter((x) => x !== i.id) : p.length >= 10 ? p : [...p, i.id]))}
                       className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm font-medium transition ${on ? "border-brand-700 bg-brand-700 text-white" : "border-black/10 bg-white text-black/70 hover:border-black/25"}`}>
-                      {on && <Check />}{i.name}
+                      {on && <Check />}<InterestIcon slug={i.slug} />{i.name}
                     </button>
                   );
                 })}

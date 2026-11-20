@@ -14,7 +14,7 @@ async function Edit() {
   const supabase = await createClient();
   const { locale, t } = await getT();
   const [{ data: interests }, { data: mine }, urls] = await Promise.all([
-    supabase.from("interests").select("id, name, emoji").order("name"),
+    supabase.from("interests").select("id, slug, name, emoji").order("name"),
     supabase.from("profile_interests").select("interest_id").eq("profile_id", me.id),
     signImages(supabase, [me.photo_path, me.cover_path]),
   ]);

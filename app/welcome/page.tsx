@@ -17,7 +17,7 @@ async function Welcome({ searchParams }: { searchParams: PageProps<"/welcome">["
 
   const supabase = await createClient();
   const [{ data: interests }, { data: contact }, locale] = await Promise.all([
-    supabase.from("interests").select("id, name").order("name"),
+    supabase.from("interests").select("id, slug, name").order("name"),
     supabase.from("private_profiles").select("email").eq("id", me.id).maybeSingle(),
     getLocale(),
   ]);

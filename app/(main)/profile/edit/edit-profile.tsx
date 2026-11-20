@@ -8,6 +8,7 @@ import { updateProfileExtras } from "@/app/actions/social";
 import { createClient } from "@/lib/supabase/client";
 import { uploadPhoto } from "@/lib/upload";
 import { ACCENTS } from "@/lib/accent";
+import { InterestIcon } from "@/components/interest-icon";
 import { NEW_AVATARS, avatarSrc } from "@/lib/avatars";
 import { makeT, type Locale } from "@/lib/i18n";
 import type { ActionResult } from "@/lib/errors";
@@ -17,7 +18,7 @@ const IMAGE_TYPES = "image/jpeg,image/png,image/webp";
 const COVER_W = 1600;
 const COVER_H = 533; // 3 : 1, the shape of the profile banner
 
-type Interest = { id: number; name: string; emoji: string };
+type Interest = { id: number; slug: string; name: string; emoji: string };
 
 // A centred dialog: closes with Escape, the X or a click outside, and keeps the page from scrolling behind it.
 function Modal({ title, onClose, children }: { title: string; onClose: () => void; children: React.ReactNode }) {
@@ -125,7 +126,7 @@ export function EditProfile(props: {
               return (
                 <button key={i.id} type="button" aria-pressed={on} onClick={() => toggle(i.id)}
                   className={`inline-flex items-center gap-1.5 rounded-full border px-4 py-2 text-[15px] font-medium transition ${on ? "border-brand-700 bg-brand-700 text-white" : "border-black/15 bg-white text-black/70 hover:border-black/30"}`}>
-                  {on && <Check className="size-4" strokeWidth={3} aria-hidden="true" />}{i.name}
+                  {on && <Check className="size-4" strokeWidth={3} aria-hidden="true" />}<InterestIcon slug={i.slug} />{i.name}
                 </button>
               );
             })}
