@@ -39,7 +39,7 @@ async function Contributions({ searchParams }: { searchParams: Promise<{ status?
       {sp.sent && <p role="status" className="rounded-xl bg-brand-50 p-3 text-sm text-brand-800">{t("Sent! A reviewer will look at it soon. We will notify you.")}</p>}
       {sp.saved && <p role="status" className="rounded-xl bg-brand-50 p-3 text-sm text-brand-800">{t("Draft saved. Only you can see it.")}</p>}
       <div className="card flex items-center justify-between gap-3 p-4">
-        <div><p className="text-sm text-black/55">{t("Points earned from resources")}</p><p className="text-2xl font-bold" data-points>⭐ {earned}</p></div>
+        <div><p className="text-sm text-black/55">{t("Points earned from resources")}</p><p className="text-2xl font-bold" data-points>{earned}</p></div>
         <Link href="/academic-resources/suggest" className="btn-primary">＋ {t("Suggest a Resource")}</Link>
       </div>
       <div className="flex flex-wrap gap-1.5" role="tablist">
@@ -57,7 +57,7 @@ async function Contributions({ searchParams }: { searchParams: Promise<{ status?
             <div className="flex flex-wrap items-center gap-2">
               <span className={`chip ${TONE[status]}`}>{t(STATUS_LABEL[status])}{r.published_at && status !== "approved" ? ` · ${t("update")}` : ""}</span>
               <span className="text-xs text-black/50">{(r.subject as unknown as { name: string } | null)?.name} · {t((LIBRARY_TYPES[r.type] ?? LIBRARY_TYPES.other).label)}</span>
-              {r.points_awarded && r.published_at && <span className="chip bg-amber-50 text-amber-800">⭐ {t("Points earned")}</span>}
+              {r.points_awarded && r.published_at && <span className="chip bg-sage-soft text-brand-800">{t("Points earned")}</span>}
             </div>
             <Link href={`/academic-resources/resource/${r.id}`} className="block font-semibold hover:underline">{r.title}</Link>
             {rev?.status === "rejected" && rev.review_note && <p className="rounded-xl bg-red-50 p-3 text-sm text-red-800"><strong>{t("Feedback")}:</strong> {rev.review_note}</p>}

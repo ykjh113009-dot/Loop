@@ -156,7 +156,7 @@ async function Library({ q, type, view, allSubjects }: { q: string; type: string
         <>
           {view !== "recent" && (
             <section data-section="top-rated">
-              {sectionHead(<Star className="size-6 fill-amber-400 text-amber-500" aria-hidden="true" />, t("Top Rated"), view === "top" ? undefined : { href: "/academic-resources?view=top", label: t("See all") })}
+              {sectionHead(<Star className="size-5 text-brand-700" aria-hidden="true" />, t("Top Rated"), view === "top" ? undefined : { href: "/academic-resources?view=top", label: t("See all") })}
               {top.length === 0 ? <p className="rounded-2xl bg-sage-soft/40 px-4 py-6 text-center text-sm text-ink-2">{t("Top rated resources will appear here once students start rating.")}</p> : <div className={grid}>{top.map(tile)}</div>}
             </section>
           )}

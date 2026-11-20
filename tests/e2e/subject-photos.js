@@ -16,7 +16,6 @@ const loaded = (p, sel) => p.locator(sel).first().evaluate((i) => new Promise((r
   const rania = await signIn(b, 'Rania Haddad');
   const p = rania.p;
   await go(p, '/academic-resources');
-  await p.locator('[data-subject-photos-panel] summary').click();
   await p.locator('input[data-subject-file="SAT"]').setInputFiles(path.join(__dirname, 'proof.png'));
   await p.waitForFunction(() => /Picture saved/.test(document.body.innerText), null, { timeout: 20000 });
   check('An admin can add a picture to a subject', sql(`select count(*) from public.study_categories where slug='sat' and image_path is not null`) === '1');
@@ -31,7 +30,6 @@ const loaded = (p, sel) => p.locator(sel).first().evaluate((i) => new Promise((r
   await maya.p.screenshot({ path: '/home/user/pbs-go/shots/subj-page.png' });
   check('The subject page shows the picture filling its square next to the subject name', (await maya.p.locator('[data-subject-banner]').count()) === 1 && (await maya.p.locator('[data-subject-banner]').evaluate((i) => getComputedStyle(i).objectFit)) === 'cover');
   await go(p, '/academic-resources');
-  await p.locator('[data-subject-photos-panel] summary').click();
   await p.locator('[data-subject-photos] li', { hasText: 'SAT' }).getByRole('button', { name: 'Remove' }).click();
   await p.waitForFunction(() => /Picture removed/.test(document.body.innerText), null, { timeout: 20000 });
   check('The picture can be removed', sql(`select count(*) from public.study_categories where image_path is not null`) === '0');
