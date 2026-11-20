@@ -47,9 +47,18 @@ async function signIn(b, email, vp = { width: 1440, height: 900 }) {
   check('The club shows its picture in the Loop Passport', await imgOk(p.locator('a[href$="00000000-0000-0000-0000-00000000c001"] img')));
   await p.goto(BASE + '/search?q=Robotics', { waitUntil: 'networkidle' });
   check('The club shows its picture in search results', await imgOk(p.locator('a[href$="00000000-0000-0000-0000-00000000c001"] img')));
+  await p.goto(BASE + '/events?view=list', { waitUntil: 'networkidle' });
+  check('Events led by the club show its picture', await imgOk(p.locator('img[src*="/api/club-image/00000000-0000-0000-0000-00000000c001"]')));
+  await p.goto(BASE + '/polls', { waitUntil: 'networkidle' });
+  check('Polls by the club show its picture', await imgOk(p.locator('img[src*="/api/club-image/00000000-0000-0000-0000-00000000c001"]')));
+  const st = await p.evaluate(async () => (await fetch('/api/club-image/00000000-0000-0000-0000-00000000c001')).status);
+  check('The club picture link works for signed-in people', st === 200, String(st));
   await layla.ctx.close();
 
   // a plain student sees it but cannot manage it
+  const anon = await (await b.newContext()).newPage();
+  const ar = await anon.goto(BASE + '/api/club-image/00000000-0000-0000-0000-00000000c001', { waitUntil: 'domcontentloaded' });
+  check('It is not available when signed out', ar.status() === 401 || /\/login/.test(anon.url()), String(ar.status()));
   const maya = await signIn(b, 'demo.maya@pioneers.edu.ps');
   await maya.p.goto(BASE + '/clubs', { waitUntil: 'networkidle' });
   check('Other students see the club picture', (await maya.p.locator('[data-club="Robotics Club"] img').count()) === 1);

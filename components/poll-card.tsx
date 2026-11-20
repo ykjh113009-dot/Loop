@@ -1,3 +1,4 @@
+import { ClubMark } from "@/components/club-mark";
 import { createClient } from "@/lib/supabase/server";
 import { formatDateTime } from "@/lib/time";
 import { deletePoll } from "@/app/actions/polls";
@@ -9,7 +10,7 @@ type Poll = {
   options: string[];
   closes_at: string;
   created_by: string | null;
-  club: { name: string; emoji: string } | null;
+  club: { id: string; name: string; emoji: string; image_path?: string | null } | null;
 };
 
 type Results = { show: boolean; total: number; mine: number | null; counts?: number[] };
@@ -24,7 +25,7 @@ export async function PollCard({ poll, canVote, canDelete }: { poll: Poll; canVo
     <article className="space-y-3 rounded-3xl border border-brand-700/10 bg-white/85 p-5 shadow-[0_1px_2px_rgba(40,60,40,0.04)]">
       <div>
         <p className="text-xs text-black/45">
-          {poll.club ? `${poll.club.emoji} ${poll.club.name}` : "🏫 Whole school"} · {open ? `closes ${formatDateTime(poll.closes_at)}` : "closed"}
+          {poll.club ? <><ClubMark club={poll.club} /> {poll.club.name}</> : "🏫 Whole school"} · {open ? `closes ${formatDateTime(poll.closes_at)}` : "closed"}
         </p>
         <h2 className="text-[17px] font-semibold">{poll.question}</h2>
       </div>

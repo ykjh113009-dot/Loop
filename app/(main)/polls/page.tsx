@@ -21,7 +21,7 @@ async function Polls({ searchParams }: { searchParams: PageProps<"/polls">["sear
   const [{ data: polls }, { count: leaderOf }] = await Promise.all([
     supabase
       .from("polls")
-      .select("id, question, options, closes_at, created_by, club:clubs(name, emoji)")
+      .select("id, question, options, closes_at, created_by, club:clubs(id, name, emoji, image_path)")
       .order("closes_at", { ascending: false })
       .limit(40),
     supabase.from("club_members").select("club_id", { count: "exact", head: true }).eq("profile_id", me.id).eq("role", "leader"),

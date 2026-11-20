@@ -1,3 +1,4 @@
+import { ClubMark } from "@/components/club-mark";
 import Link from "next/link";
 import { formatTime, localParts } from "@/lib/time";
 import type { EventSummary } from "@/lib/queries";
@@ -22,7 +23,7 @@ export function EventCard({ event, going = false }: { event: EventSummary; going
         <p className="truncate text-xs text-black/55">
           {formatTime(event.starts_at)}
           {event.location && ` · ${event.location}`}
-          {event.club && ` · ${event.club.emoji} ${event.club.name}`}
+          {event.club && <> · <ClubMark club={event.club} /> {event.club.name}</>}
           {event.category && event.category !== "other" && ` · ${eventCategory(event.category).emoji}`}
         </p>
       </div>

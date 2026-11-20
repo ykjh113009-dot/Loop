@@ -1,3 +1,4 @@
+import { ClubMark } from "@/components/club-mark";
 import { Suspense } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -24,7 +25,7 @@ async function EventDetails({ params }: { params: PageProps<"/events/[id]">["par
   const { t, locale } = await getT();
   const { data: event } = await supabase
     .from("events")
-    .select("*, club:clubs(id, name, emoji), creator:profiles!events_created_by_fkey(id, full_name)")
+    .select("*, club:clubs(id, name, emoji, image_path), creator:profiles!events_created_by_fkey(id, full_name)")
     .eq("id", id)
     .maybeSingle();
   if (!event) notFound();
@@ -94,7 +95,7 @@ async function EventDetails({ params }: { params: PageProps<"/events/[id]">["par
           <p className="flex items-center gap-2 text-sm"><Icon name="clock" className="size-4 text-brand-700" />{formatTime(event.starts_at)}{event.ends_at && ` – ${formatTime(event.ends_at)}`}</p>
           {event.location && <p className="flex items-center gap-2 text-sm"><Icon name="pin" className="size-4 text-brand-700" /> {event.location}</p>}
           <p className="text-sm text-black/55">
-            {event.club ? <Link href={`/clubs/${event.club.id}`} className="text-brand-700 hover:underline">{event.club.emoji} {event.club.name}</Link> : <>🏫 {t("Whole school")}</>}
+            {event.club ? <Link href={`/clubs/${event.club.id}`} className="text-brand-700 hover:underline"><ClubMark club={event.club} className="size-5" /> {event.club.name}</Link> : <>🏫 {t("Whole school")}</>}
           </p>
           {organizers.length > 0 && (
             <p className="text-sm text-black/60">
