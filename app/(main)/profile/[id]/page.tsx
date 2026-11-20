@@ -1,3 +1,4 @@
+import { InterestIcon } from "@/components/interest-icon";
 import { Suspense } from "react";
 import { toggleFollow, sendFriendRequest, unfriend, cancelFriendRequest, respondFriendRequest } from "@/app/actions/social";
 import { ActionForm } from "@/components/action-form";
@@ -206,7 +207,7 @@ async function Profile({ params, searchParams }: { params: PageProps<"/profile/[
           <div className="flex flex-wrap gap-2.5">
             {interests!.map((i) => i.interest && (
               <Link key={i.interest.slug} href={`/people?interest=${i.interest.slug}`} className="inline-flex items-center gap-2 rounded-full border border-brand-700/20 bg-white px-4 py-2 text-[15px] hover:bg-sage-soft/50">
-                <span aria-hidden="true">{i.interest.emoji}</span>{i.interest.name}
+                <InterestIcon slug={i.interest.slug} className="size-[18px] shrink-0 text-brand-800" />{i.interest.name}
               </Link>
             ))}
           </div>

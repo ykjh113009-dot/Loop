@@ -1,3 +1,4 @@
+import { InterestIcon } from "@/components/interest-icon";
 import { Suspense } from "react";
 import Link from "next/link";
 import { requireMe } from "@/lib/auth";
@@ -61,9 +62,9 @@ async function People({ searchParams }: { searchParams: PageProps<"/people">["se
         ))}
       </div>
       <div className="flex gap-1.5 overflow-x-auto pb-1">
-        {picked && <Link href={link({ interest: null })} className="chip shrink-0 bg-brand-700 text-white">{picked.emoji} {picked.name} ✕</Link>}
+        {picked && <Link href={link({ interest: null })} className="chip shrink-0 gap-1.5 bg-brand-700 text-white"><InterestIcon slug={picked.slug} className="size-4 shrink-0" />{picked.name} ✕</Link>}
         {interests?.filter((i) => i.slug !== interest).map((i) => (
-          <Link key={i.id} href={link({ interest: i.slug })} className="chip shrink-0">{i.emoji} {i.name}</Link>
+          <Link key={i.id} href={link({ interest: i.slug })} className="chip shrink-0 gap-1.5"><InterestIcon slug={i.slug} className="size-4 shrink-0" />{i.name}</Link>
         ))}
       </div>
 
