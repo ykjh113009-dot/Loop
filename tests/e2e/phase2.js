@@ -120,13 +120,15 @@ const waitText = (p, re, t = 15000) => p.waitForFunction((s) => new RegExp(s).te
     check('The friends list shows the new friend', /Maya Odeh/.test(await text(p)));
     // profile extras
     await go(p, '/profile/edit');
-    await p.fill('input[aria-label^="Class letter"]', 'a');
+    await p.locator('[data-section=details] input').first().fill('a');
     await p.locator('input[placeholder^="Drawing"]').fill('Robotics, Drawing');
     await p.locator('input[placeholder^="Physics"]').fill('Physics');
     await p.locator('[role=radio][aria-label=Sky]').click();
     await p.screenshot({ path: '/tmp/cover.png', clip: { x: 0, y: 0, width: 300, height: 120 } });
-    await p.setInputFiles('input[aria-label="Cover photo"]', '/tmp/cover.png');
-    await p.locator('.card', { hasText: 'Photo, class and more' }).getByRole('button', { name: 'Save' }).click();
+    await p.locator('[data-change-cover-area]').click({ force: true });
+    await p.locator('[data-cover-input]').setInputFiles('/tmp/cover.png');
+    await p.waitForSelector('[data-crop-image]');
+    await p.locator('[data-save-cover]').click();
     await waitText(p, /Saved!/);
     await go(p, `/profile/${ID.layla}`);
     const t2 = await text(p);

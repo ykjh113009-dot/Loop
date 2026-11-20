@@ -91,7 +91,7 @@ async function login(browser, name, viewport = { width: 1280, height: 850 }) {
     await waitText(p, /Done! Check your points/);
     await go(p, '/profile/edit');
     await p.locator('[role=radio][aria-label=Rose]').click();
-    await p.locator('.card', { hasText: 'Photo, class and more' }).getByRole('button', { name: 'Save' }).click();
+    await p.locator('[data-save-changes]').click();
     await waitText(p, /Saved!/);
     check('A colour bought in the shop can be used on the profile', sql(`select accent from public.profiles where id='${ID.maya}'`) === 'rose');
   }
@@ -120,7 +120,7 @@ async function login(browser, name, viewport = { width: 1280, height: 850 }) {
   {
     const p = maya.p;
     await go(p, '/profile/edit');
-    check('A student\'s class letter is locked', await p.locator('input[aria-label^="Class letter"]').isDisabled());
+    check('A student\'s class letter is locked', await p.locator('[data-section=details] input').first().isDisabled());
     await go(p, '/leaderboard');
     const t = await text(p);
     check('The house leaderboard lists all houses and marks mine', (await p.locator('[data-house]').count()) === 4 && /Your house/.test(t));

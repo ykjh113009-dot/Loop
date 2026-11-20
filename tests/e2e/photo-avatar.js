@@ -19,8 +19,9 @@ const loaded = (p, sel) => p.locator(sel).first().evaluate((i) => new Promise((r
   const p = maya.p;
   check('Before: the top bar shows the illustrated avatar', /avatars\/a09\.svg/.test(await p.locator('header img').first().getAttribute('src').catch(() => '')) || (await p.locator('img[src*="/avatars/a09.svg"]').count()) > 0);
   await go(p, '/profile/edit');
-  await p.locator('input[type=file][aria-label="Profile photo"]').setInputFiles(path.join(__dirname, 'proof.png'));
-  await p.getByRole('button', { name: /^Save$/ }).last().click();
+  await p.locator('[data-change-photo]').click();
+  await p.locator('[data-photo-input]').setInputFiles(path.join(__dirname, 'proof.png'));
+  await p.locator('[data-save-photo]').click();
   await p.waitForFunction(() => /Saved/.test(document.body.innerText), null, { timeout: 20000 });
   await p.waitForTimeout(800);
   const avatar = sql(`select avatar from public.profiles where id = '${MAYA}'`);
@@ -38,8 +39,9 @@ const loaded = (p, sel) => p.locator(sel).first().evaluate((i) => new Promise((r
   const r = await anon.goto(`${BASE}/api/avatar/${MAYA}`);
   check('It is not available when signed out', r.status() === 401 || /\/login/.test(anon.url()), String(r.status()));
   await go(p, '/profile/edit');
-  await p.getByLabel(/Remove my photo/).check().catch(async () => { await p.locator('input[type=checkbox]').last().check(); });
-  await p.getByRole('button', { name: /^Save$/ }).last().click();
+  await p.locator('[data-change-photo]').click();
+  await p.locator('[data-remove-photo]').click();
+  await p.locator('[data-save-photo]').click();
   await p.waitForFunction(() => /Saved/.test(document.body.innerText), null, { timeout: 20000 });
   await p.waitForTimeout(800);
   check('Removing the photo brings the illustrated avatar back', sql(`select avatar from public.profiles where id = '${MAYA}'`) === 'a09');

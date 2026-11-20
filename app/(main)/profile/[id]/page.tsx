@@ -89,18 +89,16 @@ async function Profile({ params, searchParams }: { params: PageProps<"/profile/[
   return (
     <div className="mx-auto max-w-5xl space-y-5" data-profile-page data-wide>
       <section className="relative overflow-hidden rounded-3xl border border-brand-700/10 bg-[#f4f1e6] pb-6 shadow-[0_1px_2px_rgba(40,60,40,0.04)]" data-profile-hero>
-        <div className="relative h-40 bg-cover bg-center sm:h-60" style={{ backgroundImage: cover ? `url(${cover})` : accent.cover }} data-testid="cover">
-          {cover && <div className="absolute inset-0 bg-black/20" aria-hidden="true" />}
-          {!cover && <p className="absolute end-[8%] top-[18%] -rotate-6 text-xl font-light text-white/70 italic sm:text-3xl" style={{ fontFamily: "Georgia, serif" }} aria-hidden="true">{t("Dream Bigger.")}<br />{t("Achieve More.")}</p>}
+        <div className="relative h-40 bg-cover sm:h-72" style={{ backgroundImage: `url(${cover || "/brand/default-cover.webp"})`, backgroundPosition: "center 20%" }} data-testid="cover">
           <svg viewBox="0 0 1440 80" preserveAspectRatio="none" className="absolute inset-x-0 -bottom-px h-10 w-full text-[#f4f1e6] sm:h-16" aria-hidden="true"><path fill="currentColor" d="M0 80V52C240 8 470 8 720 40S1190 72 1440 28V80Z" /></svg>
         </div>
         <div className="relative px-5 text-center">
-          <div className="relative z-10 -mt-[72px] inline-block sm:-mt-24">
+          <div className="relative z-10 -mt-[72px] inline-block">
             {photo ? (
               // eslint-disable-next-line @next/next/no-img-element -- private signed link
-              <img src={photo} alt="" className="size-32 rounded-full border-[5px] border-white bg-white object-cover shadow-lg sm:size-44" style={{ outline: `2px solid ${accent.ring}` }} data-profile-photo />
+              <img src={photo} alt="" className="size-32 rounded-full border-[5px] border-white bg-white object-cover shadow-lg sm:size-36" style={{ outline: `2px solid ${accent.ring}` }} data-profile-photo />
             ) : (
-              <Avatar avatar={profile.avatar} size="xl" className="!size-32 border-[5px] border-white shadow-lg sm:!size-44" />
+              <Avatar avatar={profile.avatar} size="xl" className="!size-32 border-[5px] border-white shadow-lg sm:!size-36" />
             )}
           </div>
           <div className="mt-3 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 sm:absolute sm:end-8 sm:top-7 sm:mt-0 sm:flex-nowrap" data-profile-badges>
