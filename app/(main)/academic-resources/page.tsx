@@ -173,7 +173,7 @@ async function Library({ q, type, view, allSubjects }: { q: string; type: string
             </div>
           </section>
           {me.isAdmin && (
-            <details className="rounded-3xl border border-brand-700/10 bg-white/85 p-4" data-subject-photos-panel>
+            <details open className="rounded-3xl border border-brand-700/10 bg-white/85 p-4" data-subject-photos-panel>
               <summary className="cursor-pointer font-semibold">{t("Subject pictures")}</summary>
               <div className="mt-3">
                 <SubjectPhotos schoolId={me.school_id} userId={me.id} locale={locale} subjects={subjects.map((c) => ({ id: c.id, name: c.name, url: c.image_path ? subjectImages.get(c.image_path) ?? null : null }))} />
