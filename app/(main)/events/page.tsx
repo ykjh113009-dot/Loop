@@ -6,11 +6,11 @@ import { getT } from "@/lib/i18n-server";
 import { EVENT_FIELDS, type EventSummary } from "@/lib/queries";
 import { EVENT_CATEGORIES } from "@/lib/events";
 import { formatDate, fromLocalInput, localDayKey, localParts, weekStart } from "@/lib/time";
-import { EventCard } from "@/components/event-card";
+import { EventRow } from "@/components/events/event-row";
+import { Waves } from "@/components/shop/art";
+import { ArrowRight, CalendarDays, Plus } from "lucide-react";
 import { MonthCalendar, monthParam } from "@/components/month-calendar";
 import { Empty } from "@/components/empty";
-import { Icon } from "@/components/icons";
-import { PageHeader } from "@/components/page-header";
 import { PageSkeleton } from "@/components/skeleton";
 import { Glyph } from "@/components/glyph";
 
@@ -26,7 +26,7 @@ const startOf = (key: string) => fromLocalInput(`${key}T00:00`)!;
 async function Events({ searchParams }: { searchParams: PageProps<"/events">["searchParams"] }) {
   const me = await requireMe();
   const supabase = await createClient();
-  const { t } = await getT();
+  const { t, locale } = await getT();
   const now = new Date();
   const today = localParts(now);
   const todayKey = localDayKey(now);
@@ -63,8 +63,10 @@ async function Events({ searchParams }: { searchParams: PageProps<"/events">["se
 
   const { data: myRsvps } = await supabase.from("event_rsvps").select("event_id, status").eq("profile_id", me.id);
   const goingTo = new Set((myRsvps ?? []).map((r) => r.event_id));
+  const rsvpOf = new Map((myRsvps ?? []).map((r) => [r.event_id, r.status as "going" | "waitlist"]));
+  const canRsvp = me.isStudent && !me.isSuspended;
 
-  let query = supabase.from("events").select(EVENT_FIELDS).in("status", ["approved", "cancelled", "pending"]).gte("starts_at", from.toISOString()).order("starts_at");
+  let query = supabase.from("events").select(`${EVENT_FIELDS}, description`).in("status", ["approved", "cancelled", "pending"]).gte("starts_at", from.toISOString()).order("starts_at");
   if (to) query = query.lt("starts_at", to.toISOString());
   if (category) query = query.eq("category", category);
   if (q) query = query.or(`title.ilike.%${q}%,location.ilike.%${q}%,description.ilike.%${q}%`);
@@ -98,21 +100,24 @@ async function Events({ searchParams }: { searchParams: PageProps<"/events">["se
       return (
         <section key={day} id={`day-${day}`} className="scroll-mt-16">
           <h2 className="section-title">{day === todayKey ? `${t("Today")} · ` : ""}{formatDate(startOf(day))}</h2>
-          {list.length === 0 ? <p className="card p-3 text-sm text-black/45">{t("Nothing planned.")}</p> : <div className="space-y-2">{list.map((e) => <EventCard key={e.id} event={e} going={goingTo.has(e.id)} />)}</div>}
+          {list.length === 0 ? <p className="card p-3 text-sm text-black/45">{t("Nothing planned.")}</p> : <div className="space-y-2">{list.map((e) => <EventRow key={e.id} event={e} rsvp={rsvpOf.get(e.id) ?? null} canRsvp={canRsvp} locale={locale} />)}</div>}
         </section>
       );
     });
 
   return (
-    <div className="mx-auto max-w-2xl space-y-4">
-      <PageHeader
-        title="Events"
-        action={me.isStudent && !me.isSuspended && (
-          <Link href="/events/new" className="btn-primary px-3 py-2"><Icon name="plus" className="size-4" /> {t("New event")}</Link>
+    <div className="mx-auto max-w-4xl space-y-5" data-events-page data-wide>
+      <section className="relative isolate overflow-hidden rounded-3xl border border-brand-700/10 bg-gradient-to-r from-sage-soft/80 via-brand-100/70 to-brand-50 px-6 py-7 lg:px-9 lg:py-9" data-banner data-events-banner>
+        <Waves className="pointer-events-none absolute inset-0 -z-10 size-full opacity-70" />
+        <svg className="pointer-events-none absolute -end-6 top-1/2 -z-10 hidden h-[120%] -translate-y-1/2 text-brand-700/20 sm:block" viewBox="0 0 400 200" aria-hidden="true"><path d="M200 100C240 40 340 40 340 100C340 160 240 160 200 100C160 40 60 40 60 100C60 160 160 160 200 100Z" fill="none" stroke="currentColor" strokeWidth="26" strokeLinejoin="round" /></svg>
+        <h1 className="font-heading text-[30px] leading-[1.05] font-semibold text-brand-900 lg:text-[46px]" data-banner-title>{t("One Loop.")}<br />{t("Endless Possibilities.")}</h1>
+        <p className="mt-2 text-sm text-ink-2 lg:text-base">{t("Stay updated with upcoming events and activities.")}</p>
+        {me.isStudent && !me.isSuspended && (
+          <Link href="/events/new" className="btn-primary mt-4 rounded-full px-5 py-2.5"><Plus className="size-4" aria-hidden="true" />{t("New event")}</Link>
         )}
-      />
+      </section>
 
-      <div className="flex gap-1 rounded-xl bg-black/5 p-1" role="tablist">
+      <div className="flex gap-1 rounded-2xl bg-black/5 p-1" role="tablist">
         {views.map(([id, label]) => (
           <Link key={id} role="tab" aria-selected={view === id} href={link({ view: id })} className={`flex-1 rounded-lg py-1.5 text-center text-sm font-medium ${view === id ? "bg-brand-700 text-white shadow-sm" : "text-black/55 hover:bg-sage-soft/60"}`}>{label}</Link>
         ))}
@@ -141,6 +146,11 @@ async function Events({ searchParams }: { searchParams: PageProps<"/events">["se
           <Link href={link({ date: addDays(view === "week" ? weekFirst : dateKey, view === "week" ? 7 : 1) })} className="btn-ghost px-3 py-1.5" aria-label={t("Next")}>›</Link>
         </div>
       )}
+
+      <div className="flex items-center justify-between gap-3" data-upcoming-header>
+        <h2 className="flex items-center gap-2.5 font-heading text-2xl font-semibold text-brand-900"><CalendarDays className="size-6 text-brand-800" strokeWidth={1.7} aria-hidden="true" />{view === "list" ? t("Upcoming Events") : view === "month" ? t("Events this month") : t("Events")}</h2>
+        {view !== "list" && <Link href={link({ view: "list" })} className="inline-flex items-center gap-1.5 text-sm font-medium text-brand-800 hover:underline">{t("View all")} <ArrowRight className="size-4 rtl:rotate-180" aria-hidden="true" /></Link>}
+      </div>
 
       {events.length === 0 && view !== "week" ? (
         <Empty emoji="📅" title={view === "list" ? t("No upcoming events") : t("No events here")}>{(q || category || mine) && t("Try clearing the search or filters.")}</Empty>

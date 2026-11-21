@@ -2,18 +2,21 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { requireMe } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { formatDateTime, timeAgo, toLocalInput } from "@/lib/time";
+import { formatDate, formatDateTime, localParts, timeAgo, toLocalInput } from "@/lib/time";
 import { getT } from "@/lib/i18n-server";
 import { addCouncilMember, createElection, removeCouncilMember } from "@/app/actions/council";
 import { ActionForm } from "@/components/action-form";
 import { Avatar } from "@/components/avatar";
 import { Empty } from "@/components/empty";
-import { PageHeader } from "@/components/page-header";
 import { PageSkeleton } from "@/components/skeleton";
 import { StudentPicker } from "@/components/student-picker";
 import { SubmitButton } from "@/components/submit-button";
 import { ContactForm, DeletePost, InfoForm, PostForm, ReplyForm } from "./council-forms";
 import { Glyph } from "@/components/glyph";
+import { ArrowRight, Lightbulb, MessageCircle, Pin } from "lucide-react";
+import { startChat } from "@/app/actions/messages";
+import { CampusScene } from "@/components/art/scenes";
+import { Waves } from "@/components/shop/art";
 
 export const metadata = { title: "Student council" };
 
@@ -41,7 +44,16 @@ async function Council() {
   const nextWeek = new Date(today.getTime() + 7 * 24 * 3600 * 1000);
 
   return (
-    <div className="space-y-5">
+    <div className="mx-auto max-w-5xl space-y-6" data-council-page data-wide>
+      <section className="relative isolate overflow-hidden rounded-3xl border border-brand-700/10 bg-gradient-to-r from-sage-soft/80 via-brand-100/70 to-brand-50 px-6 py-7 lg:px-9 lg:py-9" data-banner data-council-banner>
+        <Waves className="pointer-events-none absolute inset-0 -z-10 size-full opacity-70" />
+        <CampusScene className="pointer-events-none absolute end-4 bottom-0 -z-10 hidden h-[105%] w-auto opacity-90 md:block" />
+        <h1 className="font-heading text-[34px] leading-none font-semibold text-brand-900 lg:text-[52px]" data-banner-title>{t("Student Council")}</h1>
+        <p className="mt-2 text-lg font-medium text-ink lg:text-2xl">{t("Your voice. Our mission.")}</p>
+        <p className="mt-2 max-w-md text-sm text-ink-2 lg:text-base">{t("Representing students, driving change, and building a better school together.")}</p>
+        <Link href="/suggestions" className="btn-primary mt-4 rounded-full px-5 py-2.5" data-send-suggestion><MessageCircle className="size-4" aria-hidden="true" />{t("Send a Suggestion")} <ArrowRight className="size-4 rtl:rotate-180" aria-hidden="true" /></Link>
+      </section>
+
       {(info?.about || info?.contact_email || info?.office || info?.meeting_info) && (
         <section className="card space-y-1.5 p-4 text-sm">
           {info.about && <p className="whitespace-pre-wrap">{info.about}</p>}
@@ -51,20 +63,82 @@ async function Council() {
         </section>
       )}
 
-      <section className="space-y-2">
-        <h2 className="section-title">{t("News from the council")}</h2>
-        {(posts ?? []).length === 0 ? <Empty emoji="🗳️" title={t("Nothing posted yet")} /> : (posts ?? []).map((p) => (
-          <article key={p.id} className="card space-y-1.5 p-4 text-sm">
-            <div className="flex items-start gap-2">
-              <p className="min-w-0 flex-1 font-semibold"><Glyph e={KIND[p.kind as keyof typeof KIND][0]} /> {p.title}{p.pinned && <span className="chip ms-2 bg-amber-50 text-amber-800"><Glyph e="📌" /></span>}</p>
-              {p.status && <span className={`chip shrink-0 ${p.status === "done" ? "bg-brand-50 text-brand-800" : "bg-sky-50 text-sky-800"}`}>{t(STATUS[p.status as keyof typeof STATUS])}</span>}
-            </div>
-            {p.body && <p className="whitespace-pre-wrap text-black/75">{p.body}</p>}
-            <p className="flex items-center gap-2 text-xs text-black/45">{t(KIND[p.kind as keyof typeof KIND][1])} · {p.author?.full_name} · {timeAgo(p.created_at)}
-              {canPost && <span className="ms-auto"><DeletePost id={p.id} locale={locale} /></span>}</p>
-          </article>
-        ))}
+      <section data-section="members">
+        <h2 className="mb-3 flex items-center gap-3 font-heading text-2xl font-semibold text-brand-900"><span className="h-7 w-1 rounded-full bg-brand-700" aria-hidden="true" />{t("Our Council Members")}</h2>
+        {(members ?? []).length === 0 ? <Empty emoji="🗳️" title={t("No council members yet")} /> : (
+          <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+            {(members ?? []).map((m) => m.profile && (
+              <li key={m.profile.id} className="card flex flex-col items-center gap-1 p-4 text-center" data-council-member={m.profile.id}>
+                <Link href={`/profile/${m.profile.id}`} className="rounded-full"><Avatar avatar={m.profile.avatar} size="xl" /></Link>
+                <p className="mt-1 text-[15px] font-semibold">{m.profile.full_name}</p>
+                <p className="text-sm text-ink-2">{m.position}</p>
+                {m.profile.id !== me.id && (
+                  <form action={startChat} className="mt-2">
+                    <input type="hidden" name="profileId" value={m.profile.id} />
+                    <button className="inline-flex items-center gap-1.5 rounded-full bg-sage-soft/70 px-4 py-1.5 text-sm font-medium text-brand-900 hover:bg-sage-soft"><MessageCircle className="size-4" aria-hidden="true" />{t("Message")}</button>
+                  </form>
+                )}
+                {me.isAdmin && (
+                  <ActionForm action={removeCouncilMember}>
+                    <input type="hidden" name="profileId" value={m.profile.id} />
+                    <SubmitButton className="text-xs text-black/40 hover:text-red-600" pendingText="…">{t("Remove")}</SubmitButton>
+                  </ActionForm>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
       </section>
+
+      <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_340px]">
+        <section className="min-w-0 space-y-3" data-section="news">
+          <h2 className="flex items-center gap-3 font-heading text-2xl font-semibold text-brand-900"><span className="h-7 w-1 rounded-full bg-brand-700" aria-hidden="true" />{t("Latest News from the Council")}</h2>
+          {(posts ?? []).length === 0 ? <Empty emoji="🗳️" title={t("Nothing posted yet")} /> : (posts ?? []).map((p) => (
+            <article key={p.id} className="card flex gap-4 p-4 text-sm" data-council-post={p.id}>
+              <span className="flex size-20 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-sand to-sage-soft/60 text-3xl text-brand-800 sm:size-24"><Glyph e={KIND[p.kind as keyof typeof KIND][0]} strokeWidth={1.3} /></span>
+              <div className="min-w-0 flex-1 space-y-1.5">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="chip bg-sage-soft/60">{t(KIND[p.kind as keyof typeof KIND][1])}</span>
+                  {p.pinned && <span className="chip"><Pin className="size-3" aria-hidden="true" /></span>}
+                  {p.status && <span className={`chip ${p.status === "done" ? "bg-brand-50 text-brand-800" : "bg-sky-50 text-sky-800"}`}>{t(STATUS[p.status as keyof typeof STATUS])}</span>}
+                </div>
+                <h3 className="text-[17px] leading-tight font-semibold">{p.title}</h3>
+                {p.body && <p className="line-clamp-3 whitespace-pre-wrap text-ink-2">{p.body}</p>}
+                <p className="flex items-center gap-2 text-xs text-black/45">{formatDate(p.created_at)} · {p.author?.full_name} · {timeAgo(p.created_at)}
+                  {canPost && <span className="ms-auto"><DeletePost id={p.id} locale={locale} /></span>}</p>
+              </div>
+            </article>
+          ))}
+        </section>
+
+        <aside className="space-y-4">
+          <section className="relative isolate overflow-hidden rounded-3xl border border-brand-700/10 bg-sage-soft/50 p-5" data-card="suggestion">
+            <Lightbulb className="pointer-events-none absolute -end-2 top-3 -z-10 size-24 text-brand-800/20" strokeWidth={1.1} aria-hidden="true" />
+            <h2 className="font-heading text-xl font-semibold text-brand-900">{t("Have a suggestion?")}</h2>
+            <p className="mt-1 text-sm text-ink-2">{t("Share your ideas with the Student Council and help improve our school!")}</p>
+            <Link href="/suggestions" className="btn-primary mt-4 w-full rounded-full"><MessageCircle className="size-4" aria-hidden="true" />{t("Send a Suggestion")} <ArrowRight className="size-4 rtl:rotate-180" aria-hidden="true" /></Link>
+          </section>
+          <section className="card p-4" data-card="initiatives">
+            <h2 className="font-heading text-xl font-semibold text-brand-900">{t("Upcoming Initiatives")}</h2>
+            {(() => {
+              const list = (posts ?? []).filter((p) => (p.kind === "initiative" || p.kind === "activity") && p.status !== "done").slice(0, 4);
+              return list.length === 0 ? <p className="mt-2 text-sm text-ink-2">{t("No initiatives planned right now.")}</p> : (
+                <ul className="mt-3 space-y-2">
+                  {list.map((p) => {
+                    const d = localParts(p.created_at);
+                    return (
+                      <li key={p.id} className="flex items-center gap-3 rounded-2xl bg-cream/60 p-2.5">
+                        <span className="w-12 shrink-0 rounded-xl bg-sage-soft/70 py-1 text-center text-brand-900"><span className="block text-[10px] font-semibold uppercase">{["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][d.month - 1]}</span><span className="block text-lg leading-tight font-bold">{d.day}</span></span>
+                        <span className="min-w-0"><span className="block truncate text-sm font-semibold">{p.title}</span>{p.body && <span className="line-clamp-1 text-xs text-ink-2">{p.body}</span>}</span>
+                      </li>
+                    );
+                  })}
+                </ul>
+              );
+            })()}
+          </section>
+        </aside>
+      </div>
 
       {me.isStudent && !me.isSuspended && (
         <section className="space-y-2">
@@ -100,30 +174,6 @@ async function Council() {
           </details>
         </section>
       )}
-
-      <section>
-        <h2 className="section-title">Council members</h2>
-        {(members ?? []).length === 0 ? <Empty emoji="🗳️" title="No council members yet" /> : (
-          <ul className="card divide-y divide-black/5">
-            {(members ?? []).map((m) => m.profile && (
-              <li key={m.profile.id} className="flex items-center gap-3 px-4 py-3">
-                <Link href={`/profile/${m.profile.id}`}><Avatar avatar={m.profile.avatar} /></Link>
-                <div className="min-w-0 flex-1">
-                  <p className="font-medium">{m.profile.full_name}</p>
-                  <p className="text-xs text-black/50">{m.position} · Grade {m.profile.grade}</p>
-                </div>
-                {me.isAdmin && (
-                  <ActionForm action={removeCouncilMember}>
-                    <input type="hidden" name="profileId" value={m.profile.id} />
-                    <SubmitButton className="text-xs text-black/40 hover:text-red-600" pendingText="…">Remove</SubmitButton>
-                  </ActionForm>
-                )}
-              </li>
-            ))}
-          </ul>
-        )}
-        <Link href="/suggestions" className="btn-secondary mt-3 w-full"><Glyph e="💡" /> Send the council a suggestion</Link>
-      </section>
 
       <section className="space-y-2">
         <h2 className="section-title">Elections</h2>
@@ -197,7 +247,6 @@ async function Council() {
 export default function CouncilPage() {
   return (
     <>
-      <PageHeader title="Student council" back="/more" />
       <Suspense fallback={<PageSkeleton />}>
         <Council />
       </Suspense>
