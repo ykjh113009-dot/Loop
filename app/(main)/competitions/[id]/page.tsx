@@ -21,13 +21,15 @@ async function Competition({ params }: { params: PageProps<"/competitions/[id]">
   const { t } = await getT();
   const { data: c } = await supabase.from("competitions").select("*").eq("id", id).maybeSingle();
   if (!c) notFound();
-  const [{ data: teams }, { data: members }, { data: scores }, { data: houses }, { data: roles }] = await Promise.all([
+  const [{ data: teams }, { data: members }, { data: scores }, { data: houses }, { data: roles }, { data: myHouseId }] = await Promise.all([
     supabase.from("teams").select("id, name").eq("competition_id", id).order("created_at"),
     supabase.from("team_members").select("team_id, profile:profiles(id, full_name)").eq("competition_id", id),
     supabase.from("competition_scores").select("id, team_id, house_id, points, note, created_at").eq("competition_id", id).order("created_at", { ascending: false }),
     supabase.from("houses").select("id, name, emoji").order("sort"),
     supabase.from("leadership_roles").select("kind").eq("profile_id", me.id).eq("kind", "school_staff"),
+    supabase.rpc("my_house"),
   ]);
+  const myHouse = (houses ?? []).find((h) => h.id === myHouseId);
   const staff = me.isAdmin || (roles ?? []).length > 0;
   const open = new Date(c.ends_at) >= new Date();
   const byTeam = (tid: string) => (members ?? []).filter((m) => m.team_id === tid && m.profile);
@@ -41,6 +43,21 @@ async function Competition({ params }: { params: PageProps<"/competitions/[id]">
         <p className="mt-1 text-xs text-black/50">{c.kind === "house" ? t("House competition") : t("Team competition (up to {n} per team)", { n: c.team_size })} · {formatDate(c.starts_at)} → {formatDate(c.ends_at)}</p>
         {c.description && <p className="mt-2 text-sm whitespace-pre-wrap text-black/75">{c.description}</p>}
       </section>
+
+      {c.kind === "house" && (
+        <section className="card space-y-2 border-brand-700/20 bg-sage-soft/30 p-4" data-house-howto>
+          <h2 className="font-semibold">{t("How to take part")}</h2>
+          <p className="text-sm text-black/70">{t("This is a house competition, so there is nothing to sign up for. Staff give points to houses, and every student in a house helps it climb the leaderboard.")}</p>
+          {!me.isStudent ? (
+            <p className="text-sm text-black/60">{t("Only students belong to a house.")}</p>
+          ) : myHouse ? (
+            <p className="text-sm font-medium text-brand-800">{t("Your house: {name}. Earn points and join events to help it win.", { name: myHouse.name })}</p>
+          ) : (
+            <p className="text-sm text-black/70">{t("You are not in a house yet. Houses are made from classes, so ask an admin to add your class to a house.")}</p>
+          )}
+          {me.isAdmin && <Link href="/admin/houses" className="text-sm text-brand-700 underline">{t("Set up houses and their classes")}</Link>}
+        </section>
+      )}
 
       {c.kind === "team" && (
         <section className="space-y-2">

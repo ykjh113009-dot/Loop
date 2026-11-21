@@ -1251,4 +1251,11 @@ export const AR: Record<string, string> = {
   "Nothing yet. New listings show up here.": "لا شيء بعد. تظهر الإعلانات الجديدة هنا.",
   "listed": "أعلن عن",
   "You have not listed anything yet.": "لم تعرض أي غرض بعد.",
+  "Help your house: see the competitions": "ساعد بيتك: شاهد المسابقات",
+  "How to take part": "كيف تشارك",
+  "This is a house competition, so there is nothing to sign up for. Staff give points to houses, and every student in a house helps it climb the leaderboard.": "هذه مسابقة بين البيوت، لذا لا حاجة للتسجيل. يمنح الموظفون النقاط للبيوت، وكل طالب في البيت يساعده على الصعود في الترتيب.",
+  "Only students belong to a house.": "الطلاب فقط ينتمون إلى بيت.",
+  "Your house: {name}. Earn points and join events to help it win.": "بيتك: {name}. اكسب نقاطًا وشارك في الفعاليات لتساعده على الفوز.",
+  "You are not in a house yet. Houses are made from classes, so ask an admin to add your class to a house.": "لست في بيت بعد. البيوت تتكوّن من الصفوف، فاطلب من المشرف إضافة صفك إلى بيت.",
+  "Set up houses and their classes": "إعداد البيوت وصفوفها",
 };

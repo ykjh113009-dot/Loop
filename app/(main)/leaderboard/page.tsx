@@ -124,7 +124,7 @@ async function Leaderboard({ searchParams }: { searchParams: PageProps<"/leaderb
         {view === "grades" ? t("Grades are ranked by average points per student, so small and big grades compete fairly.") : view === "houses" ? t("A house's score is all the points of its students plus competition points.") : ""}
         {period === "week" && ` ${t("The week starts on Sunday.")}`}
       </p>
-      {me.isStudent && <Link href="/competitions" className="btn-primary w-full"><Glyph e="🏁" /> {t("Help your house: join a competition")}</Link>}
+      {me.isStudent && <Link href="/competitions" className="btn-primary w-full"><Glyph e="🏁" /> {t("Help your house: see the competitions")}</Link>}
     </div>
   );
 }
