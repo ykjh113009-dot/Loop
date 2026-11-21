@@ -23,7 +23,7 @@ export function PollBox({ postId, options, locale, wide = false }: { postId: str
             disabled={pending}
             onClick={() => start(async () => { await votePoll(postId, o.idx); })}
             aria-pressed={o.mine}
-            className={`relative block w-full overflow-hidden ${wide ? "rounded-full border-0 bg-white/80 px-4 py-2.5" : "rounded-xl border px-3 py-2"} text-start text-sm ${o.mine ? "border-brand-700 bg-brand-700 font-semibold text-white" : wide ? "" : "border-brand-700/15"} hover:border-brand-600 disabled:opacity-60`}
+            className={`relative block w-full overflow-hidden ${wide ? "rounded-full border-0 px-4 py-2.5" : "rounded-xl border px-3 py-2"} text-start text-sm ${o.mine ? "border-brand-700 bg-brand-700 font-semibold text-white" : wide ? "bg-white/80" : "border-brand-700/15"} hover:border-brand-600 disabled:opacity-60`}
           >
             {voted && <span className={`absolute inset-y-0 start-0 ${o.mine ? "bg-white/20" : wide ? "bg-gradient-to-r from-sage-soft to-[#9db98a]" : "bg-brand-100"}`} style={{ width: `${pct}%` }} aria-hidden="true" />}
             <span className="relative flex justify-between gap-3">
