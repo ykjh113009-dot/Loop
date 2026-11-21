@@ -1,183 +1,66 @@
 import { Suspense } from "react";
+import { GraduationCap, Sparkles } from "lucide-react";
 import { requireMe } from "@/lib/auth";
-import { createClient } from "@/lib/supabase/server";
 import { getT } from "@/lib/i18n-server";
-import { redeemReward } from "@/app/actions/community";
-import { ActionForm } from "@/components/action-form";
-import { Empty } from "@/components/empty";
-import { PageHeader } from "@/components/page-header";
-import { SubmitButton } from "@/components/submit-button";
+import { GiftScene } from "@/components/art/scenes";
 import { PageSkeleton } from "@/components/skeleton";
-import { formatDate } from "@/lib/time";
-import { signImages } from "@/lib/images";
-import Link from "next/link";
-import { Avatar } from "@/components/avatar";
-import type { MyPoints } from "@/components/level-card";
-import { Glyph, Place } from "@/components/glyph";
+import { Top10Panel } from "@/components/shop/top10-panel";
+import { Waves } from "@/components/shop/art";
 
-export const metadata = { title: "Rewards Shop" };
+export const metadata = { title: "Reward Shop" };
 
+// The Reward Shop page has two parts. Spending points on rewards is postponed (the finished pages are in
+// _postponed/rewards-redeem), so that part says Coming soon. The Top 10 Prizes are live: each prize goes to
+// the student in that place on the leaderboard.
 async function Shop({ searchParams }: { searchParams: PageProps<"/shop">["searchParams"] }) {
   const me = await requireMe();
-  const supabase = await createClient();
   const { t } = await getT();
-  const { tab: raw } = await searchParams;
-  const tab = raw === "top10" ? "top10" : "redeem";
-  const [{ data: rewards }, { data: mine }, { data: my }, { data: staff }] = await Promise.all([
-    supabase.from("rewards").select("id, name, description, cost, kind, stock, per_student_limit, image_path").eq("active", true).order("cost"),
-    supabase.from("reward_redemptions").select("id, reward_id, status, cost, note, created_at, reward:rewards(name)").eq("profile_id", me.id).order("created_at", { ascending: false }).limit(30),
-    supabase.rpc("my_points"),
-    supabase.rpc("can_manage_points"),
-  ]);
-  const p = my as unknown as MyPoints;
-  const count = new Map<string, number>();
-  for (const r of mine ?? []) if (r.status !== "cancelled") count.set(r.reward_id, (count.get(r.reward_id) ?? 0) + 1);
-  const images = await signImages(supabase, (rewards ?? []).map((r) => r.image_path));
-  const tabs = [["redeem", t("Redeem rewards")], ["top10", t("Top 10 prizes")]] as const;
-
+  const sp = await searchParams;
+  const topFirst = sp.view === "top10";
   return (
-    <div className="mx-auto max-w-3xl space-y-4">
-      <div className="card flex items-center justify-between p-4">
-        <div>
-          <p className="text-xs text-black/50">{t("Your points to spend")}</p>
-          <p className="text-3xl font-bold tabular-nums" data-testid="balance">{p.balance}</p>
-        </div>
-        <p className="max-w-[16rem] text-end text-xs text-black/55">{t("Spending points never lowers your level or your house's score.")}</p>
-      </div>
-      <div className="flex gap-1 rounded-xl bg-black/5 p-1" role="tablist">
-        {tabs.map(([id, label]) => (
-          <Link key={id} role="tab" aria-selected={tab === id} href={id === "redeem" ? "/shop" : `/shop?tab=${id}`} className={`flex-1 rounded-lg py-1.5 text-center text-sm font-medium ${tab === id ? "bg-brand-700 text-white shadow-sm" : "text-black/55 hover:bg-sage-soft/60"}`}>{label}</Link>
-        ))}
-      </div>
+    <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_390px]" data-shop-page data-wide>
+      <div className={`min-w-0 space-y-5 ${topFirst ? "order-2 xl:order-none" : ""}`} data-section="reward-shop">
+        <section className="relative isolate overflow-hidden rounded-3xl border border-brand-700/10 bg-sand/70 px-5 py-6 lg:px-8 lg:py-8" data-shop-banner>
+          <Waves className="pointer-events-none absolute inset-0 -z-10 size-full" />
+          <GiftScene className="pointer-events-none absolute end-4 bottom-0 -z-10 hidden h-[115%] w-auto sm:block" />
+          <h1 className="font-heading text-[34px] leading-none font-semibold text-brand-900 lg:text-[48px]" data-banner-title>{t("Reward Shop")}</h1>
+          <p className="mt-2 max-w-[26rem] text-[13px] text-ink-2 lg:mt-3 lg:text-base">{t("Spend your Loop Points on exclusive rewards!")}</p>
+        </section>
+        <section className="card space-y-3 p-5" data-coming-soon>
+          <span className="chip bg-brand-50 text-brand-800"><Sparkles className="size-3.5" aria-hidden="true" /> {t("Coming soon")}</span>
+          <p className="text-[15px]">{t("Soon you will be able to spend the points you earn on gift cards, technology, study help and experiences chosen by your school.")}</p>
+          <p className="text-sm text-ink-2">{t("The Top 10 Prizes are already live. Earn points to climb the leaderboard and win one.")}</p>
+        </section>
 
-      {tab === "top10" ? <TopTen staff={!!staff} meId={me.id} /> : (
-        <>
-          {(rewards ?? []).length === 0 && <Empty emoji="🎁" title={t("The shop is empty")}>{t("Your school has not added rewards yet.")}</Empty>}
-          <div className="grid gap-3 sm:grid-cols-2">
-            {(rewards ?? []).map((r) => {
-              const have = count.get(r.id) ?? 0;
-              const soldOut = r.stock !== null && r.stock <= 0;
-              const done = have >= r.per_student_limit;
-              const missing = r.cost - p.balance;
-              return (
-                <article key={r.id} className="card flex flex-col overflow-hidden" data-reward={r.id}>
-                  {r.image_path && images.get(r.image_path) ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={images.get(r.image_path)!} alt="" loading="lazy" className="h-32 w-full object-cover" />
-                  ) : (
-                    <div className="flex h-24 items-center justify-center bg-sage-soft/50 text-4xl"><Glyph e={r.kind === "prize" ? "🎁" : "🎨"} strokeWidth={1.4} /></div>
-                  )}
-                  <div className="flex flex-1 flex-col gap-2 p-4">
-                    <div className="flex items-start justify-between gap-2">
-                      <h2 className="font-semibold">{r.name}</h2>
-                      <span className="chip shrink-0 bg-brand-50 text-brand-800">{r.kind === "prize" ? t("Prize") : t("Unlockable")}</span>
-                    </div>
-                    {r.description && <p className="text-sm text-black/60">{r.description}</p>}
-                    <p className="text-xs text-black/55">
-                      {soldOut ? t("Sold out") : r.stock !== null ? t("{n} left", { n: r.stock }) : t("Available")}
-                      {" · "}<strong className="text-brand-800">{r.cost} {t("points")}</strong>
-                    </p>
-                    <ActionForm action={redeemReward} className="mt-auto">
-                      <input type="hidden" name="rewardId" value={r.id} />
-                      <SubmitButton className="btn-primary w-full" disabled={soldOut || done || p.balance < r.cost} pendingText="…">
-                        {done ? t("You have it") : soldOut ? t("Sold out") : missing > 0 ? t("Need {n} more points", { n: missing }) : t("Redeem for {n} points", { n: r.cost })}
-                      </SubmitButton>
-                    </ActionForm>
-                  </div>
-                </article>
-              );
-            })}
+        {/* A preview of what is coming: nothing here can be used yet. */}
+        <div className="pointer-events-none select-none space-y-4 opacity-80" aria-hidden="true" data-shop-preview>
+          <div className="flex gap-2 overflow-x-auto">
+            {["All", "Gift Cards", "Technology", "Study", "Experiences"].map((c, i) => (
+              <span key={c} className={`opt shrink-0 px-5 py-2 ${i === 0 ? "opt-on" : ""}`}>{t(c)}</span>
+            ))}
           </div>
-
-          {(mine ?? []).length > 0 && (
-            <section className="card p-4">
-              <h2 className="font-semibold">{t("Your rewards")}</h2>
-              <ul className="mt-2 divide-y divide-black/5 text-sm">
-                {(mine ?? []).map((r) => (
-                  <li key={r.id} className="flex flex-wrap items-center gap-2 py-2">
-                    <span className="min-w-0 flex-1 truncate font-medium">{r.reward?.name}</span>
-                    <span className={`chip ${r.status === "fulfilled" ? "bg-brand-50 text-brand-800" : r.status === "pending" ? "bg-amber-50 text-amber-900" : "bg-black/5"}`}>
-                      {t(r.status === "fulfilled" ? "Ready" : r.status === "pending" ? "Waiting for staff" : "Cancelled")}
-                    </span>
-                    <span className="text-xs text-black/45">{formatDate(r.created_at)}</span>
-                    {r.note && <span className="w-full text-xs text-black/55">{r.note}</span>}
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )}
-        </>
-      )}
-    </div>
-  );
-}
-
-// The special prizes for the top 10 students, using the same ranking as the student leaderboard.
-async function TopTen({ staff, meId }: { staff: boolean; meId: string }) {
-  const supabase = await createClient();
-  const { t } = await getT();
-  const [{ data: settings }, { data: prizes }] = await Promise.all([
-    supabase.from("top10_settings").select("period, rules").maybeSingle(),
-    supabase.from("top10_prizes").select("place, title, description").order("place"),
-  ]);
-  const period = settings?.period === "all" ? "all" : "week";
-  const { data: ranking } = await supabase.rpc("individual_leaderboard", { p_period: period, p_grade: null as unknown as number, p_limit: 50 });
-  const top = (ranking ?? []).slice(0, 10);
-  const myIndex = (ranking ?? []).findIndex((r) => r.profile_id === meId);
-  const prizeFor = (place: number) => (prizes ?? []).find((x) => x.place === place);
-  return (
-    <div className="space-y-4" data-testid="top10">
-      <section className="card space-y-2 border-brand-700/20 bg-sage-soft/30 p-4">
-        <h2 className="flex items-center gap-2 font-bold"><Glyph e="🏆" /> {t("Top 10 student prizes")}</h2>
-        <p className="text-sm text-black/70">{settings?.rules || t("The 10 students with the most points win a special prize. Earn points with challenges, events, volunteering and more.")}</p>
-        <p className="text-xs text-black/55">{t("Ranking period")}: <strong>{period === "week" ? t("this week (resets every Sunday)") : t("all time")}</strong>. {t("Students who hide themselves on the leaderboard are not listed.")}</p>
-        <p className="text-sm font-medium text-brand-800">{myIndex >= 0 ? (myIndex < 10 ? t("You are in the Top 10! Your place: {n}", { n: myIndex + 1 }) : t("Your place: {n}. Keep going!", { n: myIndex + 1 })) : t("Earn points to enter the ranking.")}</p>
-      </section>
-
-      <section className="space-y-2">
-        <h2 className="section-title">{t("The ranking and its prizes")}</h2>
-        {top.length === 0 ? <Empty emoji="🏆" title={t("Nobody is ranked yet")}>{t("Earn points to be the first!")}</Empty> : (
-          <ol className="space-y-2">
-            {top.map((r, i) => {
-              const prize = prizeFor(i + 1);
-              return (
-                <li key={r.profile_id} className={`card flex items-center gap-3 p-3 ${r.profile_id === meId ? "ring-2 ring-brand-600" : ""}`}>
-                  <Place n={i + 1} />
-                  <Avatar avatar={r.avatar} size="sm" />
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-semibold">{r.full_name}</p>
-                    <p className="truncate text-xs text-black/50">{prize ? `${prize.title}` : t("No prize set for this place yet")}</p>
-                  </div>
-                  <span className="text-sm tabular-nums"><strong>{r.points}</strong> <span className="text-black/45">{t("points")}</span></span>
-                </li>
-              );
-            })}
-          </ol>
-        )}
-      </section>
-
-      <section className="space-y-2">
-        <h2 className="section-title">{t("Prizes by place")}</h2>
-        {(prizes ?? []).length === 0 ? <p className="card p-4 text-sm text-black/55">{t("The prizes have not been announced yet.")}</p> : (
-          <ul className="card divide-y divide-black/5">
-            {(prizes ?? []).map((x) => (
-              <li key={x.place} className="flex items-start gap-3 px-4 py-3 text-sm"><Place n={x.place} /><div><p className="font-semibold">{x.title}</p>{x.description && <p className="text-black/60">{x.description}</p>}</div></li>
+          <ul className="grid grid-cols-2 gap-3 lg:grid-cols-3">
+            {Array.from({ length: 6 }, (_, i) => (
+              <li key={i} className="space-y-2 rounded-2xl border border-black/5 bg-white/60 p-2.5">
+                <div className="aspect-[4/3] rounded-xl bg-sand/70" />
+                <div className="h-3 w-2/5 rounded-full bg-black/[0.06]" />
+                <div className="h-8 rounded-full bg-black/[0.06]" />
+              </li>
             ))}
           </ul>
-        )}
-        {staff && <Link href="/admin/rewards" className="text-sm text-brand-700 underline">{t("Set the prizes and rules")}</Link>}
-      </section>
+          <div className="flex items-center gap-4 rounded-2xl bg-sage-soft/50 p-4">
+            <GraduationCap className="size-10 shrink-0 text-brand-800/60" strokeWidth={1.3} />
+            <div className="min-w-0 flex-1 space-y-2"><div className="h-3 w-3/4 rounded-full bg-black/10" /><div className="h-3 w-1/2 rounded-full bg-black/10" /></div>
+          </div>
+        </div>
+      </div>
+      <aside className={`min-w-0 ${topFirst ? "order-1 xl:order-none" : ""}`}>
+        <Top10Panel meId={me.id} />
+      </aside>
     </div>
   );
 }
 
 export default function ShopPage(props: PageProps<"/shop">) {
-  return (
-    <>
-      <PageHeader title="Rewards Shop" />
-      <Suspense fallback={<PageSkeleton />}>
-        <Shop searchParams={props.searchParams} />
-      </Suspense>
-    </>
-  );
+  return <Suspense fallback={<PageSkeleton />}><Shop searchParams={props.searchParams} /></Suspense>;
 }

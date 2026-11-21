@@ -7,18 +7,20 @@ import { ListingForm } from "./listing-form";
 
 export const metadata = { title: "Post an item" };
 
-async function NewListing() {
+async function NewListing({ searchParams }: { searchParams: PageProps<"/market/new">["searchParams"] }) {
+  const sp = await searchParams;
+  const kind = sp.kind === "swap" || sp.kind === "free" ? sp.kind : "sell";
   const me = await requireMe();
   if (!me.isStudent || me.isSuspended) redirect("/market");
-  return <ListingForm schoolId={me.school_id} userId={me.id} />;
+  return <ListingForm schoolId={me.school_id} userId={me.id} initialKind={kind} />;
 }
 
-export default function NewListingPage() {
+export default function NewListingPage(props: PageProps<"/market/new">) {
   return (
     <>
       <PageHeader title="Post an item" back="/market" />
       <Suspense fallback={<PageSkeleton />}>
-        <NewListing />
+        <NewListing searchParams={props.searchParams} />
       </Suspense>
     </>
   );

@@ -61,7 +61,7 @@ export function NavTree({
                       >
                         <NavIcon name={item.icon} className={`size-4 shrink-0 ${here ? "text-white" : ""}`} strokeWidth={here ? 2.1 : 1.8} />
                         <span className="min-w-0 flex-1 truncate">{t(item.label)}</span>
-                        {item.soon && <span className="rounded-full bg-brand-700/10 px-1.5 text-[10px] font-medium text-brand-800">{t("Soon")}</span>}
+                        {item.soon && <span className={`rounded-full px-1.5 text-[10px] font-medium ${here ? "bg-white/20 text-white" : "bg-brand-700/10 text-brand-800"}`}>{t("Soon")}</span>}
                         {item.badge && badges[item.badge] ? (
                           <span className="min-w-5 rounded-full bg-red-600 px-1.5 text-center text-[11px] leading-5 font-bold text-white">{badges[item.badge]}</span>
                         ) : null}

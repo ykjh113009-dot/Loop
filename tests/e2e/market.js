@@ -1,0 +1,50 @@
+const { chromium } = require('playwright');
+const BASE = process.env.BASE || 'http://localhost:3000';
+const check = (name, ok, info = '') => console.log((ok ? 'PASS' : 'FAIL') + '  ' + name + (info ? '  — ' + info : ''));
+const login = async (b, email, vp = { width: 1280, height: 900 }, mobile = false) => {
+  const ctx = await b.newContext({ viewport: vp, isMobile: mobile, hasTouch: mobile });
+  const p = await ctx.newPage();
+  await p.goto(BASE + '/login', { waitUntil: 'networkidle' });
+  await p.locator('form', { has: p.locator(`input[value="${email}"]`) }).locator('button').click();
+  await p.waitForURL('**/home');
+  return { ctx, p };
+};
+const go = (p, u) => p.goto(BASE + u, { waitUntil: 'networkidle' });
+const titles = async (p) => (await p.locator('[data-listing]:visible p.line-clamp-1').allInnerTexts());
+
+(async () => {
+  const b = await chromium.launch();
+  const { p } = await login(b, 'demo.maya@pioneers.edu.ps');
+  await go(p, '/marketplace');
+  check('The Marketplace is the student market', (await p.locator('[data-market-banner]').count()) === 1 && /Buy, Sell, and Swap with ease/.test(await p.innerText('body')) && /Discover great deals/.test(await p.innerText('body')));
+  check('Buy, Sell and Swap tabs, with Buy selected in green', (await p.locator('[data-market-controls] [role=tab]').allInnerTexts()).join('|') === 'Buy|Sell|Swap' && (await p.locator('[role=tab][aria-selected=true]').evaluate((e) => getComputedStyle(e).backgroundColor)) === 'rgb(70, 98, 55)');
+  check('The market page has no reward shop or Top 10 content', !/Top 10|Reward|Your Points/.test(await p.locator('[data-market-page]').innerText()));
+  const buy = await titles(p);
+  check('Buy lists items for sale and free items', buy.length >= 3 && buy.some((x) => /Football boots/.test(x)) && !buy.some((x) => /^Swap:/.test(x)), buy.join(' | '));
+  check('Items show price, seller, time and View Details', (await p.locator('[data-listing]').first().innerText()).match(/₪|Free/) && /View Details/.test(await p.locator('[data-listing]').first().innerText()));
+  await p.getByRole('tab', { name: 'Swap' }).click(); await p.waitForURL('**tab=swap**');
+  await p.waitForFunction(() => document.querySelector('[role=tab][aria-selected=true]')?.textContent === 'Swap');
+  const swaps = await titles(p);
+  check('Swap lists only swaps', swaps.length === 1 && /watercolour/i.test(swaps[0]), swaps.join(' | '));
+  await go(p, '/market?tab=sell');
+  check('Sell shows my own items (or an invitation to list)', (await p.locator('[data-listing]').count()) >= 0 && (await p.getByRole('link', { name: /Create Listing/ }).count()) >= 1);
+  await go(p, '/market?q=football');
+  check('Search finds items by name', (await titles(p)).length === 1 && /Football boots/.test((await titles(p))[0]));
+  await go(p, '/market?category=books');
+  const books = await titles(p);
+  check('The filter narrows by category', books.length >= 1 && books.length < 5 && books.some((x) => /physics book/i.test(x)), books.join(' | '));
+  await go(p, '/market?sort=low');
+  const low = (await p.locator('[data-listing]').evaluateAll((els) => els.map((e) => e.textContent.match(/₪(\d+)/)?.[1]).filter(Boolean).map(Number)));
+  check('Sorting by price puts the cheapest first', low.length >= 2 && low.every((v, i) => i === 0 || low[i - 1] <= v), low.join(','));
+  await go(p, '/market');
+  check('Sell Your Item and Swap Items cards link to the form', (await p.locator('[data-card=sell] a[href="/market/new"]').count()) === 1 && (await p.locator('[data-card=swap] a[href="/market/new?kind=swap"]').count()) === 1);
+  check('Recent activity shows real listings', (await p.locator('[data-card=recent] li').count()) >= 3 && /listed/.test(await p.locator('[data-card=recent]').innerText()));
+  await go(p, '/market/new?kind=swap');
+  check('Start a Swap opens the form with Swap selected', (await p.locator('input[name=kind][value=swap]').isChecked()));
+  check('The old URL still works', (await go(p, '/market'), (await p.locator('[data-market-banner]').count()) === 1));
+
+  const m = await login(b, 'demo.maya@pioneers.edu.ps', { width: 390, height: 844 }, true);
+  await go(m.p, '/market');
+  check('No sideways scrolling on a phone', await m.p.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1));
+  await b.close();
+})().catch((e) => { console.error('ERROR', e); process.exit(1); });

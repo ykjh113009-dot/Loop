@@ -19,7 +19,7 @@ const TREE = {
   Community: ['Clubs', 'Groups', 'Chats', 'Polls', 'Saved'],
   'School Life': ['Calendar & Events', 'Activities & Challenges', 'Houses', 'Leaderboards', 'Student Council', 'Volunteering', 'Loop Passport', 'Campus Map & Directory'],
   'Learning Hub': ['Academic Library', 'Tutors Directory'],
-  Marketplace: ['Student Marketplace', 'Rewards Shop', 'Top 10 Prizes'],
+  Marketplace: ['Student Marketplace', 'Reward Shop', 'Top 10 Prizes'],
 };
 const LANDING = { Home: '/home', Community: '/clubs', 'School Life': '/school-life', 'Learning Hub': '/learning-hub', Marketplace: '/marketplace' };
 
@@ -52,7 +52,7 @@ const LANDING = { Home: '/home', Community: '/clubs', 'School Life': '/school-li
   await p.goto(BASE + '/groups', { waitUntil: 'networkidle' });
   const act = await p.locator('[data-sidebar-root] a[aria-current=page]').allInnerTexts();
   check('Active page is highlighted inside its open category (Groups)', act.some(x => x.includes('Groups')) && (await p.locator('[data-sidebar-root]').innerText()).includes('Saved'), act.join('|'));
-  await p.goto(BASE + '/shop?tab=top10', { waitUntil: 'networkidle' });
+  await p.goto(BASE + '/shop?view=top10', { waitUntil: 'networkidle' });
   const act2 = await p.locator('[data-sidebar-root] a[aria-current=page]').allInnerTexts();
   check('Top 10 Prizes lives inside Marketplace and is the active item there', act2.length === 1 && act2[0].includes('Top 10 Prizes'), act2.join('|'));
 
@@ -84,7 +84,8 @@ const LANDING = { Home: '/home', Community: '/clubs', 'School Life': '/school-li
     check(`${cat} landing page has its banner and fits the screen`, hasBanner && over <= 0, `over=${over}`);
   }
   const mk = await body((await (async () => { await p.goto(BASE + '/marketplace', { waitUntil: 'networkidle' }); return p; })()));
-  check('Marketplace page shows the points balance and Top 10 Prizes', /Top 10 Prizes/.test(mk) && /Your Points/.test(mk));
+  const mkMain = (await p.locator('[data-market-page]').innerText()).replace(/\s+/g, ' ');
+  check('The Marketplace page is the student market, with Buy, Sell and Swap and no prizes', /Buy, Sell, and Swap with ease/.test(mk) && /\bBuy\b/.test(mkMain) && /\bSell\b/.test(mkMain) && /\bSwap\b/.test(mkMain) && !/Top 10|Rewards to redeem|Your Points/.test(mkMain));
 
   // Community opens on Clubs; the feed lives on Home
   await p.goto(BASE + '/home', { waitUntil: 'networkidle' });

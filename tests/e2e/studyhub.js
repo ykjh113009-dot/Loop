@@ -31,13 +31,13 @@ async function login(browser, name, viewport = { width: 1280, height: 850 }) {
   // 1. The sidebar (the full tree is covered by nav.js; here: the Study Hub destinations)
   {
     const p = maya.p;
-    for (const [h, re] of [['/academic-resources', /Academic Library/], ['/tutors', /Tutors Directory/], ['/shop', /Rewards Shop/]]) {
+    for (const [h, re] of [['/academic-resources', /Academic Library/], ['/tutors', /Tutors Directory/], ['/shop', /Reward Shop/]]) {
       await go(p, h);
       const active = await p.locator(`[data-sidebar-root] a[href="${h}"]`).first().getAttribute('aria-current');
       check(`${h} opens its own page and is highlighted`, active === 'page' && re.test(await text(p)));
     }
     await go(p, '/shop');
-    check('Rewards Shop is not also highlighting Activities', (await p.locator('[data-sidebar-root] a[href="/challenges"]').count()) === 0 || (await p.locator('[data-sidebar-root] a[href="/challenges"]').first().getAttribute('aria-current')) === null);
+    check('Reward Shop is not also highlighting Activities', (await p.locator('[data-sidebar-root] a[href="/challenges"]').count()) === 0 || (await p.locator('[data-sidebar-root] a[href="/challenges"]').first().getAttribute('aria-current')) === null);
   }
 
   // 2. Academic resources
@@ -162,7 +162,7 @@ async function login(browser, name, viewport = { width: 1280, height: 850 }) {
     check('An approved tutor cannot open the application again', (await go(p, '/tutors/apply'), p.url().endsWith('/tutors/me')));
   }
 
-  // 5. Rewards Shop
+  // 5. Reward Shop (coming soon) with the Top 10 prizes beside it
   {
     const p = rania.p;
     await go(p, '/admin/rewards');
@@ -171,16 +171,10 @@ async function login(browser, name, viewport = { width: 1280, height: 850 }) {
     await waitText(p, /Saved/);
     const q = maya.p;
     await go(q, '/shop');
-    check('The shop shows the balance and redeemable rewards', (await q.locator('[data-testid=balance]').count()) === 1 && (await q.locator('[data-reward]').count()) >= 1);
-    sql(`delete from public.rewards where name = 'E2E Big prize'; insert into public.rewards (school_id, name, description, cost, kind, created_by) select school_id, 'E2E Big prize', 'Too expensive for the test', 50000, 'prize', id from public.profiles where id = '${ID.rania}'`);
-    await go(q, '/shop');
-    const big = q.locator('[data-reward]', { hasText: 'E2E Big prize' });
-    check('Students cannot redeem without enough points', (await big.count()) === 1 && (await big.locator('button').first().isDisabled().catch(() => true)));
-    sql(`delete from public.rewards where name = 'E2E Big prize'`);
-    await q.getByRole('tab', { name: 'Top 10 prizes' }).click();
-    await q.waitForURL('**/shop?tab=top10');
-    check('Top 10 prizes live inside the Rewards Shop', /Top 10 student prizes/.test(await text(q)) && /Pizza party/.test(await text(q)) && /Ranking period/.test(await text(q)));
-    check('There is no separate Top 10 item in the sidebar', (await q.locator('[data-sidebar-root] [data-nav-tree] > li > div > a', { hasText: /top 10/i }).count()) === 0);
+    check('The Reward Shop part is coming soon', (await q.locator('[data-coming-soon]').count()) === 1 && /Coming soon/.test(await text(q)) && (await q.locator('[data-reward]').count()) === 0);
+    check('The Top 10 prizes are on the Reward Shop page', (await q.locator('[data-section=top10]').count()) === 1 && /Pizza party/.test(await text(q)));
+    check('The Top 10 has ten prize slots and the countdown', (await q.locator('[data-prize-slot]').count()) === 10 && (await q.locator('[data-countdown]').count()) === 1);
+    check('The Top 10 view link opens the same page', (await go(q, '/shop?view=top10'), (await q.locator('[data-section=top10]').count()) === 1 && q.url().includes('/shop')));
   }
 
   // 6. Phones

@@ -8,9 +8,9 @@ import { PhotoField } from "@/components/photo-field";
 import { MarketSafetyNote } from "@/components/safety-note";
 import { SubmitButton } from "@/components/submit-button";
 
-export function ListingForm({ schoolId, userId }: { schoolId: string; userId: string }) {
+export function ListingForm({ schoolId, userId, initialKind = "sell" }: { schoolId: string; userId: string; initialKind?: string }) {
   const [state, action] = useActionState(createListing, null);
-  const [kind, setKind] = useState("sell");
+  const [kind, setKind] = useState(initialKind);
   return (
     <form action={action} className="card space-y-4 p-4">
       <fieldset>
