@@ -172,7 +172,7 @@ async function login(browser, name, viewport = { width: 1280, height: 850 }) {
     const q = maya.p;
     await go(q, '/shop');
     check('The shop page is the Top 10 prizes', /Top 10 student prizes/.test(await text(q)) && /Pizza party/.test(await text(q)) && /Ranking period/.test(await text(q)));
-    check('There is nothing to redeem', (await q.locator('[data-reward]').count()) === 0 && (await q.locator('[data-testid=balance]').count()) === 0 && !/Redeem/.test(await text(q)));
+    check('There is nothing to redeem', (await q.locator('[data-reward]').count()) === 0 && (await q.locator('[data-testid=balance]').count()) === 0 && !/Redeem for/.test(await q.locator('main').innerText()));
     check('The old Top 10 link still works', (await go(q, '/shop?tab=top10'), /Top 10 student prizes/.test(await text(q))));
     check('The sidebar has one Top 10 Prizes item', (await q.locator('[data-sidebar-root] [data-nav-tree] a', { hasText: /top 10 prizes/i }).count()) === 1);
   }

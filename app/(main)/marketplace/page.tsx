@@ -32,7 +32,7 @@ async function Marketplace() {
     <div className="space-y-5" data-category-page="marketplace">
       <PageBanner title={t("Marketplace")} subtitle={t("Shop. Earn. Win.")} note={t("Discover what students are sharing and see the Top 10 prizes.")} scene="gift" />
       <SectionTabs label={t("Marketplace")} current="" items={[
-        { href: "/market", label: t("Student Marketplace"), icon: "store" }, { href: "/shop", label: t("Top 10 Prizes"), icon: "crown" },
+        { href: "/market", label: t("Student Marketplace"), icon: "store" }, { href: "/redeem", label: t("Redeem Rewards"), icon: "gift" }, { href: "/shop", label: t("Top 10 Prizes"), icon: "crown" },
       ]} />
 
       <DashCard title={t("Featured listings")} href="/market" linkLabel={t("See all")}>
@@ -69,6 +69,7 @@ async function Marketplace() {
           <div className="relative z-10 max-w-full space-y-2">
             <h2 className="flex items-center gap-1.5 text-[15px] font-semibold"><Star className="size-4 text-brand-700" strokeWidth={1.8} aria-hidden="true" />{t("Your Points")}</h2>
             {balance !== null ? <p className="font-heading text-3xl font-semibold tabular-nums" data-testid="mk-balance">{balance.toLocaleString("en")} <span className="text-base font-medium text-ink-2">{t("pts")}</span></p> : <p className="text-sm text-ink-2">{t("Points are for current students.")}</p>}
+            <p className="text-xs text-ink-2"><span className="chip bg-brand-50 text-brand-800">{t("Coming soon")}</span> {t("Redeem your points for rewards")}</p>
             <Link href="/shop" className="btn-primary inline-flex items-center gap-1.5 px-4 py-2 text-sm">{t("See the Top 10 Prizes")} <ArrowRight className="size-4 rtl:rotate-180" aria-hidden="true" /></Link>
           </div>
         </section>

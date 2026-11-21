@@ -77,7 +77,9 @@ async function login(browser, name, viewport = { width: 1280, height: 850 }) {
   {
     const p = maya.p;
     await go(p, '/shop');
-    check('The shop shows the Top 10 prizes and nothing to redeem', (await p.locator('[data-testid=top10]').count()) === 1 && (await p.locator('[data-reward]').count()) === 0 && !/Redeem/.test(await text(p)));
+    check('The shop shows the Top 10 prizes and nothing to redeem', (await p.locator('[data-testid=top10]').count()) === 1 && (await p.locator('[data-reward]').count()) === 0 && !/Redeem for/.test(await p.locator('main').innerText()));
+    await go(p, '/redeem');
+    check('Redeem Rewards is shown as coming soon', (await p.locator('[data-coming-soon]').count()) === 1 && /Coming soon/.test(await text(p)) && (await p.locator('[data-sidebar-root] a[href="/redeem"]').count()) === 1);
   }
 
   // ---------- Houses and leaderboards

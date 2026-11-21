@@ -1184,4 +1184,12 @@ export const AR: Record<string, string> = {
   "Discover what students are sharing and see the Top 10 prizes.": "اكتشف ما يشاركه الطلاب وشاهد جوائز العشرة الأوائل.",
   "See the Top 10 Prizes": "شاهد جوائز العشرة الأوائل",
   "Set the prizes and the ranking rules": "حدّد الجوائز وقواعد الترتيب",
+  "Redeem Rewards": "استبدال المكافآت",
+  "Turn your points into rewards.": "حوّل نقاطك إلى مكافآت.",
+  "Soon you will be able to spend the points you earn on prizes and profile unlocks chosen by your school.": "قريبًا ستتمكن من إنفاق النقاط التي تكسبها على جوائز وميزات للملف الشخصي تختارها مدرستك.",
+  "Prizes and unlockables you can redeem with your points": "جوائز وميزات يمكنك استبدالها بنقاطك",
+  "Your points balance and what you have redeemed": "رصيد نقاطك وما استبدلته",
+  "Spending points never lowers your level or your house's score": "إنفاق النقاط لا يخفض مستواك ولا نقاط فريقك",
+  "See my points": "شاهد نقاطي",
+  "Redeem your points for rewards": "استبدل نقاطك بمكافآت",
 };

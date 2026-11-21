@@ -19,7 +19,7 @@ const TREE = {
   Community: ['Clubs', 'Groups', 'Chats', 'Polls', 'Saved'],
   'School Life': ['Calendar & Events', 'Activities & Challenges', 'Houses', 'Leaderboards', 'Student Council', 'Volunteering', 'Loop Passport', 'Campus Map & Directory'],
   'Learning Hub': ['Academic Library', 'Tutors Directory'],
-  Marketplace: ['Student Marketplace', 'Top 10 Prizes'],
+  Marketplace: ['Student Marketplace', 'Redeem Rewards', 'Top 10 Prizes'],
 };
 const LANDING = { Home: '/home', Community: '/clubs', 'School Life': '/school-life', 'Learning Hub': '/learning-hub', Marketplace: '/marketplace' };
 
