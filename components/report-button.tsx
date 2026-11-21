@@ -21,10 +21,12 @@ export function ReportButton({
   targetType,
   targetId,
   compact = false,
+  label,
 }: {
   targetType: keyof typeof NAMES;
   targetId: string;
   compact?: boolean;
+  label?: string;
 }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const [result, setResult] = useState<ActionResult>(null);
@@ -52,10 +54,10 @@ export function ReportButton({
           dialog.current?.showModal();
         }}
         className={compact ? "p-1 text-black/35 hover:text-red-600" : "btn-ghost px-2 py-1 text-xs text-black/50"}
-        aria-label={`Report this ${NAMES[targetType]}`}
+        aria-label={label ?? `Report this ${NAMES[targetType]}`}
       >
         <Icon name="flag" className="size-4" />
-        {!compact && "Report"}
+        {!compact && (label ?? "Report")}
       </button>
       <dialog
         ref={dialog}

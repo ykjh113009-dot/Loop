@@ -4,7 +4,7 @@ import { useActionState, useState } from "react";
 import { createListing } from "@/app/actions/market";
 import { CATEGORIES, CONDITIONS } from "@/lib/market";
 import { FormMessage } from "@/components/form-message";
-import { PhotoField } from "@/components/photo-field";
+import { MultiPhotoField } from "@/components/market/multi-photo-field";
 import { MarketSafetyNote } from "@/components/safety-note";
 import { SubmitButton } from "@/components/submit-button";
 
@@ -40,7 +40,8 @@ export function ListingForm({ schoolId, userId, initialKind = "sell" }: { school
           <input name="price" type="number" required min={0} max={5000} step={1} className="input" placeholder="e.g. 20" />
         </label>
       )}
-      <PhotoField schoolId={schoolId} userId={userId} />
+      <input name="location" maxLength={80} placeholder="Where can you meet? e.g. School gate (optional)" className="input" aria-label="Where to meet" />
+      <MultiPhotoField schoolId={schoolId} userId={userId} />
       <MarketSafetyNote />
       <FormMessage state={state} />
       <SubmitButton className="btn-primary w-full" pendingText="Posting…">Post item</SubmitButton>

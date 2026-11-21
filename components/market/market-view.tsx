@@ -10,6 +10,7 @@ import { Avatar } from "@/components/avatar";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Waves } from "@/components/shop/art";
 import { MarketScene } from "@/components/market/scene";
+import { DetailsTrigger } from "@/components/market/details-trigger";
 import { MarketSafetyNote } from "@/components/safety-note";
 import { Glyph } from "@/components/glyph";
 
@@ -19,7 +20,7 @@ const SORTS = [["new", "Newest First"], ["low", "Price: low to high"], ["high", 
 // The student market: buy, sell and swap with other students. It only shows what students list; prizes live in the Reward Shop.
 export async function MarketView({ searchParams, base }: { searchParams: Promise<Record<string, string | string[] | undefined>>; base: string }) {
   const me = await requireMe();
-  const { t } = await getT();
+  const { t, locale } = await getT();
   const sp = await searchParams;
   const one = (k: string) => (typeof sp[k] === "string" ? (sp[k] as string) : "");
   const tab = sp.mine === "1" ? "sell" : TABS.some(([id]) => id === one("tab")) ? one("tab") : "buy";
@@ -104,8 +105,8 @@ export async function MarketView({ searchParams, base }: { searchParams: Promise
               const url = l.image_path ? urls.get(l.image_path) : null;
               const seller = l.seller as unknown as { full_name: string; avatar: string } | null;
               return (
-                <li key={l.id} className="card flex flex-col overflow-hidden" data-listing={l.id}>
-                  <Link href={`/market/${l.id}`} className="relative flex aspect-[4/3] items-center justify-center bg-gradient-to-br from-sand to-sage-soft/60 text-4xl text-brand-800">
+                <DetailsTrigger key={l.id} id={l.id} title={l.title} locale={locale} className="card flex flex-col overflow-hidden">
+                  <Link href={`/market/${l.id}`} data-details className="relative flex aspect-[4/3] items-center justify-center bg-gradient-to-br from-sand to-sage-soft/60 text-4xl text-brand-800">
                     {url
                       // eslint-disable-next-line @next/next/no-img-element -- private signed link
                       ? <img src={url} alt="" loading="lazy" className="size-full object-cover" />
@@ -119,9 +120,9 @@ export async function MarketView({ searchParams, base }: { searchParams: Promise
                       <span className="flex min-w-0 items-center gap-1.5">{seller && <Avatar avatar={seller.avatar} size="xs" />}<span className="truncate">{seller?.full_name}</span></span>
                       <span className="shrink-0">{timeAgo(l.created_at)}</span>
                     </p>
-                    <Link href={`/market/${l.id}`} className="mt-auto inline-flex items-center justify-center gap-1.5 rounded-full bg-sage-soft/70 px-3 py-2 text-sm font-semibold text-brand-900 hover:bg-sage-soft">{t("View Details")} <ArrowRight className="size-4 rtl:rotate-180" aria-hidden="true" /></Link>
+                    <Link href={`/market/${l.id}`} data-details className="mt-auto inline-flex items-center justify-center gap-1.5 rounded-full bg-sage-soft/70 px-3 py-2 text-sm font-semibold text-brand-900 hover:bg-sage-soft">{t("View Details")} <ArrowRight className="size-4 rtl:rotate-180" aria-hidden="true" /></Link>
                   </div>
-                </li>
+                </DetailsTrigger>
               );
             })}
           </ul>

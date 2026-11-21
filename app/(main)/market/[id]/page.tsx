@@ -1,60 +1,31 @@
 import { Suspense } from "react";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireMe } from "@/lib/auth";
-import { createClient } from "@/lib/supabase/server";
-import { signImages } from "@/lib/images";
-import { timeAgo } from "@/lib/time";
-import { CATEGORIES, CONDITIONS, priceLabel } from "@/lib/market";
+import { getT } from "@/lib/i18n-server";
+import { loadListingDetails } from "@/lib/market-details";
+import { ListingPageView } from "@/components/market/listing-page-view";
 import { deleteListing, setListingStatus } from "@/app/actions/market";
-import { startChat } from "@/app/actions/messages";
-import { Avatar } from "@/components/avatar";
 import { PageHeader } from "@/components/page-header";
-import { ReportButton } from "@/components/report-button";
 import { MarketSafetyNote } from "@/components/safety-note";
 import { PageSkeleton } from "@/components/skeleton";
 import { SubmitButton } from "@/components/submit-button";
-import { Glyph } from "@/components/glyph";
 
 async function Listing({ params }: { params: PageProps<"/market/[id]">["params"] }) {
   const { id } = await params;
   const me = await requireMe();
-  const supabase = await createClient();
-  const { data: l } = await supabase
-    .from("listings")
-    .select("*, seller:profiles(id, full_name, avatar, grade)")
-    .eq("id", id)
-    .maybeSingle();
-  if (!l) notFound();
-  const urls = await signImages(supabase, [l.image_path]);
-  const url = l.image_path ? urls.get(l.image_path) : null;
-  const mine = l.seller_id === me.id;
+  const { locale } = await getT();
+  const d = await loadListingDetails(id, me);
+  if (!d) notFound();
+  const mine = d.mine;
+  const l = { id: d.id, status: d.status };
 
   return (
-    <div className="space-y-4">
-      <PageHeader title={l.title} back="/market" action={!mine && <ReportButton targetType="listing" targetId={l.id} compact />} />
-      {l.status === "held" && (
+    <div className="mx-auto max-w-4xl space-y-4">
+      <PageHeader title={d.title} back="/market" />
+      {d.status === "held" && (
         <p className="rounded-xl bg-amber-50 px-3 py-2 text-sm text-amber-800">Only you can see this. A moderator is checking it.</p>
       )}
-      {url && (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={url} alt="" className="max-h-96 w-full rounded-2xl bg-black/5 object-cover" />
-      )}
-      <div className="card space-y-3 p-4">
-        <div className="flex items-baseline justify-between">
-          <p className="text-2xl font-bold text-brand-800">{priceLabel(l)}</p>
-          <span className="chip">{l.status === "active" ? "Available" : l.status === "reserved" ? "Reserved" : l.status === "sold" ? "Sold" : "Checking"}</span>
-        </div>
-        <p className="text-sm text-black/55">{CATEGORIES[l.category]} · {CONDITIONS[l.condition]} · {timeAgo(l.created_at)}</p>
-        {l.description && <p className="whitespace-pre-wrap">{l.description}</p>}
-        {l.seller && (
-          <Link href={`/profile/${l.seller.id}`} className="flex items-center gap-2 border-t border-black/5 pt-3 text-sm">
-            <Avatar avatar={l.seller.avatar} size="sm" />
-            <span className="font-semibold">{l.seller.full_name}</span>
-            <span className="text-black/45">Grade {l.seller.grade}</span>
-          </Link>
-        )}
-      </div>
+      <div className="card p-4 md:p-6"><ListingPageView d={d} locale={locale} /></div>
 
       {mine ? (
         <div className="card space-y-2 p-4">
@@ -75,14 +46,7 @@ async function Listing({ params }: { params: PageProps<"/market/[id]">["params"]
             </form>
           </div>
         </div>
-      ) : (
-        l.status !== "sold" && me.isStudent && !me.isSuspended && (
-          <form action={startChat}>
-            <input type="hidden" name="profileId" value={l.seller_id} />
-            <SubmitButton className="btn-primary w-full py-3" pendingText="Opening…"><Glyph e="💬" /> Message the seller</SubmitButton>
-          </form>
-        )
-      )}
+      ) : null}
       <MarketSafetyNote />
     </div>
   );

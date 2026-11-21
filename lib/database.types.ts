@@ -1909,16 +1909,106 @@ isOneToOne: true
       referencedColumns: ["id"]
     }
                   ]
-                },"listings": {
+                },"listing_images": {
                   Row: {
-                    "category": string,"condition": string,"created_at": string,"description": string,"id": string,"image_path": string | null,"kind": string,"price": number | null,"school_id": string,"seller_id": string,"status": string,"title": string
+                    "created_at": string,"id": string,"listing_id": string,"path": string,"school_id": string,"sort": number
                   }
                   ComputedFields: never
                   Insert: {
-                    "category": string,"condition"?: string,"created_at"?: string,"description"?: string,"id"?: string,"image_path"?: string | null,"kind": string,"price"?: number | null,"school_id": string,"seller_id": string,"status"?: string,"title": string
+                    "created_at"?: string,"id"?: string,"listing_id": string,"path": string,"school_id": string,"sort"?: number
                   }
                   Update: {
-                    "category"?: string,"condition"?: string,"created_at"?: string,"description"?: string,"id"?: string,"image_path"?: string | null,"kind"?: string,"price"?: number | null,"school_id"?: string,"seller_id"?: string,"status"?: string,"title"?: string
+                    "created_at"?: string,"id"?: string,"listing_id"?: string,"path"?: string,"school_id"?: string,"sort"?: number
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "listing_images_listing_id_fkey"
+      columns: ["listing_id"]
+isOneToOne: false
+      referencedRelation: "listings"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "listing_images_school_id_fkey"
+      columns: ["school_id"]
+isOneToOne: false
+      referencedRelation: "schools"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"listing_offers": {
+                  Row: {
+                    "amount": number,"buyer_id": string,"created_at": string,"id": string,"listing_id": string,"message": string,"responded_at": string | null,"school_id": string,"status": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "amount": number,"buyer_id": string,"created_at"?: string,"id"?: string,"listing_id": string,"message"?: string,"responded_at"?: string | null,"school_id": string,"status"?: string
+                  }
+                  Update: {
+                    "amount"?: number,"buyer_id"?: string,"created_at"?: string,"id"?: string,"listing_id"?: string,"message"?: string,"responded_at"?: string | null,"school_id"?: string,"status"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "listing_offers_buyer_id_fkey"
+      columns: ["buyer_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "listing_offers_listing_id_fkey"
+      columns: ["listing_id"]
+isOneToOne: false
+      referencedRelation: "listings"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "listing_offers_school_id_fkey"
+      columns: ["school_id"]
+isOneToOne: false
+      referencedRelation: "schools"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"listing_saves": {
+                  Row: {
+                    "created_at": string,"listing_id": string,"profile_id": string,"school_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"listing_id": string,"profile_id": string,"school_id": string
+                  }
+                  Update: {
+                    "created_at"?: string,"listing_id"?: string,"profile_id"?: string,"school_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "listing_saves_listing_id_fkey"
+      columns: ["listing_id"]
+isOneToOne: false
+      referencedRelation: "listings"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "listing_saves_profile_id_fkey"
+      columns: ["profile_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "listing_saves_school_id_fkey"
+      columns: ["school_id"]
+isOneToOne: false
+      referencedRelation: "schools"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"listings": {
+                  Row: {
+                    "category": string,"condition": string,"created_at": string,"description": string,"id": string,"image_path": string | null,"kind": string,"location": string,"price": number | null,"school_id": string,"seller_id": string,"status": string,"title": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "category": string,"condition"?: string,"created_at"?: string,"description"?: string,"id"?: string,"image_path"?: string | null,"kind": string,"location"?: string,"price"?: number | null,"school_id": string,"seller_id": string,"status"?: string,"title": string
+                  }
+                  Update: {
+                    "category"?: string,"condition"?: string,"created_at"?: string,"description"?: string,"id"?: string,"image_path"?: string | null,"kind"?: string,"location"?: string,"price"?: number | null,"school_id"?: string,"seller_id"?: string,"status"?: string,"title"?: string
                   }
                   Relationships: [
                     {
@@ -3932,6 +4022,9 @@ isOneToOne: false
 "make_handle":
 { Args: { "p_email": string,"p_id": string,"p_school": string }; Returns: string
                            },
+"make_listing_offer":
+{ Args: { "p_amount": number,"p_listing": string,"p_message": string }; Returns: string
+                           },
 "manage_attendee":
 { Args: { "p_action": string,"p_event": string,"p_profile": string }; Returns: undefined
                            },
@@ -4080,6 +4173,9 @@ isOneToOne: false
 "respond_group_request":
 { Args: { "p_approve": boolean,"p_group": string,"p_profile": string }; Returns: undefined
                            },
+"respond_listing_offer":
+{ Args: { "p_accept": boolean,"p_id": string }; Returns: undefined
+                           },
 "respond_message_request":
 { Args: { "p_accept": boolean,"p_conversation": string }; Returns: undefined
                            },
@@ -4178,6 +4274,9 @@ isOneToOne: false
                            },
 "set_group_role":
 { Args: { "p_group": string,"p_profile": string,"p_role": string }; Returns: undefined
+                           },
+"set_listing_images":
+{ Args: { "p_listing": string,"p_paths": (string)[] }; Returns: undefined
                            },
 "set_member_title":
 { Args: { "p_club": string,"p_profile": string,"p_title": string }; Returns: undefined
@@ -4309,6 +4408,9 @@ isOneToOne: false
                            },
 "withdraw_club_application":
 { Args: { "p_application": string }; Returns: undefined
+                           },
+"withdraw_listing_offer":
+{ Args: { "p_id": string }; Returns: undefined
                            },
 "withdraw_tutor_application":
 { Args: Record<PropertyKey, never>; Returns: undefined

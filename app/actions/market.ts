@@ -31,11 +31,14 @@ export async function createListing(_: ActionResult, formData: FormData): Promis
       kind,
       condition,
       price: kind === "sell" ? Math.round(price * 100) / 100 : null,
-      image_path: String(formData.get("image_path") ?? "") || null,
+      location: String(formData.get("location") ?? "").trim().slice(0, 80),
+      image_path: formData.getAll("image_path").map(String).filter(Boolean)[0] ?? null,
     })
     .select("id")
     .single();
   if (error) return { error: friendlyError(error) };
+  const paths = formData.getAll("image_path").map(String).filter(Boolean).slice(0, 4);
+  if (paths.length) await supabase.rpc("set_listing_images", { p_listing: data.id, p_paths: paths });
   redirect(`/market/${data.id}`);
 }
 
@@ -51,8 +54,52 @@ export async function setListingStatus(formData: FormData) {
 export async function deleteListing(formData: FormData) {
   const me = await requireMe();
   const supabase = await createClient();
-  const { data } = await supabase.from("listings").delete().eq("id", String(formData.get("id"))).eq("seller_id", me.id).select("image_path");
-  const path = data?.[0]?.image_path;
-  if (path) await supabase.storage.from("post-images").remove([path]);
+  const id = String(formData.get("id"));
+  const { data: imgs } = await supabase.from("listing_images").select("path").eq("listing_id", id);
+  const { data } = await supabase.from("listings").delete().eq("id", id).eq("seller_id", me.id).select("image_path");
+  const paths = [...new Set([...(imgs ?? []).map((i) => i.path), ...(data ?? []).map((d) => d.image_path).filter((p): p is string => !!p)])];
+  if (data?.length && paths.length) await supabase.storage.from("post-images").remove(paths);
   redirect("/market");
+}
+
+// ---- Item details: save, offers -------------------------------------------------------
+export async function setListingSaved(listingId: string, save: boolean): Promise<ActionResult> {
+  const me = await requireMe();
+  if (!me.isStudent || me.isSuspended) return { error: "Only students can save items." };
+  const supabase = await createClient();
+  const { error } = save
+    ? await supabase.from("listing_saves").upsert({ profile_id: me.id, listing_id: listingId, school_id: me.school_id }, { onConflict: "profile_id,listing_id", ignoreDuplicates: true })
+    : await supabase.from("listing_saves").delete().eq("profile_id", me.id).eq("listing_id", listingId);
+  if (error) return { error: friendlyError(error) };
+  return { ok: true };
+}
+
+export async function makeOffer(_: ActionResult, formData: FormData): Promise<ActionResult> {
+  await requireMe();
+  const amount = Number(formData.get("amount"));
+  if (!Number.isFinite(amount) || amount <= 0) return { error: "Enter the amount you want to offer." };
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("make_listing_offer", {
+    p_listing: String(formData.get("listingId")), p_amount: amount, p_message: String(formData.get("message") ?? ""),
+  });
+  if (error) return { error: friendlyError(error) };
+  return { ok: true, message: "Offer sent. The seller will get a notification." };
+}
+
+export async function withdrawOffer(_: ActionResult, formData: FormData): Promise<ActionResult> {
+  await requireMe();
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("withdraw_listing_offer", { p_id: String(formData.get("offerId")) });
+  if (error) return { error: friendlyError(error) };
+  return { ok: true, message: "Offer withdrawn." };
+}
+
+export async function respondOffer(_: ActionResult, formData: FormData): Promise<ActionResult> {
+  await requireMe();
+  const supabase = await createClient();
+  const accept = formData.get("decision") === "accept";
+  const { error } = await supabase.rpc("respond_listing_offer", { p_id: String(formData.get("offerId")), p_accept: accept });
+  if (error) return { error: friendlyError(error) };
+  refresh();
+  return { ok: true, message: accept ? "Offer accepted. The item is now reserved for them." : "Offer declined." };
 }
