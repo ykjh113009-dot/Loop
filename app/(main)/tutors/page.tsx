@@ -36,8 +36,7 @@ async function Find({ subject, format, q, meId }: { subject: string; format: str
       .from("tutor_profiles")
       .select("profile_id, subjects, about, qualifications, availability, format, days, hours, photo_path, profile:profiles(id, full_name, avatar, grade)")
       .eq("active", true)
-      .not("approved_at", "is", null)
-      .neq("profile_id", meId),
+      .not("approved_at", "is", null),
     supabase.from("tutor_profiles").select("profile_id, active, approved_at").eq("profile_id", meId).maybeSingle(),
     supabase.from("tutor_applications").select("status, review_note").eq("profile_id", meId).maybeSingle(),
     supabase.rpc("can_review_tutors"),
@@ -102,7 +101,7 @@ async function Find({ subject, format, q, meId }: { subject: string; format: str
                 </Link>
                 <div className="flex min-w-0 flex-1 flex-col">
                   <p className="flex items-start gap-2">
-                    <span className="min-w-0 flex-1 truncate text-[17px] leading-tight font-semibold">{x.profile!.full_name}</span>
+                    <span className="min-w-0 flex-1 truncate text-[17px] leading-tight font-semibold">{x.profile!.full_name}{x.profile_id === meId && <span className="chip ms-2 bg-brand-700 text-white">{t("You")}</span>}</span>
                     <span className="chip shrink-0 bg-sage-soft/70 text-brand-800">{t(formatLabel(x.format))}</span>
                   </p>
                   <p className="mt-1 line-clamp-2 text-sm text-ink-2">{x.subjects.slice(0, 4).join(" • ")}</p>
@@ -114,7 +113,9 @@ async function Find({ subject, format, q, meId }: { subject: string; format: str
                   {st && Number(st.sessions) > 0 && <p className="text-xs text-ink-2">{st.sessions} {Number(st.sessions) === 1 ? t("session") : t("sessions")}</p>}
                   <div className="mt-auto flex flex-wrap gap-2 pt-3">
                     <Link href={`/tutors/${x.profile_id}`} className="btn-secondary rounded-full px-4 py-2 text-sm">{t("View Profile")}</Link>
-                    <Link href={`/tutors/${x.profile_id}#request`} className="btn-primary rounded-full px-4 py-2 text-sm">{t("Request Session")} →</Link>
+                    {x.profile_id === meId
+                      ? <Link href="/tutors/me" className="btn-primary rounded-full px-4 py-2 text-sm">{t("Edit my profile")}</Link>
+                      : <Link href={`/tutors/${x.profile_id}#request`} className="btn-primary rounded-full px-4 py-2 text-sm">{t("Request Session")} →</Link>}
                   </div>
                 </div>
               </article>

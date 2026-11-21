@@ -3167,14 +3167,14 @@ isOneToOne: true
                   ]
                 },"tutor_application_documents": {
                   Row: {
-                    "application_id": string,"created_at": string,"id": string,"kind": string,"name": string,"path": string,"profile_id": string,"school_id": string,"size": number
+                    "application_id": string,"created_at": string,"id": string,"kind": string,"name": string,"path": string,"profile_id": string,"public_on_profile": boolean,"school_id": string,"size": number
                   }
                   ComputedFields: never
                   Insert: {
-                    "application_id": string,"created_at"?: string,"id"?: string,"kind": string,"name": string,"path": string,"profile_id": string,"school_id": string,"size": number
+                    "application_id": string,"created_at"?: string,"id"?: string,"kind": string,"name": string,"path": string,"profile_id": string,"public_on_profile"?: boolean,"school_id": string,"size": number
                   }
                   Update: {
-                    "application_id"?: string,"created_at"?: string,"id"?: string,"kind"?: string,"name"?: string,"path"?: string,"profile_id"?: string,"school_id"?: string,"size"?: number
+                    "application_id"?: string,"created_at"?: string,"id"?: string,"kind"?: string,"name"?: string,"path"?: string,"profile_id"?: string,"public_on_profile"?: boolean,"school_id"?: string,"size"?: number
                   }
                   Relationships: [
                     {
@@ -4203,6 +4203,9 @@ isOneToOne: false
 "set_top10_settings":
 { Args: { "p_period": string,"p_rules": string }; Returns: undefined
                            },
+"set_tutor_doc_public":
+{ Args: { "p_id": string,"p_public": boolean }; Returns: undefined
+                           },
 "split_subjects":
 { Args: { "p": string }; Returns: (string)[]
                            },
@@ -4240,11 +4243,17 @@ isOneToOne: false
               "posts": number,"tag": string
             }[]
                            },
+"tutor_doc_shared":
+{ Args: { "p_name": string }; Returns: boolean
+                           },
 "tutor_doc_uploader":
 { Args: { "p_name": string }; Returns: boolean
                            },
 "tutor_doc_viewer":
 { Args: { "p_name": string }; Returns: boolean
+                           },
+"tutor_is_listed":
+{ Args: { "p_tutor": string }; Returns: boolean
                            },
 "tutor_stats":
 { Args: { "p_tutors": (string)[] }; Returns: {

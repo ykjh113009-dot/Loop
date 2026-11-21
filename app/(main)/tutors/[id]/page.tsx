@@ -5,15 +5,15 @@ import { requireMe } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { getT } from "@/lib/i18n-server";
 import { signImages } from "@/lib/images";
-import { DAYS, formatLabel } from "@/lib/tutor";
+import { DAYS, DOC_KINDS, formatLabel } from "@/lib/tutor";
 import { startChat } from "@/app/actions/messages";
 import { Avatar } from "@/components/avatar";
-import { ArrowLeft, Star, GraduationCap, BookOpen, CalendarDays } from "lucide-react";
+import { ArrowLeft, Star, GraduationCap, BookOpen, CalendarDays, FileText } from "lucide-react";
 import { Stars } from "@/components/ui/stars";
 import { timeAgo } from "@/lib/time";
 import { PageSkeleton } from "@/components/skeleton";
 import { SubmitButton } from "@/components/submit-button";
-import { AskTutorForm } from "../forms";
+import { AskTutorForm, ReviewForm } from "../forms";
 import { Glyph } from "@/components/glyph";
 
 export const metadata = { title: "Tutor" };
@@ -37,6 +37,14 @@ async function Tutor({ params }: { params: PageProps<"/tutors/[id]">["params"] }
     supabase.from("tutor_reviews").select("id, rating, comment, created_at, reviewer:profiles!tutor_reviews_reviewer_id_fkey(full_name, avatar)").eq("tutor_id", x.profile_id).order("created_at", { ascending: false }).limit(10),
   ]);
   const st = (statRows ?? [])[0];
+  // CVs and other documents the tutor chose to share (the database only returns those), and a finished session I have not reviewed yet.
+  const [{ data: sharedDocs }, { data: myDone }] = await Promise.all([
+    supabase.from("tutor_application_documents").select("id, name, kind").eq("profile_id", x.profile_id).eq("public_on_profile", true).order("created_at"),
+    mine ? Promise.resolve({ data: [] as { id: string }[] }) : supabase.from("tutoring_requests").select("id").eq("learner_id", me.id).eq("tutor_id", x.profile_id).eq("status", "completed"),
+  ]);
+  const { data: myReviews } = (myDone ?? []).length ? await supabase.from("tutor_reviews").select("request_id").eq("reviewer_id", me.id).in("request_id", (myDone ?? []).map((r) => r.id)) : { data: [] };
+  const reviewedIds = new Set((myReviews ?? []).map((r) => r.request_id));
+  const toReview = (myDone ?? []).find((r) => !reviewedIds.has(r.id));
   const photo = x.photo_path ? photos.get(x.photo_path) : null;
   const card = "rounded-3xl border border-brand-700/10 bg-white/85 p-5 shadow-[0_1px_2px_rgba(40,60,40,0.04)]";
   const times = [x.hours, x.preferred_times].filter(Boolean).join(" · ") || x.availability;
@@ -104,8 +112,29 @@ async function Tutor({ params }: { params: PageProps<"/tutors/[id]">["params"] }
         </section>
       )}
 
+      <section className={card} data-tutor-documents>
+        <h2 className="mb-3 flex items-center gap-2 text-lg font-semibold"><FileText className="size-5 text-brand-700" aria-hidden="true" />{t("CV and documents")}</h2>
+        {(sharedDocs ?? []).length === 0 ? (
+          <p className="rounded-2xl bg-sage-soft/40 px-4 py-5 text-center text-sm text-ink-2">
+            {mine ? <>{t("Nothing is shown yet.")} <Link href="/tutors/me" className="font-medium text-brand-700 underline">{t("Choose what to share")}</Link></> : t("This tutor has not shared a CV or documents.")}
+          </p>
+        ) : (
+          <ul className="divide-y divide-brand-700/10">
+            {(sharedDocs ?? []).map((d) => (
+              <li key={d.id} className="flex items-center gap-3 py-2.5 first:pt-0 last:pb-0">
+                <FileText className="size-4 shrink-0 text-ink-2" aria-hidden="true" />
+                <a href={`/api/tutor-doc/${d.id}`} target="_blank" rel="noreferrer" className="min-w-0 flex-1 truncate font-medium text-brand-700 underline" data-tutor-doc>{d.name}</a>
+                <span className="chip">{t(DOC_KINDS.find((k) => k.id === d.kind)?.label ?? d.kind)}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
       <section className={card} data-tutor-reviews>
         <h2 className="mb-3 flex items-center gap-2 text-lg font-semibold"><Star className="size-5 text-brand-700" aria-hidden="true" />{t("Reviews")}</h2>
+        {toReview && <div className="mb-4"><ReviewForm requestId={toReview.id} /></div>}
+        {!mine && !toReview && me.isStudent && <p className="mb-3 text-xs text-ink-2">{t("You can leave a review after a session with this tutor is marked as done. Open Requests, then tap “We met — it helped!”.")}</p>}
         {(reviews ?? []).length === 0 ? (
           <p className="rounded-2xl bg-sage-soft/40 px-4 py-5 text-center text-sm text-ink-2">{t("No reviews yet. Students can review a tutor after a finished session.")}</p>
         ) : (

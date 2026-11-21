@@ -20,7 +20,7 @@ export type DocRow = { id: string; name: string; kind: string; size: number };
 
 const GRADES = ["Grade 6", "Grade 7", "Grade 8", "Grade 9", "Grade 10", "Grade 11", "Grade 12"];
 
-function RemoveDoc({ id, label }: { id: string; label: string }) {
+export function RemoveDoc({ id, label }: { id: string; label: string }) {
   const [state, action, pending] = useActionState(removeTutorDocument, null);
   return (
     <form action={action} className="inline">
@@ -31,7 +31,7 @@ function RemoveDoc({ id, label }: { id: string; label: string }) {
   );
 }
 
-function Uploader({ schoolId, userId, locale }: { schoolId: string; userId: string; locale: Locale }) {
+export function Uploader({ schoolId, userId, locale }: { schoolId: string; userId: string; locale: Locale }) {
   const t = makeT(locale);
   const router = useRouter();
   const input = useRef<HTMLInputElement>(null);

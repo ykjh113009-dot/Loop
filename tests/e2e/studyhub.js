@@ -150,7 +150,7 @@ async function login(browser, name, viewport = { width: 1280, height: 850 }) {
   {
     const p = maya.p;
     await go(p, '/tutors');
-    check('The approved tutor appears in the directory', (await p.locator(`[data-tutor="${ID.maya}"]`).count()) === 0 && /You are an approved tutor/.test(await text(p)));
+    check('The approved tutor appears in the directory (also to themselves)', (await p.locator(`[data-tutor="${ID.maya}"]`).count()) === 1 && /You are an approved tutor/.test(await text(p)));
     await go(layla.p, '/tutors');
     check('Other students see the approved tutor', (await layla.p.locator(`[data-tutor="${ID.maya}"]`).count()) === 1);
     await go(layla.p, `/tutors/${ID.maya}`);

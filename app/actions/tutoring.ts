@@ -51,6 +51,9 @@ export async function addTutorDocument(path: string, name: string, kind: string,
 export async function removeTutorDocument(_: ActionResult, fd: FormData) {
   return rpc("remove_tutor_document", { p_id: str(fd, "id") });
 }
+export async function setTutorDocPublic(_: ActionResult, fd: FormData) {
+  return rpc("set_tutor_doc_public", { p_id: str(fd, "id"), p_public: fd.get("public") === "true" });
+}
 export async function reviewTutorApplication(_: ActionResult, fd: FormData) {
   const approve = fd.get("decision") === "approve";
   const result = await rpc("review_tutor_application", { p_app: str(fd, "id"), p_approve: approve, p_note: str(fd, "note") },
