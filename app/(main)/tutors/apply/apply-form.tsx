@@ -4,6 +4,7 @@ import { useActionState, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { addTutorDocument, removeTutorDocument, saveTutorApplication } from "@/app/actions/tutoring";
 import { Avatar } from "@/components/avatar";
+import { Briefcase, CalendarDays, Camera, Check, FileText, Heart, MessageSquare, Send, UserRound, BookOpen } from "lucide-react";
 import { PhotoField } from "@/components/photo-field";
 import { createClient } from "@/lib/supabase/client";
 import { DAYS, DOC_KINDS, DOC_TYPES, FORMATS, MAX_DOC_MB, TUTOR_SUBJECTS } from "@/lib/tutor";
@@ -17,14 +18,14 @@ export type AppDraft = {
 };
 export type DocRow = { id: string; name: string; kind: string; size: number };
 
-const STEPS = ["Personal", "Academic", "About you", "Availability", "Documents", "Review"] as const;
+const GRADES = ["Grade 6", "Grade 7", "Grade 8", "Grade 9", "Grade 10", "Grade 11", "Grade 12"];
 
 function RemoveDoc({ id, label }: { id: string; label: string }) {
   const [state, action, pending] = useActionState(removeTutorDocument, null);
   return (
     <form action={action} className="inline">
       <input type="hidden" name="id" value={id} />
-      <button disabled={pending} className="text-xs text-black/45 hover:text-red-600" aria-label={label}><Glyph e="✕" /></button>
+      <button disabled={pending} className="rounded-full p-1 text-black/45 hover:bg-red-50 hover:text-red-600" aria-label={label}><Glyph e="✕" /></button>
       {state?.error && <span className="text-xs text-red-700"> {state.error}</span>}
     </form>
   );
@@ -67,151 +68,142 @@ function Uploader({ schoolId, userId, locale }: { schoolId: string; userId: stri
   );
 }
 
+// A card for one part of the application: a line icon, a title and a hint, then the fields.
+function Section({ icon: Icon, title, hint, children }: { icon: typeof UserRound; title: string; hint?: string; children: React.ReactNode }) {
+  return (
+    <section className="card space-y-3 p-5">
+      <div className="flex items-start gap-3">
+        <span className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-full bg-sage-soft text-brand-800"><Icon className="size-5" strokeWidth={1.7} aria-hidden="true" /></span>
+        <div className="min-w-0">
+          <h2 className="font-heading text-[19px] leading-tight font-semibold text-brand-900">{title}</h2>
+          {hint && <p className="text-sm text-ink-2">{hint}</p>}
+        </div>
+      </div>
+      {children}
+    </section>
+  );
+}
+
+// A text area with a live "0 / 300" count.
+function Counted({ name, max, rows = 3, defaultValue, placeholder, label }: { name: string; max: number; rows?: number; defaultValue: string; placeholder?: string; label: string }) {
+  const [n, setN] = useState(defaultValue.length);
+  return (
+    <div className="relative">
+      <textarea name={name} rows={rows} maxLength={max} defaultValue={defaultValue} placeholder={placeholder} aria-label={label} onChange={(e) => setN(e.target.value.length)} className="input resize-none pb-7" />
+      <span className="pointer-events-none absolute end-3 bottom-2 text-xs text-ink-2 tabular-nums">{n} / {max}</span>
+    </div>
+  );
+}
+
 export function ApplyForm({ initial, docs, user, locale, schoolId, userId, feedback }: {
   initial: AppDraft; docs: DocRow[]; user: { name: string; email: string; avatar: string }; locale: Locale; schoolId: string; userId: string; feedback?: string | null;
 }) {
   const t = makeT(locale);
-  const form = useRef<HTMLFormElement>(null);
-  const [step, setStep] = useState(0);
-  const [summary, setSummary] = useState<Record<string, string | string[]> | null>(null);
   const [state, action, pending] = useActionState(saveTutorApplication, null);
   const [, start] = useTransition();
-
-  function goTo(n: number) {
-    if (n === 5 && form.current) {
-      const fd = new FormData(form.current);
-      const one = (k: string) => String(fd.get(k) ?? "").trim();
-      setSummary({
-        grade: one("grade"), subjects: [...fd.getAll("subject").map(String), ...one("other_subjects").split(/[,\n;]/).map((x) => x.trim()).filter(Boolean)],
-        achievements: one("achievements"), experience: one("experience"), qualifications: one("qualifications"), intro: one("intro"),
-        motivation: one("motivation"), topics: one("topics"), format: one("format"), days: fd.getAll("day").map(String), hours: one("hours"),
-        preferred_times: one("preferred_times"), availability_notes: one("availability_notes"),
-      });
-    }
-    setStep(n);
-    if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
-  }
-
-  const field = "input";
-  const row = (label: string, value: string | string[] | undefined) => (
-    <div className="py-2"><dt className="text-xs text-black/45">{label}</dt><dd className="text-sm whitespace-pre-wrap">{(Array.isArray(value) ? value.join(", ") : value) || <span className="text-black/35">—</span>}</dd></div>
-  );
+  const grades = GRADES.includes(initial.grade) || !initial.grade ? GRADES : [initial.grade, ...GRADES];
+  const readOnly = "input bg-black/[0.03] text-ink-2";
 
   return (
-    <form ref={form} onSubmit={(e) => { e.preventDefault(); const fd = new FormData(e.currentTarget, (e.nativeEvent as SubmitEvent).submitter); start(() => action(fd)); }} className="space-y-4">
+    <form onSubmit={(e) => { e.preventDefault(); const fd = new FormData(e.currentTarget, (e.nativeEvent as SubmitEvent).submitter); start(() => action(fd)); }} className="space-y-4">
       {initial.photo_path && <input type="hidden" name="keep_photo" value={initial.photo_path} />}
       {feedback && <p className="rounded-xl bg-amber-50 p-3 text-sm text-amber-900"><strong>{t("Feedback from the reviewers")}:</strong> {feedback}</p>}
 
-      <ol className="flex gap-1" aria-label={t("Steps")}>
-        {STEPS.map((s, i) => (
-          <li key={s} className="min-w-0 flex-1">
-            <button type="button" onClick={() => goTo(i)} aria-current={step === i ? "step" : undefined}
-              className={`w-full rounded-lg px-1 py-1.5 text-center text-[11px] font-medium sm:text-xs ${step === i ? "bg-brand-700 text-white" : i < step ? "bg-brand-50 text-brand-800" : "bg-black/5 text-black/50"}`}>
-              <span className="block truncate">{i + 1}. {t(s)}</span>
-            </button>
-          </li>
-        ))}
-      </ol>
-
-      {/* A. Personal information, taken from the Loop account */}
-      <section hidden={step !== 0} className="card space-y-4 p-4">
-        <h2 className="section-title">{t("A. Personal information")}</h2>
-        <div className="flex items-center gap-3">
-          <Avatar avatar={user.avatar} size="lg" />
-          <div className="min-w-0"><p className="font-semibold">{user.name}</p><p className="truncate text-sm text-black/55">{user.email}</p></div>
-        </div>
-        <p className="text-xs text-black/50">{t("We take your name, picture and school email from your Loop account. Change them in Edit profile.")}</p>
-        <div>
-          <p className="label">{t("Tutor photo (optional)")}</p>
-          <PhotoField schoolId={schoolId} userId={userId} label={initial.photo_path ? t("Change tutor photo") : t("Use a different photo for tutoring")} />
-          <p className="mt-1 text-xs text-black/45">{t("This only changes your tutor profile, not your account.")}</p>
-        </div>
-      </section>
-
-      {/* B. Academic information */}
-      <section hidden={step !== 1} className="card space-y-4 p-4">
-        <h2 className="section-title">{t("B. Academic information")}</h2>
-        <label className="block"><span className="label">{t("Current grade")}</span><input name="grade" maxLength={40} defaultValue={initial.grade} className={field} placeholder={t("e.g. Grade 11")} /></label>
-        <fieldset><legend className="label">{t("Subjects you want to tutor")}</legend>
-          <div className="flex flex-wrap gap-2">
-            {TUTOR_SUBJECTS.map((s) => (
-              <label key={s} className="rounded-full border border-black/10 px-3 py-1.5 text-sm has-checked:border-brand-600 has-checked:bg-brand-50 has-checked:text-brand-900">
-                <input type="checkbox" name="subject" value={s} defaultChecked={initial.subjects.includes(s)} className="sr-only" /> {s}
-              </label>
-            ))}
+      <Section icon={UserRound} title={t("Your Information")} hint={t("We take your name and school email from your Loop account. Change them in Edit profile.")}>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div><label className="label" htmlFor="ta-name">{t("Full Name")}</label><input id="ta-name" value={user.name} readOnly className={readOnly} /></div>
+          <div><label className="label" htmlFor="ta-grade">{t("Grade")} *</label>
+            <select id="ta-grade" name="grade" defaultValue={initial.grade} required className="input">
+              <option value="" disabled>{t("Select your grade")}</option>
+              {grades.map((g) => <option key={g} value={g}>{g}</option>)}
+            </select>
           </div>
-        </fieldset>
-        <label className="block"><span className="label">{t("Other subjects (separate with commas)")}</span><input name="other_subjects" maxLength={200} defaultValue={initial.other_subjects} className={field} /></label>
-        <label className="block"><span className="label">{t("Relevant grades or achievements")}</span><textarea name="achievements" rows={3} maxLength={1000} defaultValue={initial.achievements} className={`${field} resize-none`} placeholder={t("e.g. Chemistry 96, SAT practice score 1480")} /></label>
-        <label className="block"><span className="label">{t("Tutoring or teaching experience")} <span className="font-normal text-black/45">({t("optional")})</span></span><textarea name="experience" rows={2} maxLength={600} defaultValue={initial.experience} className={`${field} resize-none`} /></label>
-        <label className="block"><span className="label">{t("Qualifications and certificates")} <span className="font-normal text-black/45">({t("if you have any")})</span></span><textarea name="qualifications" rows={2} maxLength={600} defaultValue={initial.qualifications} className={`${field} resize-none`} /></label>
-      </section>
+        </div>
+        <div><label className="label" htmlFor="ta-email">{t("School Email")}</label><input id="ta-email" value={user.email} readOnly className={readOnly} /></div>
+      </Section>
 
-      {/* C. Tutor information */}
-      <section hidden={step !== 2} className="card space-y-4 p-4">
-        <h2 className="section-title">{t("C. About you as a tutor")}</h2>
-        <label className="block"><span className="label">{t("Short introduction")} <span className="font-normal text-black/45">({t("shown on your profile")})</span></span><textarea name="intro" rows={3} maxLength={300} defaultValue={initial.intro} className={`${field} resize-none`} /></label>
-        <label className="block"><span className="label">{t("Why do you want to become a tutor?")}</span><textarea name="motivation" rows={3} maxLength={600} defaultValue={initial.motivation} className={`${field} resize-none`} /></label>
-        <label className="block"><span className="label">{t("Subjects and topics you feel confident teaching")}</span><textarea name="topics" rows={2} maxLength={600} defaultValue={initial.topics} className={`${field} resize-none`} /></label>
+      <Section icon={BookOpen} title={t("Subjects You Can Tutor")} hint={t("Select all subjects you feel confident in:")}>
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
+          {TUTOR_SUBJECTS.map((s) => (
+            <label key={s} className="flex cursor-pointer items-center gap-2.5 rounded-xl border border-black/10 bg-white px-3 py-2.5 text-sm text-ink transition-colors hover:border-brand-700/30 hover:bg-sage-soft/50 has-checked:border-brand-700 has-checked:bg-brand-700 has-checked:text-white has-checked:hover:bg-brand-800 has-focus-visible:ring-2 has-focus-visible:ring-brand-600">
+              <input type="checkbox" name="subject" value={s} defaultChecked={initial.subjects.includes(s)} className="peer sr-only" />
+              <span className="grid size-[18px] shrink-0 place-items-center rounded-md border border-black/25 bg-white text-transparent peer-checked:border-white peer-checked:text-brand-700"><Check className="size-3.5" strokeWidth={3} aria-hidden="true" /></span>
+              <span className="min-w-0 truncate">{s}</span>
+            </label>
+          ))}
+        </div>
+        <div><label className="label" htmlFor="ta-other">{t("Other subjects (separate with commas)")}</label><input id="ta-other" name="other_subjects" maxLength={200} defaultValue={initial.other_subjects} className="input" /></div>
+      </Section>
+
+      <Section icon={Camera} title={t("Profile Photo")} hint={t("Upload a clear photo of yourself (optional but recommended).")}>
+        <div className="flex flex-wrap items-center gap-4">
+          <div className="min-w-0 flex-1 rounded-2xl border-2 border-dashed border-brand-700/20 bg-sage-soft/20 p-4 text-center">
+            <div className="flex justify-center"><PhotoField schoolId={schoolId} userId={userId} label={initial.photo_path ? t("Change tutor photo") : t("Upload a photo")} /></div>
+            <p className="mt-2 text-xs text-ink-2">{t("This only changes your tutor profile, not your account.")}</p>
+          </div>
+          <Avatar avatar={user.avatar} size="lg" />
+        </div>
+      </Section>
+
+      <Section icon={MessageSquare} title={t("About Me / Tutor Bio")} hint={t("Write a short introduction about yourself. This will appear on your tutor profile.")}>
+        <Counted name="intro" max={300} rows={3} defaultValue={initial.intro} label={t("Short introduction")} placeholder={t("e.g. I'm a Grade 11 student who loves math and has helped many classmates...")} />
+        <div>
+          <label className="label" htmlFor="ta-topics">{t("Subjects and topics you feel confident teaching")}</label>
+          <textarea id="ta-topics" name="topics" rows={2} maxLength={600} defaultValue={initial.topics} className="input resize-none" />
+        </div>
         <fieldset><legend className="label">{t("Preferred tutoring format")}</legend>
           <div className="flex flex-wrap gap-2">{FORMATS.map((f) => (
-            <label key={f.id} className="flex items-center gap-2 rounded-xl border border-black/10 px-3 py-2 text-sm has-checked:border-brand-600 has-checked:bg-brand-50"><input type="radio" name="format" value={f.id} defaultChecked={initial.format === f.id} className="accent-brand-700" /> {t(f.label)}</label>
+            <label key={f.id} className="opt cursor-pointer has-checked:border-brand-700 has-checked:bg-brand-700 has-checked:text-white has-focus-visible:ring-2 has-focus-visible:ring-brand-600"><input type="radio" name="format" value={f.id} defaultChecked={initial.format === f.id} className="sr-only" />{t(f.label)}</label>
           ))}</div>
         </fieldset>
-      </section>
+      </Section>
 
-      {/* D. Availability */}
-      <section hidden={step !== 3} className="card space-y-4 p-4">
-        <h2 className="section-title">{t("D. Availability")}</h2>
-        <fieldset><legend className="label">{t("Days you are free")}</legend>
+      <Section icon={Briefcase} title={t("Your Experience")} hint={t("Tell us about your tutoring experience, relevant skills, or any past teaching.")}>
+        <Counted name="experience" max={600} rows={3} defaultValue={initial.experience} label={t("Tutoring or teaching experience")} placeholder={t("e.g. I've tutored math before, or I'm great at explaining concepts...")} />
+        <div><label className="label" htmlFor="ta-ach">{t("Relevant grades or achievements")}</label><textarea id="ta-ach" name="achievements" rows={2} maxLength={1000} defaultValue={initial.achievements} className="input resize-none" placeholder={t("e.g. Chemistry 96, SAT practice score 1480")} /></div>
+        <div><label className="label" htmlFor="ta-qual">{t("Qualifications and certificates")} <span className="font-normal text-black/45">({t("if you have any")})</span></label><textarea id="ta-qual" name="qualifications" rows={2} maxLength={600} defaultValue={initial.qualifications} className="input resize-none" /></div>
+      </Section>
+
+      <Section icon={Heart} title={t("Why do you want to be a Loop Tutor?")} hint={t("Share your motivation and what you hope to achieve.")}>
+        <Counted name="motivation" max={600} rows={3} defaultValue={initial.motivation} label={t("Why do you want to become a tutor?")} placeholder={t("e.g. I want to help students and be part of the Loop community...")} />
+      </Section>
+
+      <Section icon={CalendarDays} title={t("Availability")} hint={t("Days you are free")}>
+        <fieldset>
+          <legend className="sr-only">{t("Days you are free")}</legend>
           <div className="flex flex-wrap gap-2">{DAYS.map((d) => (
-            <label key={d.id} className="rounded-full border border-black/10 px-3.5 py-2 text-sm has-checked:border-brand-600 has-checked:bg-brand-700 has-checked:text-white"><input type="checkbox" name="day" value={d.id} defaultChecked={initial.days.includes(d.id)} className="sr-only" /> {t(d.label)}</label>
+            <label key={d.id} className="opt cursor-pointer has-checked:border-brand-700 has-checked:bg-brand-700 has-checked:text-white has-focus-visible:ring-2 has-focus-visible:ring-brand-600"><input type="checkbox" name="day" value={d.id} defaultChecked={initial.days.includes(d.id)} className="sr-only" /> {t(d.label)}</label>
           ))}</div>
         </fieldset>
-        <label className="block"><span className="label">{t("Hours")}</span><input name="hours" maxLength={100} defaultValue={initial.hours} className={field} placeholder="15:00–17:00" /></label>
-        <label className="block"><span className="label">{t("Preferred times")}</span><input name="preferred_times" maxLength={100} defaultValue={initial.preferred_times} className={field} placeholder={t("e.g. After school, weekends")} /></label>
-        <label className="block"><span className="label">{t("Anything else about your availability?")}</span><textarea name="availability_notes" rows={2} maxLength={300} defaultValue={initial.availability_notes} className={`${field} resize-none`} /></label>
-      </section>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div><label className="label" htmlFor="ta-hours">{t("Hours")}</label><input id="ta-hours" name="hours" maxLength={100} defaultValue={initial.hours} className="input" placeholder="15:00–17:00" /></div>
+          <div><label className="label" htmlFor="ta-times">{t("Preferred times")}</label><input id="ta-times" name="preferred_times" maxLength={100} defaultValue={initial.preferred_times} className="input" placeholder={t("e.g. After school, weekends")} /></div>
+        </div>
+        <div><label className="label" htmlFor="ta-notes">{t("Anything else about your availability?")}</label><textarea id="ta-notes" name="availability_notes" rows={2} maxLength={300} defaultValue={initial.availability_notes} className="input resize-none" /></div>
+      </Section>
 
-      {/* E. Supporting documents */}
-      <section hidden={step !== 4} className="card space-y-3 p-4">
-        <h2 className="section-title">{t("E. Supporting documents")}</h2>
-        <p className="text-sm text-black/60">{t("A CV, certificates or academic records help the reviewers. Only you and the reviewers can open them. PDF, JPG, PNG or Word, up to {n} MB each.", { n: MAX_DOC_MB })}</p>
+      <Section icon={FileText} title={t("Supporting documents")} hint={t("A CV, certificates or academic records help the reviewers. Only you and the reviewers can open them. PDF, JPG, PNG or Word, up to {n} MB each.", { n: MAX_DOC_MB })}>
         <ul className="divide-y divide-black/5 text-sm">
           {docs.map((d) => (
-            <li key={d.id} className="flex items-center gap-2 py-2"><span><Glyph e="📄" /></span><span className="min-w-0 flex-1 truncate">{d.name}</span><span className="chip bg-black/5">{t(DOC_KINDS.find((k) => k.id === d.kind)?.label ?? d.kind)}</span><RemoveDoc id={d.id} label={t("Remove")} /></li>
+            <li key={d.id} className="flex items-center gap-2 py-2"><FileText className="size-4 shrink-0 text-ink-2" aria-hidden="true" /><span className="min-w-0 flex-1 truncate">{d.name}</span><span className="chip">{t(DOC_KINDS.find((k) => k.id === d.kind)?.label ?? d.kind)}</span><RemoveDoc id={d.id} label={t("Remove")} /></li>
           ))}
           {docs.length === 0 && <li className="py-2 text-black/45">{t("No documents yet.")}</li>}
         </ul>
         {docs.length < 8 && <Uploader schoolId={schoolId} userId={userId} locale={locale} />}
-      </section>
-
-      {/* Review */}
-      <section hidden={step !== 5} className="card space-y-2 p-4">
-        <h2 className="section-title">{t("Review your application")}</h2>
-        <p className="text-sm text-black/60">{t("Check everything. Reviewers will see all of this and your documents. Only your introduction, subjects, qualifications, experience and availability will be public.")}</p>
-        <dl className="divide-y divide-black/5">
-          {row(t("Name"), user.name)}{row(t("School email"), user.email)}
-          {row(t("Grade"), summary?.grade)}{row(t("Subjects"), summary?.subjects)}{row(t("Grades and achievements"), summary?.achievements)}
-          {row(t("Experience"), summary?.experience)}{row(t("Qualifications"), summary?.qualifications)}
-          {row(t("Introduction"), summary?.intro)}{row(t("Why a tutor"), summary?.motivation)}{row(t("Topics"), summary?.topics)}
-          {row(t("Format"), FORMATS.filter((f) => f.id === summary?.format).map((f) => t(f.label)))}
-          {row(t("Days"), (summary?.days as string[] | undefined)?.map((d) => t(DAYS.find((x) => x.id === d)?.label ?? d)))}
-          {row(t("Hours"), [summary?.hours, summary?.preferred_times].filter(Boolean) as string[])}{row(t("Availability notes"), summary?.availability_notes)}
-          {row(t("Documents"), docs.map((d) => d.name))}
-        </dl>
-      </section>
+      </Section>
 
       {state?.error && <p role="alert" className="text-sm text-red-700">{state.error}</p>}
       {state?.message && <p className="text-sm text-brand-800">{state.message}</p>}
-      <div className="sticky bottom-16 z-10 flex gap-2 rounded-2xl bg-cream/90 p-2 backdrop-blur lg:bottom-4">
-        {step > 0 && <button type="button" onClick={() => goTo(step - 1)} className="btn-secondary">‹ {t("Back")}</button>}
-        <button name="intent" value="draft" disabled={pending} className="btn-ghost">{t("Save draft")}</button>
-        {step < 5 ? (
-          <button type="button" onClick={() => goTo(step + 1)} className="btn-primary ms-auto">{t("Next")} ›</button>
-        ) : (
-          <button name="intent" value="submit" disabled={pending} className="btn-primary ms-auto">{pending ? "…" : t("Submit application")}</button>
-        )}
+
+      <div className="card space-y-3 p-5">
+        <label className="flex cursor-pointer items-start gap-2.5 text-sm">
+          <input type="checkbox" name="agree" required className="mt-0.5 size-4" />
+          <span>{t("I agree to the Loop Tutor Guidelines.")}</span>
+        </label>
+        <button name="intent" value="submit" disabled={pending} className="btn-primary w-full rounded-full py-3 text-[15px]">
+          <Send className="size-4" aria-hidden="true" />{pending ? "…" : t("Submit application")}
+        </button>
+        <button name="intent" value="draft" formNoValidate disabled={pending} className="btn-secondary w-full rounded-full">{t("Save draft")}</button>
       </div>
     </form>
   );

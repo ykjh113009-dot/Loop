@@ -93,7 +93,7 @@ a.chip:hover, button.chip:hover, a.opt:hover, button.opt:hover, label.opt:hover 
 }
 .chip-on, .opt-on,
 .chip[aria-pressed="true"], .chip[aria-selected="true"], .chip[aria-checked="true"], .chip[aria-current="page"],
-.opt[aria-pressed="true"], .opt[aria-selected="true"], .opt[aria-checked="true"], .opt[aria-current="page"],
+.opt[aria-pressed="true"], .opt[aria-selected="true"], .opt[aria-checked="true"], .opt[aria-current="page"], .opt:has(input:checked),
 .chip.bg-brand-700, .opt.bg-brand-700 {
   background-color: var(--color-brand-700) !important;
   border-color: var(--color-brand-700) !important;

@@ -70,17 +70,15 @@ async function login(browser, name, viewport = { width: 1280, height: 850 }) {
     check('Maya is not listed before approval', (await p.locator(`[data-tutor="${ID.maya}"]`).count()) === 0);
     await p.getByRole('link', { name: 'Become a Tutor' }).click();
     await p.waitForURL('**/tutors/apply');
-    await waitText(p, /A\. Personal information/);
-    check('The application takes name and email from the account', /Maya Odeh/.test(await text(p)) && /@pioneers\.edu\.ps/.test(await text(p)));
+    await waitText(p, /Your Information/);
+    check('The application takes name and email from the account', /Maya Odeh/.test(await p.inputValue('#ta-name')) && /@pioneers\.edu\.ps/.test(await p.inputValue('#ta-email')));
     // B
-    await p.getByRole('button', { name: /2\. Academic/ }).click();
-    await p.fill('input[name=grade]', 'Grade 9');
+    await p.selectOption('select[name=grade]', 'Grade 9');
     await p.locator('label', { hasText: /^\s*SAT\s*$/ }).click();
     await p.locator('label', { hasText: 'AP Chemistry' }).click();
     await p.fill('input[name=other_subjects]', 'Latin');
     await p.fill('textarea[name=achievements]', 'Chemistry 96');
     // C
-    await p.getByRole('button', { name: /3\. About/ }).click();
     await p.fill('textarea[name=intro]', 'I explain chemistry step by step.');
     await p.fill('textarea[name=motivation]', 'I want to help classmates feel ready for exams.');
     // draft
@@ -88,18 +86,15 @@ async function login(browser, name, viewport = { width: 1280, height: 850 }) {
     await waitText(p, /Draft saved/);
     check('A draft can be saved', sql(`select status from public.tutor_applications where profile_id='${ID.maya}'`) === 'draft');
     await go(p, '/tutors/apply');
-    check('The draft comes back filled in', (await p.inputValue('input[name=grade]')) === 'Grade 9');
+    check('The draft comes back filled in', (await p.inputValue('select[name=grade]')) === 'Grade 9');
     // D, E
-    await p.getByRole('button', { name: /4\. Avail/ }).click();
     await p.locator('label', { hasText: 'Mon' }).click();
     await p.fill('input[name=hours]', '15:00-17:00');
-    await p.getByRole('button', { name: /5\. Doc/ }).click();
     await p.setInputFiles('input[type=file][accept*=docx]', PDF);
     await waitText(p, /sample\.pdf/).catch(async () => { console.log('UPLOAD PAGE:', (await text(p)).slice(-500)); throw new Error('upload failed'); });
     check('A document uploads into the private bucket', sql(`select count(*) from public.tutor_application_documents where size > 0`) >= '1' && sql(`select public from storage.buckets where id='tutor-docs'`) === 'f');
-    // review
-    await p.getByRole('button', { name: /6\. Review/ }).click();
-    { const b = await text(p); check('A summary is shown before submitting', /review your application/i.test(b) && /Latin/.test(b) && /sample\.pdf/.test(b), b.slice(-350)); }
+    check('The page shows availability and documents without extra steps', /Availability/.test(await text(p)) && /sample\.pdf/.test(await text(p)));
+    await p.locator('input[name=agree]').check();
     await p.getByRole('button', { name: 'Submit application' }).click();
     await waitText(p, /Your application is with the reviewers/);
     check('Submitting sets Pending Review', sql(`select status from public.tutor_applications where profile_id='${ID.maya}'`) === 'pending');
@@ -138,8 +133,8 @@ async function login(browser, name, viewport = { width: 1280, height: 850 }) {
   {
     const p = maya.p;
     await go(p, '/tutors/apply');
-    check('The applicant sees the feedback and can edit', /Please add your latest chemistry grade/.test(await text(p)) && (await p.locator('input[name=grade]').count()) === 1);
-    await p.getByRole('button', { name: /6\. Review/ }).click();
+    check('The applicant sees the feedback and can edit', /Please add your latest chemistry grade/.test(await text(p)) && (await p.locator('select[name=grade]').count()) === 1);
+    await p.locator('input[name=agree]').check();
     await p.getByRole('button', { name: 'Submit application' }).click();
     await waitText(p, /Your application is with the reviewers/);
     check('A rejected application can be resubmitted', sql(`select count(*) from public.tutor_application_events where action='resubmit'`) >= '1');

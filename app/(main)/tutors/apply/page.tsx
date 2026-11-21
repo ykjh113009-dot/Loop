@@ -5,7 +5,7 @@ import { requireMe } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { getT } from "@/lib/i18n-server";
 import { formatDateTime } from "@/lib/time";
-import { PageHeader } from "@/components/page-header";
+import { ArrowLeft, GraduationCap } from "lucide-react";
 import { PageSkeleton } from "@/components/skeleton";
 import { ApplyForm } from "./apply-form";
 import { WithdrawButton } from "./withdraw-button";
@@ -34,7 +34,7 @@ async function Apply() {
 
   if (app?.status === "pending") {
     return (
-      <div className="mx-auto max-w-2xl space-y-4">
+      <div className="mx-auto max-w-3xl space-y-4">
         <div className="card space-y-2 p-5">
           <span className="chip bg-amber-50 text-amber-800"><Glyph e="⏳" /> {t("Pending review")}</span>
           <h2 className="text-lg font-bold">{t("Your application is with the reviewers")}</h2>
@@ -54,7 +54,7 @@ async function Apply() {
     preferred_times: app?.preferred_times ?? "", availability_notes: app?.availability_notes ?? "", photo_path: app?.photo_path ?? null,
   };
   return (
-    <div className="mx-auto max-w-2xl space-y-4">
+    <div className="mx-auto max-w-3xl space-y-4">
       {app?.status === "rejected" && <span className="chip bg-red-50 text-red-700">{t("Needs changes")}</span>}
       <ApplyForm initial={initial} docs={docs ?? []} user={{ name: me.full_name, email: priv?.email ?? "", avatar: me.avatar }} locale={locale}
         schoolId={me.school_id} userId={me.id} feedback={app?.status === "rejected" ? app.review_note : null} />
@@ -70,10 +70,23 @@ async function Apply() {
   );
 }
 
+async function Banner() {
+  const { t } = await getT();
+  return (
+    <section className="relative isolate mx-auto mb-4 max-w-3xl overflow-hidden rounded-3xl bg-[#e9ead6] px-5 py-6 lg:px-8 lg:py-7" data-banner>
+      <div className="pointer-events-none absolute -end-10 -top-16 -z-10 size-56 rounded-full bg-[#dbe5cc]" aria-hidden="true" />
+      <GraduationCap className="pointer-events-none absolute end-6 top-1/2 -z-10 hidden size-24 -translate-y-1/2 text-brand-800/70 sm:block" strokeWidth={1.2} aria-hidden="true" />
+      <Link href="/tutors" className="mb-2 inline-flex items-center gap-1 text-sm font-medium text-brand-800 hover:underline"><ArrowLeft className="size-4 rtl:rotate-180" aria-hidden="true" />{t("Tutors")}</Link>
+      <h1 className="font-heading text-[30px] leading-none font-semibold text-brand-900 lg:text-[40px]" data-banner-title>{t("Tutor Application")}</h1>
+      <p className="mt-2 text-[13px] text-ink-2 lg:text-base">{t("Share your knowledge. Help your peers.")}</p>
+    </section>
+  );
+}
+
 export default function ApplyPage() {
   return (
     <>
-      <PageHeader title="Become a tutor" back="/tutors" />
+      <Suspense fallback={null}><Banner /></Suspense>
       <Suspense fallback={<PageSkeleton />}><Apply /></Suspense>
     </>
   );
