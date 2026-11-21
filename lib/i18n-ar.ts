@@ -1180,4 +1180,8 @@ export const AR: Record<string, string> = {
   "You can leave a review after a session with this tutor is marked as done. Open Requests, then tap “We met — it helped!”.": "يمكنك كتابة تقييم بعد أن تُسجَّل الجلسة مع هذا المدرّس كمنتهية. افتح الطلبات ثم اضغط «التقينا — ساعدني!».",
   "You": "أنت",
   "Edit my profile": "تعديل ملفي",
+  "Shop. Earn. Win.": "تسوّق. اكسب. افز.",
+  "Discover what students are sharing and see the Top 10 prizes.": "اكتشف ما يشاركه الطلاب وشاهد جوائز العشرة الأوائل.",
+  "See the Top 10 Prizes": "شاهد جوائز العشرة الأوائل",
+  "Set the prizes and the ranking rules": "حدّد الجوائز وقواعد الترتيب",
 };

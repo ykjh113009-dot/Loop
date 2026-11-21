@@ -34,7 +34,7 @@ async function login(browser, name, viewport = { width: 1280, height: 850 }) {
   {
     const p = maya.p;
     await go(p, '/points');
-    check('My points shows a level and a balance', (await p.locator('[data-testid=level]').count()) === 1 && /Rewards shop/.test(await text(p)));
+    check('My points shows a level and a balance', (await p.locator('[data-testid=level]').count()) === 1 && /Top 10 prizes/.test(await text(p)));
     await p.selectOption('select[name=reason]', 'help_classmate');
     await p.fill('textarea[name=description]', 'Explained fractions to Sara after school');
     await p.getByRole('button', { name: 'Send request' }).click();
@@ -69,38 +69,15 @@ async function login(browser, name, viewport = { width: 1280, height: 850 }) {
   // shop
   sql(`insert into public.points_ledger (school_id, profile_id, points, reason, source_id) select school_id, id, 200, 'academic', gen_random_uuid() from public.profiles where id='${ID.maya}'`);
   {
+    // Redeeming points is postponed: the shop shows only the Top 10 prizes, and admins only manage those.
     const p = rania.p;
     await go(p, '/admin/rewards');
-    await p.fill('input[name=name]', 'Free lunch voucher');
-    await p.fill('input[name=cost]', '50');
-    await p.fill('input[name=stock]', '3');
-    await p.getByRole('button', { name: 'Add prize' }).click();
-    await waitText(p, /Reward added/);
-    check('An admin can add a school-approved prize', sql(`select count(*) from public.rewards where name='Free lunch voucher'`) === '1');
+    check('Admins only manage the Top 10 prizes for now', (await p.locator('form[data-place="1"]').count()) === 1 && (await p.locator('input[name=cost]').count()) === 0 && (await p.locator('[data-redemption]').count()) === 0);
   }
   {
     const p = maya.p;
     await go(p, '/shop');
-    const balanceBefore = Number(await p.locator('[data-testid=balance]').first().innerText());
-    await p.locator('article', { hasText: 'Free lunch voucher' }).getByRole('button', { name: /50 points/ }).click();
-    await waitText(p, /Done! Check your points/);
-    await p.reload({ waitUntil: 'networkidle' });
-    check('Buying a prize lowers the balance by its cost', Number(await p.locator('[data-testid=balance]').first().innerText()) === balanceBefore - 50);
-    check('The purchase waits for staff', /Waiting for staff/.test(await text(p)));
-    await p.locator('article', { hasText: 'Rose profile colour' }).getByRole('button', { name: /points/ }).click();
-    await waitText(p, /Done! Check your points/);
-    await go(p, '/profile/edit');
-    await p.locator('[role=radio][aria-label=Rose]').click();
-    await p.locator('[data-save-changes]').click();
-    await waitText(p, /Saved!/);
-    check('A colour bought in the shop can be used on the profile', sql(`select accent from public.profiles where id='${ID.maya}'`) === 'rose');
-  }
-  {
-    const p = rania.p;
-    await go(p, '/admin/rewards');
-    await p.locator('[data-redemption]').first().getByRole('button', { name: 'Handed over' }).click();
-    await p.waitForFunction(() => !document.querySelector('[data-redemption]'), null, { timeout: 15000 });
-    check('Staff can hand over a prize', sql(`select count(*) from public.reward_redemptions where status='fulfilled' and cost=50`) === '1');
+    check('The shop shows the Top 10 prizes and nothing to redeem', (await p.locator('[data-testid=top10]').count()) === 1 && (await p.locator('[data-reward]').count()) === 0 && !/Redeem/.test(await text(p)));
   }
 
   // ---------- Houses and leaderboards
