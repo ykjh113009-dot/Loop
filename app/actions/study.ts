@@ -59,13 +59,7 @@ export async function deleteStudyOpportunity(fd: FormData) {
 
 // ---- Top 10 prizes --------------------------------------------------------------------
 export async function setTop10Prize(_: ActionResult, fd: FormData) {
-  return rpc("set_top10_prize", {
-    p_place: Number(s(fd, "place")), p_title: s(fd, "title"), p_description: s(fd, "description"), p_value: s(fd, "value"),
-    p_image: s(fd, "image_path") || null, p_special: fd.get("special") === "on",
-  }, "Saved.");
-}
-export async function clearTop10Image(_: ActionResult, fd: FormData) {
-  return rpc("clear_top10_image", { p_place: Number(s(fd, "place")) });
+  return rpc("set_top10_prize", { p_place: Number(s(fd, "place")), p_title: s(fd, "title"), p_description: s(fd, "description") }, "Saved.");
 }
 export async function setTop10Settings(_: ActionResult, fd: FormData) {
   return rpc("set_top10_settings", { p_period: s(fd, "period"), p_rules: s(fd, "rules") }, "Saved.");

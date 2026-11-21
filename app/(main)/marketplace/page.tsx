@@ -19,20 +19,21 @@ async function Marketplace() {
   const me = await requireMe();
   const { t } = await getT();
   const supabase = await createClient();
-  const [{ data: listings }, { data: prizes }, { data: pts }] = await Promise.all([
+  const [{ data: listings }, { data: rewards }, { data: prizes }, { data: pts }] = await Promise.all([
     supabase.from("listings").select("id, title, kind, price, image_path, seller:profiles!listings_seller_id_fkey(full_name, avatar)").eq("status", "active").order("created_at", { ascending: false }).limit(4),
+    supabase.from("rewards").select("id, name, cost, image_path").eq("active", true).order("cost").limit(3),
     supabase.from("top10_prizes").select("place, title").order("place").limit(3),
     me.isStudent ? supabase.rpc("my_points") : Promise.resolve({ data: null }),
   ]);
-  const images = await signImages(supabase, (listings ?? []).map((l) => l.image_path));
+  const images = await signImages(supabase, [...(listings ?? []).map((l) => l.image_path), ...(rewards ?? []).map((r) => r.image_path)]);
   const balance = pts ? Number((pts as unknown as { balance: number }).balance) : null;
   const price = (l: { kind: string; price: number | null }) => (l.kind === "sell" ? (l.price !== null ? `₪${Number(l.price)}` : t("Ask")) : l.kind === "swap" ? t("Swap") : t("Free"));
 
   return (
     <div className="space-y-5" data-category-page="marketplace">
-      <PageBanner title={t("Marketplace")} subtitle={t("Shop. Earn. Win.")} note={t("Discover what students are sharing and see the Top 10 prizes.")} scene="gift" />
+      <PageBanner title={t("Marketplace")} subtitle={t("Shop. Earn. Redeem.")} note={t("Discover what students are sharing and explore Loop rewards.")} scene="gift" />
       <SectionTabs label={t("Marketplace")} current="" items={[
-        { href: "/market", label: t("Student Marketplace"), icon: "store" }, { href: "/shop", label: t("Reward Shop"), icon: "gift" }, { href: "/shop?view=top10", label: t("Top 10 Prizes"), icon: "crown" },
+        { href: "/market", label: t("Student Marketplace"), icon: "store" }, { href: "/shop", label: t("Rewards Shop"), icon: "gift" }, { href: "/shop?tab=top10", label: t("Top 10 Prizes"), icon: "crown" },
       ]} />
 
       <DashCard title={t("Featured listings")} href="/market" linkLabel={t("See all")}>
@@ -69,12 +70,12 @@ async function Marketplace() {
           <div className="relative z-10 max-w-full space-y-2">
             <h2 className="flex items-center gap-1.5 text-[15px] font-semibold"><Star className="size-4 text-brand-700" strokeWidth={1.8} aria-hidden="true" />{t("Your Points")}</h2>
             {balance !== null ? <p className="font-heading text-3xl font-semibold tabular-nums" data-testid="mk-balance">{balance.toLocaleString("en")} <span className="text-base font-medium text-ink-2">{t("pts")}</span></p> : <p className="text-sm text-ink-2">{t("Points are for current students.")}</p>}
-            <p className="text-xs text-ink-2"><span className="chip bg-brand-50 text-brand-800">{t("Coming soon")}</span> {t("Reward Shop")}</p>
-            <Link href="/shop" className="btn-primary inline-flex items-center gap-1.5 px-4 py-2 text-sm">{t("Visit Reward Shop")} <ArrowRight className="size-4 rtl:rotate-180" aria-hidden="true" /></Link>
+            {(rewards ?? []).length > 0 && <p className="text-xs text-ink-2">{t("Rewards from {n} points", { n: Number(rewards![0].cost) })}</p>}
+            <Link href="/shop" className="btn-primary inline-flex items-center gap-1.5 px-4 py-2 text-sm">{t("Visit Rewards Shop")} <ArrowRight className="size-4 rtl:rotate-180" aria-hidden="true" /></Link>
           </div>
         </section>
 
-        <DashCard title={t("Top 10 Prizes")} href="/shop?view=top10" linkLabel={t("View Winners")}>
+        <DashCard title={t("Top 10 Prizes")} href="/shop?tab=top10" linkLabel={t("View Winners")}>
           {(prizes ?? []).length === 0 ? (
             <EmptyState compact scene="gift" title={t("Prizes will appear here")} action={me.isAdmin ? { href: "/admin/rewards", label: t("Set the prizes") } : undefined}>
               {t("The top students each period win prizes chosen by your school.")}
@@ -88,6 +89,23 @@ async function Marketplace() {
           )}
         </DashCard>
       </div>
+
+      {(rewards ?? []).length > 0 && (
+        <DashCard title={t("Rewards to redeem")} href="/shop" linkLabel={t("See all")}>
+          <ul className="grid grid-cols-1 gap-3 sm:grid-cols-3" data-card="rewards">
+            {(rewards ?? []).map((r) => {
+              const img = r.image_path ? images.get(r.image_path) : null;
+              return (
+                <li key={r.id}><Link href="/shop" className="flex items-center gap-3 rounded-xl border border-brand-700/10 bg-white p-2.5 hover:border-brand-700/25">
+                  <span className="flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-sage-soft/50 text-2xl">{img
+                    // eslint-disable-next-line @next/next/no-img-element -- private signed link
+                    ? <img src={img} alt="" className="size-full object-cover" /> : <Glyph e="🎁" />}</span>
+                  <span className="min-w-0"><span className="block truncate text-sm font-semibold">{r.name}</span><span className="text-xs text-ink-2">{Number(r.cost).toLocaleString("en")} {t("points")}</span></span></Link></li>
+              );
+            })}
+          </ul>
+        </DashCard>
+      )}
     </div>
   );
 }

@@ -80,31 +80,8 @@ export async function saveReward(_: ActionResult, fd: FormData): Promise<ActionR
   return insert("rewards", {
     school_id: me.school_id, name: s(fd, "name"), description: s(fd, "description"), cost: Math.round(n(fd, "cost")),
     kind: "prize", stock: stock === "" ? null : Math.round(Number(stock)), per_student_limit: Math.round(n(fd, "limit")) || 1,
-    created_by: me.id, image_path: s(fd, "image_path") || null, category: s(fd, "category") || "other",
+    created_by: me.id, image_path: s(fd, "image_path") || null,
   }, "Reward added.");
-}
-// Edit a reward: name, details, price, how many are left, which category, and (optionally) a new picture.
-export async function updateReward(_: ActionResult, fd: FormData): Promise<ActionResult> {
-  await requireMe();
-  const supabase = await createClient();
-  const stock = s(fd, "stock");
-  const row: Record<string, unknown> = {
-    name: s(fd, "name"), description: s(fd, "description"), cost: Math.round(n(fd, "cost")),
-    stock: stock === "" ? null : Math.round(Number(stock)), per_student_limit: Math.round(n(fd, "limit")) || 1, category: s(fd, "category") || "other",
-  };
-  if (s(fd, "image_path")) row.image_path = s(fd, "image_path");
-  const { error } = await supabase.from("rewards").update(row as never).eq("id", s(fd, "rewardId"));
-  if (error) return { error: error.code === "23514" ? "Please check what you typed." : friendlyError(error) };
-  refresh();
-  return { ok: true, message: "Saved." };
-}
-export async function removeRewardImage(_: ActionResult, fd: FormData): Promise<ActionResult> {
-  await requireMe();
-  const supabase = await createClient();
-  const { error } = await supabase.from("rewards").update({ image_path: null }).eq("id", s(fd, "rewardId"));
-  if (error) return { error: friendlyError(error) };
-  refresh();
-  return { ok: true };
 }
 export async function setRewardActive(_: ActionResult, fd: FormData): Promise<ActionResult> {
   await requireMe();
