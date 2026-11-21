@@ -30,6 +30,7 @@ export async function PollCard({ poll, canVote, canDelete }: { poll: Poll; canVo
         </p>
         <h2 className="text-[17px] font-semibold">{poll.question}</h2>
       </div>
+      {open && canVote && r.mine === null && <VoteForm pollId={poll.id} options={poll.options} />}
       {r.show && r.counts ? (
         <ul className="space-y-2">
           {poll.options.map((option, i) => {
@@ -48,11 +49,9 @@ export async function PollCard({ poll, canVote, canDelete }: { poll: Poll; canVo
             );
           })}
         </ul>
-      ) : open && canVote ? (
-        <VoteForm pollId={poll.id} options={poll.options} />
-      ) : (
+      ) : !(open && canVote) ? (
         <p className="text-sm text-black/50">Results appear when the poll closes.</p>
-      )}
+      ) : null}
       <div className="flex items-center justify-between text-xs text-black/45">
         <span>{r.total} {r.total === 1 ? "vote" : "votes"} · votes are private</span>
         {canDelete && (
