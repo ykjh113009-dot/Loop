@@ -1,3 +1,4 @@
+// POSTPONED: the Reward Shop where students spend points. Not routed. See ../README.md.
 "use client";
 
 import { useActionState } from "react";

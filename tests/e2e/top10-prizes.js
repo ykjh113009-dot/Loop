@@ -1,0 +1,58 @@
+const { chromium } = require('playwright');
+const { execSync } = require('child_process');
+const BASE = process.env.BASE || 'http://localhost:3000';
+const DB = process.env.DB_URL || 'postgresql://postgres:postgres@127.0.0.1:54322/postgres';
+const q = (sql) => execSync(`psql "${DB}" -qtA -F '|' -c "${sql.replace(/"/g, '\\"')}"`).toString().trim();
+const check = (name, ok, info = '') => console.log((ok ? 'PASS' : 'FAIL') + '  ' + name + (info ? '  — ' + info : ''));
+const login = async (b, email, vp = { width: 1280, height: 900 }, mobile = false) => {
+  const ctx = await b.newContext({ viewport: vp, isMobile: mobile, hasTouch: mobile });
+  const p = await ctx.newPage();
+  await p.goto(BASE + '/login', { waitUntil: 'networkidle' });
+  await p.locator('form', { has: p.locator(`input[value="${email}"]`) }).locator('button').click();
+  await p.waitForURL('**/home');
+  return { ctx, p };
+};
+const text = (p) => p.innerText('body');
+
+(async () => {
+  const b = await chromium.launch();
+  const maya = await login(b, 'demo.maya@pioneers.edu.ps');
+  let p = maya.p;
+  await p.goto(BASE + '/shop', { waitUntil: 'networkidle' });
+  check('The Reward Shop page shows Coming soon for redeeming', (await p.locator('[data-coming-soon]').count()) === 1 && /Coming soon/.test(await text(p)) && (await p.locator('[data-reward]').count()) === 0);
+  check('The Top 10 banner shows the competition, title and trophy text', (await p.locator('[data-top10-banner]').count()) === 1 && /Monthly competition/.test(await p.locator('[data-top10-banner]').innerText()) && /Reach the top 10 and win exclusive rewards/.test(await text(p)));
+  check('The countdown is shown for the monthly competition', (await p.locator('[data-countdown]').count()) === 1 && /Ends in/.test(await p.locator('[data-countdown]').innerText()));
+  const slots = await p.locator('[data-prize-slot]').evaluateAll((els) => els.map((e) => e.querySelector('p span')?.textContent));
+  check('The ten starting prizes are in place', slots[0] === 'MacBook Air' && slots[1] === 'AirPods Pro' && slots[2] === '$100 Gift Card' && slots[3] === 'iPad' && slots[8] === 'SAT Refund' && slots[9] === 'Four Cinema Tickets' && slots.length === 10, slots.join(' / '));
+  check('The SAT refund is highlighted as an education reward', (await p.locator('[data-prize-slot="9"][data-special]').count()) === 1 && /Education reward/.test(await p.locator('[data-prize-slot="9"]').innerText()));
+  const holders = await p.locator('[data-prize-slot]').evaluateAll((els) => els.filter((e) => /LP/.test(e.textContent)).length);
+  check('The students holding the top places are shown with their points', holders >= 3, String(holders));
+  check('Your own place is shown', (await p.locator('[data-my-place]').count()) === 1);
+  check('Students see no admin controls here', (await p.locator('a[href="/admin/rewards#top10"]').count()) === 0);
+  await p.goto(BASE + '/admin/rewards', { waitUntil: 'networkidle' });
+  check('Students cannot use the admin prize page', /Only admins/.test(await text(p)) || (await p.locator('form[data-place]').count()) === 0);
+
+  const rania = await login(b, 'demo.rania@pioneers.edu.ps');
+  p = rania.p;
+  await p.goto(BASE + '/shop?view=top10', { waitUntil: 'networkidle' });
+  check('Admins get a link to set the prizes', (await p.locator('a[href="/admin/rewards#top10"]').count()) === 1);
+  await p.goto(BASE + '/admin/rewards', { waitUntil: 'networkidle' });
+  check('The admin page manages the ten prizes and the competition', (await p.locator('[data-place-row]').count()) === 10 && (await p.locator('select[name=period]').count()) === 1 && (await p.locator('input[name=cost]').count()) === 0);
+  const slot3 = p.locator('form[data-place="3"]');
+  await slot3.locator('input[name=value]').fill('$100');
+  await slot3.getByRole('button', { name: 'Save' }).click();
+  await p.waitForFunction(() => /Saved/.test(document.body.innerText), null, { timeout: 15000 });
+  check('An admin can set a prize value', q(`select value from public.top10_prizes where place=3`) === '$100');
+  await p.locator('select[name=period]').selectOption('week');
+  await p.getByRole('button', { name: 'Save rules' }).click();
+  await p.waitForFunction(() => /Saved/.test(document.body.innerText), null, { timeout: 15000 });
+  check('The competition period can be changed', q(`select period from public.top10_settings`) === 'week');
+  await maya.p.goto(BASE + '/shop?view=top10', { waitUntil: 'networkidle' });
+  check('The banner follows the period and shows the value', /Weekly competition/.test(await maya.p.locator('[data-top10-banner]').innerText()) && /\$100/.test(await maya.p.locator('[data-prize-slot="3"]').innerText()));
+  q(`update public.top10_settings set period='month'`);
+
+  const mobile = await login(b, 'demo.maya@pioneers.edu.ps', { width: 390, height: 844 }, true);
+  await mobile.p.goto(BASE + '/shop?view=top10', { waitUntil: 'networkidle' });
+  check('No sideways scrolling on a phone', await mobile.p.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1));
+  await b.close();
+})().catch((e) => { console.error('ERROR', e); process.exit(1); });

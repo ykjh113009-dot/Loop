@@ -53,7 +53,7 @@ export const CATEGORIES: NavCategory[] = [
     key: "marketplace", href: "/marketplace", label: "Marketplace", icon: "store",
     children: [
       { href: "/market", label: "Student Marketplace", icon: "store" },
-      { href: "/shop", label: "Reward Shop", icon: "gift" },
+      { href: "/shop", label: "Reward Shop", icon: "gift", soon: true },
       { href: "/shop?view=top10", label: "Top 10 Prizes", icon: "crown" },
     ],
   },

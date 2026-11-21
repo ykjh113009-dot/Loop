@@ -162,7 +162,7 @@ async function login(browser, name, viewport = { width: 1280, height: 850 }) {
     check('An approved tutor cannot open the application again', (await go(p, '/tutors/apply'), p.url().endsWith('/tutors/me')));
   }
 
-  // 5. Reward Shop and Top 10 prizes
+  // 5. Reward Shop (coming soon) with the Top 10 prizes beside it
   {
     const p = rania.p;
     await go(p, '/admin/rewards');
@@ -171,10 +171,10 @@ async function login(browser, name, viewport = { width: 1280, height: 850 }) {
     await waitText(p, /Saved/);
     const q = maya.p;
     await go(q, '/shop');
-    check('The shop shows the balance, the reward area and the Top 10 beside it', (await q.locator('[data-testid=balance]').count()) >= 1 && (await q.locator('[data-section=top10]').count()) === 1 && /Pizza party/.test(await text(q)));
+    check('The Reward Shop part is coming soon', (await q.locator('[data-coming-soon]').count()) === 1 && /Coming soon/.test(await text(q)) && (await q.locator('[data-reward]').count()) === 0);
+    check('The Top 10 prizes are on the Reward Shop page', (await q.locator('[data-section=top10]').count()) === 1 && /Pizza party/.test(await text(q)));
     check('The Top 10 has ten prize slots and the countdown', (await q.locator('[data-prize-slot]').count()) === 10 && (await q.locator('[data-countdown]').count()) === 1);
-    check('The old Top 10 link still opens the shop page', (await go(q, '/shop?view=top10'), (await q.locator('[data-section=top10]').count()) === 1));
-    check('The sidebar has Reward Shop and Top 10 Prizes', (await q.locator('[data-sidebar-root] [data-nav-tree] a', { hasText: /^\s*(Reward Shop|Top 10 Prizes)\s*$/ }).count()) === 2);
+    check('The Top 10 view link opens the same page', (await go(q, '/shop?view=top10'), (await q.locator('[data-section=top10]').count()) === 1 && q.url().includes('/shop')));
   }
 
   // 6. Phones

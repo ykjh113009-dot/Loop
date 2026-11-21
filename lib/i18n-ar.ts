@@ -1231,4 +1231,5 @@ export const AR: Record<string, string> = {
   "Reward Shop and Top 10": "متجر المكافآت والعشرة الأوائل",
   "Hand over prizes, add rewards and set the Top 10": "سلّم الجوائز وأضف مكافآت وحدّد العشرة الأوائل",
   "Visit Reward Shop": "زر متجر المكافآت",
+  "The Top 10 Prizes are already live. Earn points to climb the leaderboard and win one.": "جوائز العشرة الأوائل متاحة الآن. اكسب نقاطًا لتصعد في الترتيب وتفوز بواحدة.",
 };
