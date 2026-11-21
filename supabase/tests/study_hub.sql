@@ -233,6 +233,8 @@ select tests.login(:rania);
 select public.set_top10_prize(1, 'Pizza party for you and 3 friends', 'Held at the end of the month');
 select public.set_top10_prize(2, 'Cinema tickets', '');
 select tests.refused($$select public.set_top10_prize(11, 'x', '')$$, 'place', 'places run from 1 to 10');
+select public.set_top10_settings('month', 'x');
+select tests.refused($$select public.set_top10_prize(3, 'Pic', '', '', 'x/y/z.jpg')$$, 'not yours', 'a prize image must be your own upload');
 select public.set_top10_settings('all', 'Be in the top 10 students by points to win.');
 select public.set_top10_prize(2, '', '');
 select tests.refused($$insert into public.rewards (school_id, name, cost, kind, image_path, created_by) values (public.my_school_id(), 'Mug', 50, 'prize', 'x/y/z.jpg', auth.uid())$$, 'not yours', 'a reward image must be your own upload');
@@ -240,12 +242,14 @@ insert into public.rewards (school_id, name, cost, kind, image_path, created_by)
 values (public.my_school_id(), 'School mug', 50, 'prize', public.my_school_id()::text || '/' || :rania || '/mug.jpg', auth.uid());
 reset role;
 select tests.login(:ahmad);
-select tests.ok((select count(*) from public.top10_prizes) = 1 and (select period from public.top10_settings) = 'all', 'students can read the Top 10 prizes and rules');
+select tests.ok((select count(*) from public.top10_prizes) = 9 and (select period from public.top10_settings) = 'all', 'students can read the Top 10 prizes (ten start in place) and rules');
+select tests.ok((select title from public.top10_prizes where place = 9) = 'SAT Refund' and (select special from public.top10_prizes where place = 9), 'the SAT refund starts as the special prize');
+select tests.ok(public.top10_period_end('month') > now() and public.top10_period_end('all') is null, 'the monthly competition has an end');
 select tests.ok(exists (select 1 from public.rewards where name = 'School mug' and image_path is not null), 'rewards can have an image');
 select tests.ok((select count(*) from public.individual_leaderboard('all', null, 10)) <= 10, 'the Top 10 uses the existing ranking');
 reset role;
 select tests.login('eeeeeeee-0000-0000-0000-0000000000b1');
-select tests.ok((select count(*) from public.top10_prizes) = 0, 'another school sees no Top 10 prizes');
+select tests.ok((select count(*) from public.top10_prizes where school_id <> public.my_school_id()) = 0, 'another school sees no Top 10 prizes of ours');
 reset role;
 
 rollback;

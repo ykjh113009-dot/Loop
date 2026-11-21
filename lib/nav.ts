@@ -53,8 +53,8 @@ export const CATEGORIES: NavCategory[] = [
     key: "marketplace", href: "/marketplace", label: "Marketplace", icon: "store",
     children: [
       { href: "/market", label: "Student Marketplace", icon: "store" },
-      { href: "/redeem", label: "Redeem Rewards", icon: "gift", soon: true },
-      { href: "/shop", label: "Top 10 Prizes", icon: "crown" },
+      { href: "/shop", label: "Reward Shop", icon: "gift" },
+      { href: "/shop?view=top10", label: "Top 10 Prizes", icon: "crown" },
     ],
   },
 ];
@@ -67,6 +67,8 @@ export const counselorLink = (user: { isStudent: boolean; isCounselor: boolean }
 export function pageActive(pathname: string, search: string, item: NavItem) {
   const [path, query] = item.href.split("?");
   if (query) return pathname === path && search.includes(query);
+  // Reward Shop is active on /shop unless the Top 10 view is open.
+  if (path === "/shop") return pathname === "/shop" && !search.includes("view=top10");
   return [path, ...(item.also ?? [])].some((h) => pathname === h || pathname.startsWith(h + "/"));
 }
 export function categoryActive(pathname: string, search: string, cat: NavCategory) {

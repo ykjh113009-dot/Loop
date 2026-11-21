@@ -2731,14 +2731,14 @@ isOneToOne: false
                   ]
                 },"rewards": {
                   Row: {
-                    "active": boolean,"cost": number,"created_at": string,"created_by": string | null,"description": string,"id": string,"image_path": string | null,"kind": string,"name": string,"per_student_limit": number,"school_id": string,"stock": number | null,"unlock_key": string | null
+                    "active": boolean,"category": string,"cost": number,"created_at": string,"created_by": string | null,"description": string,"id": string,"image_path": string | null,"kind": string,"name": string,"per_student_limit": number,"school_id": string,"stock": number | null,"unlock_key": string | null
                   }
                   ComputedFields: never
                   Insert: {
-                    "active"?: boolean,"cost": number,"created_at"?: string,"created_by"?: string | null,"description"?: string,"id"?: string,"image_path"?: string | null,"kind": string,"name": string,"per_student_limit"?: number,"school_id": string,"stock"?: number | null,"unlock_key"?: string | null
+                    "active"?: boolean,"category"?: string,"cost": number,"created_at"?: string,"created_by"?: string | null,"description"?: string,"id"?: string,"image_path"?: string | null,"kind": string,"name": string,"per_student_limit"?: number,"school_id": string,"stock"?: number | null,"unlock_key"?: string | null
                   }
                   Update: {
-                    "active"?: boolean,"cost"?: number,"created_at"?: string,"created_by"?: string | null,"description"?: string,"id"?: string,"image_path"?: string | null,"kind"?: string,"name"?: string,"per_student_limit"?: number,"school_id"?: string,"stock"?: number | null,"unlock_key"?: string | null
+                    "active"?: boolean,"category"?: string,"cost"?: number,"created_at"?: string,"created_by"?: string | null,"description"?: string,"id"?: string,"image_path"?: string | null,"kind"?: string,"name"?: string,"per_student_limit"?: number,"school_id"?: string,"stock"?: number | null,"unlock_key"?: string | null
                   }
                   Relationships: [
                     {
@@ -3127,14 +3127,14 @@ isOneToOne: false
                   ]
                 },"top10_prizes": {
                   Row: {
-                    "description": string,"place": number,"school_id": string,"title": string
+                    "description": string,"image_path": string | null,"place": number,"school_id": string,"special": boolean,"title": string,"value": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "description"?: string,"place": number,"school_id": string,"title": string
+                    "description"?: string,"image_path"?: string | null,"place": number,"school_id": string,"special"?: boolean,"title": string,"value"?: string
                   }
                   Update: {
-                    "description"?: string,"place"?: number,"school_id"?: string,"title"?: string
+                    "description"?: string,"image_path"?: string | null,"place"?: number,"school_id"?: string,"special"?: boolean,"title"?: string,"value"?: string
                   }
                   Relationships: [
                     {
@@ -3654,6 +3654,9 @@ isOneToOne: false
 "class_summary":
 { Args: { "p_class": string }; Returns: Json
                            },
+"clear_top10_image":
+{ Args: { "p_place": number }; Returns: undefined
+                           },
 "club_analytics":
 { Args: { "p_club": string }; Returns: Json
                            },
@@ -3941,6 +3944,9 @@ isOneToOne: false
 "moderate_report":
 { Args: { "p_action": string,"p_note": string,"p_report": string }; Returns: undefined
                            },
+"month_start":
+{ Args: Record<PropertyKey, never>; Returns: string
+                           },
 "my_achievements":
 { Args: Record<PropertyKey, never>; Returns: {
               "category": string,"code": string,"description": string,"earned_at": string,"emoji": string,"name": string,"pinned": boolean,"points_reward": number,"progress": number,"threshold": number,"tier": string,"unlocked": boolean
@@ -4198,7 +4204,7 @@ isOneToOne: false
 { Args: { "p_status": string,"p_task": string }; Returns: undefined
                            },
 "set_top10_prize":
-{ Args: { "p_description": string,"p_place": number,"p_title": string }; Returns: undefined
+{ Args: { "p_description": string,"p_image"?: string,"p_place": number,"p_special"?: boolean,"p_title": string,"p_value"?: string }; Returns: undefined
                            },
 "set_top10_settings":
 { Args: { "p_period": string,"p_rules": string }; Returns: undefined
@@ -4237,6 +4243,9 @@ isOneToOne: false
 { Args: Record<PropertyKey, never>; Returns: {
               "entries_24h": number,"full_name": string,"points_24h": number,"profile_id": string,"reasons": string
             }[]
+                           },
+"top10_period_end":
+{ Args: { "p_period": string }; Returns: string
                            },
 "trending_tags":
 { Args: { "p_limit"?: number }; Returns: {

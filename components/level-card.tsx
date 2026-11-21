@@ -16,7 +16,7 @@ export function LevelCard({ p, week, t }: { p: MyPoints; week: number; t: (s: st
             {p.level_name && <p className="text-sm font-semibold text-white/90" data-testid="level-name">{t(p.level_name)}</p>}
           </div>
           <div className="text-end">
-            <p className="text-xs text-white/75">{t("Points")}</p>
+            <p className="text-xs text-white/75">{t("To spend")}</p>
             <p className="text-2xl font-bold tabular-nums" data-testid="balance">{p.balance}</p>
           </div>
         </div>
@@ -29,7 +29,7 @@ export function LevelCard({ p, week, t }: { p: MyPoints; week: number; t: (s: st
       </div>
       <div className="flex items-center justify-between gap-3 px-4 py-3 text-sm">
         <span>{t("This week")}: <strong className="tabular-nums">{week}</strong></span>
-        <Link href="/shop" className="btn-secondary px-3 py-1.5">{t("Top 10 prizes")}</Link>
+        <Link href="/shop" className="btn-secondary px-3 py-1.5">{t("Reward Shop")}</Link>
       </div>
     </div>
   );

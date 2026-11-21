@@ -31,13 +31,13 @@ async function login(browser, name, viewport = { width: 1280, height: 850 }) {
   // 1. The sidebar (the full tree is covered by nav.js; here: the Study Hub destinations)
   {
     const p = maya.p;
-    for (const [h, re] of [['/academic-resources', /Academic Library/], ['/tutors', /Tutors Directory/], ['/shop', /Top 10 Prizes/]]) {
+    for (const [h, re] of [['/academic-resources', /Academic Library/], ['/tutors', /Tutors Directory/], ['/shop', /Reward Shop/]]) {
       await go(p, h);
       const active = await p.locator(`[data-sidebar-root] a[href="${h}"]`).first().getAttribute('aria-current');
       check(`${h} opens its own page and is highlighted`, active === 'page' && re.test(await text(p)));
     }
     await go(p, '/shop');
-    check('Top 10 Prizes is not also highlighting Activities', (await p.locator('[data-sidebar-root] a[href="/challenges"]').count()) === 0 || (await p.locator('[data-sidebar-root] a[href="/challenges"]').first().getAttribute('aria-current')) === null);
+    check('Reward Shop is not also highlighting Activities', (await p.locator('[data-sidebar-root] a[href="/challenges"]').count()) === 0 || (await p.locator('[data-sidebar-root] a[href="/challenges"]').first().getAttribute('aria-current')) === null);
   }
 
   // 2. Academic resources
@@ -162,7 +162,7 @@ async function login(browser, name, viewport = { width: 1280, height: 850 }) {
     check('An approved tutor cannot open the application again', (await go(p, '/tutors/apply'), p.url().endsWith('/tutors/me')));
   }
 
-  // 5. Top 10 prizes (redeeming points is postponed)
+  // 5. Reward Shop and Top 10 prizes
   {
     const p = rania.p;
     await go(p, '/admin/rewards');
@@ -171,10 +171,10 @@ async function login(browser, name, viewport = { width: 1280, height: 850 }) {
     await waitText(p, /Saved/);
     const q = maya.p;
     await go(q, '/shop');
-    check('The shop page is the Top 10 prizes', /Top 10 student prizes/.test(await text(q)) && /Pizza party/.test(await text(q)) && /Ranking period/.test(await text(q)));
-    check('There is nothing to redeem', (await q.locator('[data-reward]').count()) === 0 && (await q.locator('[data-testid=balance]').count()) === 0 && !/Redeem for/.test(await q.locator('main').innerText()));
-    check('The old Top 10 link still works', (await go(q, '/shop?tab=top10'), /Top 10 student prizes/.test(await text(q))));
-    check('The sidebar has one Top 10 Prizes item', (await q.locator('[data-sidebar-root] [data-nav-tree] a', { hasText: /top 10 prizes/i }).count()) === 1);
+    check('The shop shows the balance, the reward area and the Top 10 beside it', (await q.locator('[data-testid=balance]').count()) >= 1 && (await q.locator('[data-section=top10]').count()) === 1 && /Pizza party/.test(await text(q)));
+    check('The Top 10 has ten prize slots and the countdown', (await q.locator('[data-prize-slot]').count()) === 10 && (await q.locator('[data-countdown]').count()) === 1);
+    check('The old Top 10 link still opens the shop page', (await go(q, '/shop?view=top10'), (await q.locator('[data-section=top10]').count()) === 1));
+    check('The sidebar has Reward Shop and Top 10 Prizes', (await q.locator('[data-sidebar-root] [data-nav-tree] a', { hasText: /^\s*(Reward Shop|Top 10 Prizes)\s*$/ }).count()) === 2);
   }
 
   // 6. Phones

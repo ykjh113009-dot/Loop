@@ -37,7 +37,7 @@ async function Dashboard() {
   const clubs = list.filter((r) => r.kind === "club_leader" && r.club);
   const staff = has("school_staff");
 
-  const [classData, clubData, claims, achievements, suggestions] = await Promise.all([
+  const [classData, clubData, claims, redemptions, achievements, suggestions] = await Promise.all([
     Promise.all(classes.map(async (r) => {
       const [{ data: summary }, { data: posts }] = await Promise.all([
         supabase.rpc("class_summary", { p_class: r.scope }),
@@ -53,6 +53,7 @@ async function Dashboard() {
       return { r, apps: apps ?? 0, members: members ?? 0 };
     })),
     staff ? supabase.from("point_claims").select("id", { count: "exact", head: true }).eq("status", "pending") : Promise.resolve({ count: 0 }),
+    staff ? supabase.from("reward_redemptions").select("id", { count: "exact", head: true }).eq("status", "pending") : Promise.resolve({ count: 0 }),
     staff ? supabase.from("club_achievements").select("id", { count: "exact", head: true }).eq("status", "pending") : Promise.resolve({ count: 0 }),
     has("council_member") ? supabase.from("suggestions").select("id", { count: "exact", head: true }).eq("status", "new") : Promise.resolve({ count: 0 }),
   ]);
@@ -120,7 +121,7 @@ async function Dashboard() {
         <section className="space-y-2" data-tools="school_staff">
           <h2 className="section-title">{t("School administration")}</h2>
           <Tool href="/admin/points" icon="⭐" title={t("Points requests and rules")} text={t("Check what students ask for and club achievements")} count={(claims.count ?? 0) + (achievements.count ?? 0)} />
-          <Tool href="/admin/rewards" icon="🏆" title={t("Top 10 Prizes")} text={t("Set the prizes and the ranking rules")} />
+          <Tool href="/admin/rewards" icon="🎁" title={t("Reward Shop and Top 10")} text={t("Hand over prizes, add rewards and set the Top 10")} count={redemptions.count ?? 0} />
           <Tool href="/admin/houses" icon="🏠" title={t("Houses and competitions")} text={t("Create competitions and give points to teams and houses")} />
           <Tool href="/groups/new" icon="📣" title={t("Make an official group")} text={t("For classes, activities and announcements")} />
           {me.isAdmin && <Tool href="/admin" icon="⚙️" title={t("Admin dashboard")} text={t("Accounts, moderation and settings")} />}
