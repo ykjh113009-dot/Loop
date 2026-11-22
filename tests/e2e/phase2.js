@@ -186,7 +186,7 @@ const waitText = (p, re, t = 15000) => p.waitForFunction((s) => new RegExp(s).te
     await p.fill('input[aria-label=Message]', 'Welcome everyone');
     await p.getByRole('button', { name: 'Send', exact: true }).click();
     await waitText(p, /Welcome everyone/);
-    await p.setInputFiles('input[type=file]', '/tmp/cover.png');
+    await p.setInputFiles('input[type=file]:not([data-group-photo-input])', '/tmp/cover.png');
     await p.locator('img[alt=Attachment]').waitFor({ timeout: 20000 });
     check('A photo can be sent in a chat', sql(`select count(*) from public.messages where attachment_kind='image'`) === '1');
   }
