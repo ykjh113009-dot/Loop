@@ -3,9 +3,20 @@
 -- mistake cannot expose data to signed-out visitors.
 revoke all on all tables in schema public from anon;
 revoke all on all sequences in schema public from anon;
+-- Functions: take them away from signed-out visitors and from PUBLIC, then give signed-in people back exactly what they
+-- could already run (nothing new is opened up).
+create temporary table _authed_fns as
+  select p.oid::regprocedure as fn from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+  where n.nspname = 'public' and p.prokind in ('f', 'p') and has_function_privilege('authenticated', p.oid, 'execute');
 revoke execute on all functions in schema public from anon, public;
--- Signed-in people (and the storage policies that run as them) keep calling the helper functions.
-grant execute on all functions in schema public to authenticated;
+do $$
+declare r record;
+begin
+  for r in select fn from _authed_fns loop
+    execute format('grant execute on function %s to authenticated', r.fn);
+  end loop;
+end $$;
+drop table _authed_fns;
 
 alter default privileges in schema public revoke all on tables from anon;
 alter default privileges in schema public revoke all on sequences from anon;

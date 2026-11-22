@@ -58,7 +58,7 @@ export function EventRow({ event, rsvp, canRsvp, locale }: { event: EventWithTex
           <span className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-sm text-ink-2">
             <span className="inline-flex items-center gap-1.5"><Clock className="size-4" aria-hidden="true" />{formatTime(event.starts_at)}</span>
             {event.location && <span className="inline-flex items-center gap-1.5"><MapPin className="size-4" aria-hidden="true" />{event.location}</span>}
-            {event.club && <span className="inline-flex items-center gap-1.5"><Users className="size-4" aria-hidden="true" />{event.club.name}</span>}
+            {event.club && <span className="inline-flex items-center gap-1.5"><ClubMark club={event.club} className="size-5" />{event.club.name}</span>}
           </span>
         </span>
         <span className="shrink-0 text-end text-xs">
