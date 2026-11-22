@@ -73,8 +73,8 @@ async function Apply() {
 async function Banner() {
   const { t } = await getT();
   return (
-    <section className="relative isolate mx-auto mb-4 max-w-3xl overflow-hidden rounded-3xl bg-[#e9ead6] px-5 py-6 lg:px-8 lg:py-7" data-banner>
-      <div className="pointer-events-none absolute -end-10 -top-16 -z-10 size-56 rounded-full bg-[#dbe5cc]" aria-hidden="true" />
+    <section className="relative isolate mx-auto mb-4 max-w-3xl overflow-hidden rounded-3xl bg-[#e8efe6] px-5 py-6 lg:px-8 lg:py-7" data-banner>
+      <div className="pointer-events-none absolute -end-10 -top-16 -z-10 size-56 rounded-full bg-[#d7e6d9]" aria-hidden="true" />
       <GraduationCap className="pointer-events-none absolute end-6 top-1/2 -z-10 hidden size-24 -translate-y-1/2 text-brand-800/70 sm:block" strokeWidth={1.2} aria-hidden="true" />
       <Link href="/tutors" className="mb-2 inline-flex items-center gap-1 text-sm font-medium text-brand-800 hover:underline"><ArrowLeft className="size-4 rtl:rotate-180" aria-hidden="true" />{t("Tutors")}</Link>
       <h1 className="font-heading text-[30px] leading-none font-semibold text-brand-900 lg:text-[40px]" data-banner-title>{t("Tutor Application")}</h1>

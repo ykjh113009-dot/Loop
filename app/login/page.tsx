@@ -43,7 +43,7 @@ export default function LoginPage(props: PageProps<"/login">) {
       <div className="lp-main">
         <div className="lp-brand">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/brand/loop-wordmark.png" alt="Loop" width={574} height={240} className="lp-wordmark" />
+          <img src="/brand/loop-wordmark.png" alt="Loop" width={1148} height={520} className="lp-wordmark" />
         </div>
 
         <div className="lp-center">

@@ -10,13 +10,10 @@ export async function HomeHero() {
   const part = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
   const first = me.full_name.split(" ")[0];
   return (
-    <section className="overflow-hidden rounded-3xl" data-banner data-home-hero>
+    <section className="overflow-hidden" data-banner data-home-hero>
       <h1 className="sr-only" data-banner-title>{t(part)}{locale === "ar" ? "،" : ","} {first}! {t("Keep learning, keep growing")}</h1>
-      {/* A slim version for computers and tablets, the full picture on phones. */}
-      <picture>
-        <source media="(min-width: 640px)" srcSet="/brand/home-banner-wide.webp" />
-        <img src="/brand/home-banner.webp" alt="" width={2000} height={750} className="block h-auto w-full" data-home-art fetchPriority="high" />
-      </picture>
+      {/* eslint-disable-next-line @next/next/no-img-element -- a fixed, local illustration */}
+      <img src="/banners/dashboard.webp" alt="" width={1123} height={277} className="block h-auto w-full select-none" data-home-art fetchPriority="high" draggable={false} />
     </section>
   );
 }

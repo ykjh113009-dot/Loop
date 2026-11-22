@@ -14,7 +14,7 @@ export function ResourceTile({ r, cover, saved, t }: { r: LibraryResource; cover
   const by = r.source === "official" ? (r.author || "Loop") : (r.submitter?.full_name ?? r.author ?? "Loop");
   return (
     <article className="relative flex flex-col gap-2 rounded-3xl border border-brand-700/10 bg-white/85 p-3.5 shadow-[0_1px_2px_rgba(40,60,40,0.04)]" data-resource={r.id}>
-      <Link href={`/academic-resources/resource/${r.id}`} className="flex h-28 w-28 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-sage-soft to-[#dbe5cc] after:absolute after:inset-0 after:rounded-3xl" aria-label={r.title}>
+      <Link href={`/academic-resources/resource/${r.id}`} className="flex h-28 w-28 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-sage-soft to-[#d7e6d9] after:absolute after:inset-0 after:rounded-3xl" aria-label={r.title}>
         {cover
           // eslint-disable-next-line @next/next/no-img-element -- short-lived signed URL
           ? <img src={cover} alt="" className="size-full object-cover" />

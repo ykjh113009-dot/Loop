@@ -6,8 +6,8 @@ import { getT } from "@/lib/i18n-server";
 import { joinGroup } from "@/app/actions/community";
 import { ActionForm } from "@/components/action-form";
 import { EmptyState } from "@/components/ui/empty-state";
-import { Users, Search } from "lucide-react";
-import { FeatureBanner } from "@/components/ui/feature-banner";
+import { Search } from "lucide-react";
+import { ImageBanner } from "@/components/ui/image-banner";
 import { SectionTabs } from "@/components/ui/section-tabs";
 import { SubmitButton } from "@/components/submit-button";
 import { PageSkeleton } from "@/components/skeleton";
@@ -39,7 +39,7 @@ async function Groups({ searchParams }: { searchParams: PageProps<"/groups">["se
 
   return (
     <div className="space-y-5" data-groups-page data-wide>
-      <FeatureBanner title={t("Groups")} subtitle={t("Find and join groups that match your interests!")} icon={Users} />
+      <ImageBanner name="community" title="Community" subtitle="Connect. Share. Belong." />
       <div className="flex flex-wrap items-center gap-3">
         <SectionTabs label={t("Groups")} current={href(tab)} items={TABS.map(([k, label]) => ({ href: href(k), label: t(label) }))} />
         <form role="search" className="relative ms-auto min-w-[200px] flex-1 sm:max-w-xs">

@@ -1,5 +1,4 @@
 import { Suspense } from "react";
-import { Bookmark } from "lucide-react";
 import { requireMe } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { loadFeed } from "@/lib/feed";
@@ -9,7 +8,7 @@ import { Empty } from "@/components/empty";
 import { PageSkeleton } from "@/components/skeleton";
 import { FeedPostCard } from "@/components/dashboard/feed-post";
 import { ResourceCard } from "@/components/library/resource-card";
-import { FeatureBanner } from "@/components/ui/feature-banner";
+import { ImageBanner } from "@/components/ui/image-banner";
 import { SectionTabs } from "@/components/ui/section-tabs";
 
 export const metadata = { title: "Saved" };
@@ -25,7 +24,7 @@ async function Saved({ searchParams }: { searchParams: PageProps<"/saved">["sear
   const href = (k: string) => `/saved${k ? `?tab=${k}` : ""}`;
   const header = (
     <>
-      <FeatureBanner title={t("Saved")} subtitle={t("Your saved posts, polls and resources")} icon={Bookmark} />
+      <ImageBanner name="community" title="Community" subtitle="Connect. Share. Belong." />
       <SectionTabs label={t("Saved")} current={href(tab)} items={TABS.map(([k, label]) => ({ href: href(k), label: t(label) }))} />
     </>
   );

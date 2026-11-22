@@ -17,7 +17,7 @@ const loaded = (p, sel) => p.locator(sel).first().evaluate((i) => new Promise((r
   sql(`update public.profiles set photo_path = null, avatar = 'a09', avatar_icon = 'a09' where id = '${MAYA}'`);
   const maya = await signIn(browser, 'Maya Odeh');
   const p = maya.p;
-  check('Before: the top bar shows the illustrated avatar', /avatars\/a09\.svg/.test(await p.locator('header img').first().getAttribute('src').catch(() => '')) || (await p.locator('img[src*="/avatars/a09.svg"]').count()) > 0);
+  check('Before: the top bar shows the illustrated avatar', /avatars\/f09\.png/.test(await p.locator('header img').first().getAttribute('src').catch(() => '')) || (await p.locator('img[src*="/avatars/f09.png"]').count()) > 0);
   await go(p, '/profile/edit');
   await p.locator('[data-change-photo]').click();
   await p.locator('[data-photo-input]').setInputFiles(path.join(__dirname, 'proof.png'));
@@ -46,6 +46,6 @@ const loaded = (p, sel) => p.locator(sel).first().evaluate((i) => new Promise((r
   await p.waitForTimeout(800);
   check('Removing the photo brings the illustrated avatar back', sql(`select avatar from public.profiles where id = '${MAYA}'`) === 'a09');
   await go(p, '/home');
-  check('The top bar shows the illustration again', (await p.locator('img[src*="/avatars/a09.svg"]').count()) > 0);
+  check('The top bar shows the illustration again', (await p.locator('img[src*="/avatars/f09.png"]').count()) > 0);
   await browser.close();
 })();

@@ -36,7 +36,7 @@ export function Sidebar({ user, badges, locale, search = "", pathname }: { user:
             // eslint-disable-next-line @next/next/no-img-element -- static brand image
             ? <img src="/brand/loop-icon-192.png" alt="Loop" width={40} height={40} className="size-10" />
             // eslint-disable-next-line @next/next/no-img-element -- static brand image
-            : <img src="/brand/loop-wordmark.png" alt="Loop" width={574} height={240} className="h-11 w-auto" />}
+            : <img src="/brand/loop-wordmark.png" alt="Loop" width={1148} height={520} className="h-11 w-auto" />}
         </Link>
         <button
           type="button"

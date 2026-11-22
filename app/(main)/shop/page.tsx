@@ -5,10 +5,10 @@ import { requireMe } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { signImages } from "@/lib/images";
 import { getT } from "@/lib/i18n-server";
-import { GiftScene } from "@/components/art/scenes";
+import { ImageBanner } from "@/components/ui/image-banner";
 import { PageSkeleton } from "@/components/skeleton";
 import { Top10Panel } from "@/components/shop/top10-panel";
-import { CATEGORIES, CATEGORY_LABEL, PrizeIcon, Waves, prizeCategory } from "@/components/shop/art";
+import { CATEGORIES, CATEGORY_LABEL, PrizeIcon, prizeCategory } from "@/components/shop/art";
 
 export const metadata = { title: "Reward Shop" };
 
@@ -29,12 +29,7 @@ async function Shop({ searchParams }: { searchParams: PageProps<"/shop">["search
   return (
     <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_390px]" data-shop-page data-wide>
       <div className={`min-w-0 space-y-5 ${topFirst ? "order-2 xl:order-none" : ""}`} data-section="reward-shop">
-        <section className="relative isolate overflow-hidden rounded-3xl border border-brand-700/10 bg-sand/70 px-5 py-6 lg:px-8 lg:py-8" data-shop-banner>
-          <Waves className="pointer-events-none absolute inset-0 -z-10 size-full" />
-          <GiftScene className="pointer-events-none absolute end-4 bottom-0 -z-10 hidden h-[115%] w-auto sm:block" />
-          <h1 className="font-heading text-[34px] leading-none font-semibold text-brand-900 lg:text-[48px]" data-banner-title>{t("Reward Shop")}</h1>
-          <p className="mt-2 max-w-[26rem] text-[13px] text-ink-2 lg:mt-3 lg:text-base">{t("Spend your Loop Points on exclusive rewards!")}</p>
-        </section>
+        <div data-shop-banner><ImageBanner name="rewards" title="Reward Shop" subtitle="Spend your Loop Points on exclusive rewards!" /></div>
         <section className="card space-y-3 p-5" data-coming-soon>
           <span className="chip bg-brand-50 text-brand-800"><Sparkles className="size-3.5" aria-hidden="true" /> {t("Coming soon")}</span>
           <p className="text-[15px]">{t("Soon you will be able to spend the points you earn on gift cards, technology, study help and experiences chosen by your school.")}</p>

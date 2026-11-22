@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { iconFor } from "@/lib/dashboard";
 import { formatDateTime } from "@/lib/time";
 import { Empty } from "@/components/empty";
-import { PageHeader } from "@/components/page-header";
+import { ImageBanner } from "@/components/ui/image-banner";
 import { PageSkeleton } from "@/components/skeleton";
 import { IconTile } from "@/components/dashboard/card";
 
@@ -37,7 +37,7 @@ async function Announcements() {
 export default function AnnouncementsPage() {
   return (
     <div className="space-y-4">
-      <PageHeader title="School announcements" />
+      <ImageBanner name="announcements" title="Announcements" subtitle="Stay updated." />
       <Suspense fallback={<PageSkeleton />}>
         <Announcements />
       </Suspense>
