@@ -1303,4 +1303,8 @@ export const AR: Record<string, string> = {
   "Checking": "قيد المراجعة",
   "We could not open this item. Try again.": "تعذّر فتح هذا الغرض. حاول مرة أخرى.",
   "Offer sent. The seller will get a notification.": "تم إرسال العرض. سيصل إشعار للبائع.",
+  "Prize categories": "فئات الجوائز",
+  "No prizes in this group.": "لا توجد جوائز في هذه الفئة.",
+  "Top of the leaderboard": "صدارة الترتيب",
+  "Rank {n} on the leaderboard": "المركز {n} في لوحة الصدارة",
 };
