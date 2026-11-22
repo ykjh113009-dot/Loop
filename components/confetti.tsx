@@ -1,5 +1,5 @@
 // A short, quiet burst of confetti. Hidden for people who ask their device for less motion.
-const COLORS = ["#a7c4aa", "#4d725b", "#dce9ef", "#e8c36a", "#f0a58f", "#8fb7d3"];
+const COLORS = ["#99ab78", "#466237", "#dce9ef", "#e8c36a", "#f0a58f", "#8fb7d3"];
 
 export function Confetti() {
   const pieces = Array.from({ length: 26 }, (_, i) => ({

@@ -98,7 +98,7 @@ async function Tutor({ params }: { params: PageProps<"/tutors/[id]">["params"] }
         </div>
       </section>
 
-      <section className="rounded-3xl bg-[#e8efe6] p-5" data-tutor-hours>
+      <section className="rounded-3xl bg-[#e9ead6] p-5" data-tutor-hours>
         <h2 className="mb-2 flex items-center gap-2 text-lg font-semibold"><CalendarDays className="size-5 text-brand-700" aria-hidden="true" />{t("Available Hours")}</h2>
         <div className="flex flex-wrap gap-1.5">{DAYS.map((d) => <span key={d.id} className={`chip ${x.days.includes(d.id) ? "bg-brand-700 text-white" : "bg-white/60 text-black/35"}`}>{t(d.label)}</span>)}</div>
         <p className="mt-2 text-[15px] text-ink-2">{times || t("Ask for times")}</p>

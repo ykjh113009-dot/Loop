@@ -1,14 +1,11 @@
 // The illustrated avatars students can choose from (files in public/avatars).
 const ids = (prefix: string, n = 12) => Array.from({ length: n }, (_, i) => `${prefix}${String(i + 1).padStart(2, "0")}`);
-// The set offered when picking an avatar: the ten Loop animal friends (b01–b10 are their ids; the art is f01–f10 in public/avatars).
-export const NEW_AVATARS = ids("b", 10);
+// The set offered when picking an avatar: b01–b16, the Loop animal friends (PNG files in public/avatars).
+export const NEW_AVATARS = ids("b", 16);
 // Everything that is a valid avatar. a01–a12 are the older illustrations that existing students may still have.
 export const AVATARS = [...ids("a"), ...NEW_AVATARS];
-// Every avatar id shows one of the ten Loop animal friends, so students who picked an older illustration get the new look too.
-export const avatarFile = (id: string) => {
-  const n = AVATARS.includes(id) ? Number(id.slice(1)) : 1;
-  return `/avatars/f${String(((n - 1) % 10) + 1).padStart(2, "0")}.png`;
-};
+// a01–a12 are the older SVG illustrations; the animal friends are PNGs.
+export const avatarFile = (id: string) => `/avatars/${AVATARS.includes(id) ? id : "b01"}.${id.startsWith("b") ? "png" : "svg"}`;
 
 // "a05" is an illustration. "u:<student id>:<version>" means the student uploaded a photo: it is served
 // through /api/avatar, which checks that you are signed in to the same school (photos are private).

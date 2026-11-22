@@ -7,7 +7,7 @@ import { EVENT_FIELDS, type EventSummary } from "@/lib/queries";
 import { EVENT_CATEGORIES } from "@/lib/events";
 import { formatDate, fromLocalInput, localDayKey, localParts, weekStart } from "@/lib/time";
 import { EventRow } from "@/components/events/event-row";
-import { ImageBanner } from "@/components/ui/image-banner";
+import { Waves } from "@/components/shop/art";
 import { ArrowRight, CalendarDays, Plus } from "lucide-react";
 import { MonthCalendar, monthParam } from "@/components/month-calendar";
 import { Empty } from "@/components/empty";
@@ -107,10 +107,15 @@ async function Events({ searchParams }: { searchParams: PageProps<"/events">["se
 
   return (
     <div className="mx-auto max-w-4xl space-y-5" data-events-page data-wide>
-      <ImageBanner name={view === "list" ? "events" : "calendar"} title={view === "list" ? "Events" : "Calendar"} subtitle={view === "list" ? "Be part of more." : "Never miss a thing."} />
-      {me.isStudent && !me.isSuspended && (
-        <div className="flex justify-end"><Link href="/events/new" className="btn-primary rounded-full px-5 py-2.5"><Plus className="size-4" aria-hidden="true" />{t("New event")}</Link></div>
-      )}
+      <section className="relative isolate overflow-hidden rounded-3xl border border-brand-700/10 bg-gradient-to-r from-sage-soft/80 via-brand-100/70 to-brand-50 px-6 py-7 lg:px-9 lg:py-9" data-banner data-events-banner>
+        <Waves className="pointer-events-none absolute inset-0 -z-10 size-full opacity-70" />
+        <svg className="pointer-events-none absolute -end-6 top-1/2 -z-10 hidden h-[120%] -translate-y-1/2 text-brand-700/20 sm:block" viewBox="0 0 400 200" aria-hidden="true"><path d="M200 100C240 40 340 40 340 100C340 160 240 160 200 100C160 40 60 40 60 100C60 160 160 160 200 100Z" fill="none" stroke="currentColor" strokeWidth="26" strokeLinejoin="round" /></svg>
+        <h1 className="font-heading text-[30px] leading-[1.05] font-semibold text-brand-900 lg:text-[46px]" data-banner-title>{t("One Loop.")}<br />{t("Endless Possibilities.")}</h1>
+        <p className="mt-2 text-sm text-ink-2 lg:text-base">{t("Stay updated with upcoming events and activities.")}</p>
+        {me.isStudent && !me.isSuspended && (
+          <Link href="/events/new" className="btn-primary mt-4 rounded-full px-5 py-2.5"><Plus className="size-4" aria-hidden="true" />{t("New event")}</Link>
+        )}
+      </section>
 
       <div className="flex gap-1 rounded-2xl bg-black/5 p-1" role="tablist">
         {views.map(([id, label]) => (

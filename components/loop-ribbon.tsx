@@ -30,7 +30,7 @@ export function LoopRibbon() {
         d={LOOP}
         transform="translate(200 100) scale(1.55) translate(-200 -100)"
         fill="none"
-        stroke="#a7c4aa"
+        stroke="#99AB78"
         strokeOpacity="0.7"
         strokeWidth="1.3"
         vectorEffect="non-scaling-stroke"

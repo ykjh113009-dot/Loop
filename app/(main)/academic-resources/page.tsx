@@ -86,7 +86,7 @@ async function Library({ q, type, view, allSubjects }: { q: string; type: string
   const subjectTile = (c: (typeof subjects)[number]) => {
     const img = c.image_path ? subjectImages.get(c.image_path) : null;
     return (
-      <Link key={c.id} href={`/academic-resources/${c.slug}`} className="group relative block aspect-square overflow-hidden rounded-3xl border border-brand-700/10 bg-gradient-to-br from-sage-soft to-[#d7e6d9] shadow-[0_1px_2px_rgba(40,60,40,0.04)]" data-category={c.slug}>
+      <Link key={c.id} href={`/academic-resources/${c.slug}`} className="group relative block aspect-square overflow-hidden rounded-3xl border border-brand-700/10 bg-gradient-to-br from-sage-soft to-[#dbe5cc] shadow-[0_1px_2px_rgba(40,60,40,0.04)]" data-category={c.slug}>
         {img ? (
           <>
             {/* eslint-disable-next-line @next/next/no-img-element -- short-lived signed URL */}
@@ -111,7 +111,7 @@ async function Library({ q, type, view, allSubjects }: { q: string; type: string
 
   return (
     <div className="space-y-6" data-library-page data-wide>
-      <section className="relative isolate overflow-hidden rounded-3xl bg-[#e8efe6] px-5 py-6 lg:px-8 lg:py-8" data-banner>
+      <section className="relative isolate overflow-hidden rounded-3xl bg-[#e9ead6] px-5 py-6 lg:px-8 lg:py-8" data-banner>
         {/* eslint-disable-next-line @next/next/no-img-element -- static brand artwork */}
         <img src="/brand/library-hero.png" alt="" width={580} height={170} className="pointer-events-none absolute end-0 bottom-0 -z-10 hidden h-full w-auto object-contain object-right-bottom sm:block rtl:-scale-x-100" />
         <div className="flex items-center gap-4 lg:gap-6">

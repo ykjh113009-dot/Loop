@@ -9,7 +9,7 @@ import { Avatar } from "@/components/avatar";
 import { DashCard } from "@/components/dashboard/card";
 import { PageSkeleton } from "@/components/skeleton";
 import { ResourceCard } from "@/components/library/resource-card";
-import { ImageBanner } from "@/components/ui/image-banner";
+import { PageBanner } from "@/components/ui/page-banner";
 import { SectionTabs } from "@/components/ui/section-tabs";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Glyph } from "@/components/glyph";
@@ -39,7 +39,7 @@ async function LearningHub() {
 
   return (
     <div className="space-y-5" data-category-page="learning-hub">
-      <ImageBanner name="learning-hub" title="Learning Hub" subtitle="Learn. Improve. Grow." />
+      <PageBanner title={t("Learning Hub")} subtitle={t("Learn. Prepare. Achieve.")} note={t("Your academic hub in one place.")} scene="books" />
       <SectionTabs label={t("Learning Hub")} current="" items={[
         { href: "/academic-resources", label: t("Academic Library"), icon: "library" }, { href: "/tutors", label: t("Tutors Directory"), icon: "tutors" },
       ]} />

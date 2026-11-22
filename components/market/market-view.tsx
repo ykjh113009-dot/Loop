@@ -8,7 +8,8 @@ import { CATEGORIES, priceLabel } from "@/lib/market";
 import { timeAgo } from "@/lib/time";
 import { Avatar } from "@/components/avatar";
 import { EmptyState } from "@/components/ui/empty-state";
-import { ImageBanner } from "@/components/ui/image-banner";
+import { Waves } from "@/components/shop/art";
+import { MarketScene } from "@/components/market/scene";
 import { DetailsTrigger } from "@/components/market/details-trigger";
 import { MarketSafetyNote } from "@/components/safety-note";
 import { Glyph } from "@/components/glyph";
@@ -54,7 +55,13 @@ export async function MarketView({ searchParams, base }: { searchParams: Promise
   return (
     <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_330px]" data-market-page data-wide>
       <div className="min-w-0 space-y-4">
-        <div data-market-banner><ImageBanner name="market" title="Market" subtitle="Buy, Sell, and Swap with ease. Discover great deals, sell your items, or trade with other students!" /></div>
+        <section className="relative isolate overflow-hidden rounded-3xl border border-brand-700/10 bg-sand/70 px-5 py-6 lg:px-8 lg:py-8" data-banner data-market-banner>
+          <Waves className="pointer-events-none absolute inset-0 -z-10 size-full" />
+          <MarketScene className="pointer-events-none absolute end-4 bottom-0 -z-10 hidden h-[104%] w-auto sm:block" />
+          <h1 className="font-heading text-[38px] leading-none font-semibold text-brand-900 lg:text-[56px]" data-banner-title>{t("Market")}</h1>
+          <p className="mt-2 text-[15px] font-medium text-ink lg:text-xl">{t("Buy, Sell, and Swap with ease.")}</p>
+          <p className="mt-1 max-w-md text-[13px] text-ink-2 lg:text-sm">{t("Discover great deals, sell your items, or trade with other students!")}</p>
+        </section>
 
         <form action={base} role="search" className="relative">
           {tab !== "buy" && <input type="hidden" name="tab" value={tab} />}

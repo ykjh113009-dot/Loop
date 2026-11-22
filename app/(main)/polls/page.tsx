@@ -4,7 +4,7 @@ import { requireMe } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { Empty } from "@/components/empty";
 import { BarChart3 } from "lucide-react";
-import { ImageBanner } from "@/components/ui/image-banner";
+import { FeatureBanner } from "@/components/ui/feature-banner";
 import { SectionTabs } from "@/components/ui/section-tabs";
 import { PollCard } from "@/components/poll-card";
 import { PageSkeleton } from "@/components/skeleton";
@@ -36,7 +36,7 @@ async function Polls({ searchParams }: { searchParams: PageProps<"/polls">["sear
 
   return (
     <div className="space-y-5" data-polls-page data-wide>
-      <ImageBanner name="community" title="Community" subtitle="Connect. Share. Belong." />
+      <FeatureBanner title="Polls" subtitle="See your polls and vote in ongoing ones!" icon={BarChart3} />
       <SectionTabs label="Polls" current={href(tab)} items={TABS.map(([k, label]) => ({ href: href(k), label }))} />
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1fr)_300px]">
         <section className="min-w-0 space-y-3">

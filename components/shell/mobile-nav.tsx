@@ -45,7 +45,7 @@ export function MobileNav({ user, badges, locale, search = "", pathname: pathnam
           <div ref={panel} role="dialog" aria-modal="true" aria-label={t("Menu")} className="absolute inset-y-0 start-0 flex w-[min(86vw,320px)] flex-col bg-cream px-3.5 pt-[max(1rem,env(safe-area-inset-top))] pb-4 shadow-xl">
             <div className="flex items-center justify-between px-1.5">
               {/* eslint-disable-next-line @next/next/no-img-element -- static brand image */}
-              <img src="/brand/loop-wordmark.png" alt="Loop" width={1148} height={520} className="h-10 w-auto" />
+              <img src="/brand/loop-wordmark.png" alt="Loop" width={574} height={240} className="h-10 w-auto" />
               <button type="button" onClick={() => { setOpen(false); button.current?.focus(); }} aria-label={t("Close the menu")} className="rounded-full p-2 text-ink-2 hover:bg-brand-700/5"><X className="size-5" aria-hidden="true" /></button>
             </div>
             <nav aria-label={t("Menu")} className="mt-4 min-h-0 flex-1 overflow-y-auto">

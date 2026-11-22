@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getT } from "@/lib/i18n-server";
 import { houseColor } from "@/lib/house";
 import { Avatar } from "@/components/avatar";
-import { ImageBanner } from "@/components/ui/image-banner";
+import { PageHeader } from "@/components/page-header";
 import { PageSkeleton } from "@/components/skeleton";
 import { Glyph, Place } from "@/components/glyph";
 
@@ -132,7 +132,7 @@ async function Leaderboard({ searchParams }: { searchParams: PageProps<"/leaderb
 export default function LeaderboardPage(props: PageProps<"/leaderboard">) {
   return (
     <>
-      <ImageBanner name="leaderboards" title="Leaderboards" subtitle="See who's on top!" />
+      <PageHeader title="Leaderboards" back="/more" />
       <Suspense fallback={<PageSkeleton />}>
         <Leaderboard searchParams={props.searchParams} />
       </Suspense>

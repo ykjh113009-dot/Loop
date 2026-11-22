@@ -25,7 +25,7 @@ export function ClubCard({ club, joined = false, leaders = [], nextAt = null, ca
   return (
     <article className={`relative flex flex-col gap-3 overflow-hidden rounded-3xl border border-brand-700/10 bg-white/85 shadow-[0_1px_2px_rgba(40,60,40,0.04)] ${featured ? "" : "p-4"}`} data-club={club.name} data-club-featured={featured ? "true" : undefined}>
       {featured && (
-        <div className="relative h-28 w-full bg-gradient-to-br from-sage-soft to-[#d7e6d9]" aria-hidden="true">
+        <div className="relative h-28 w-full bg-gradient-to-br from-sage-soft to-[#dbe5cc]" aria-hidden="true">
           {imageUrl
             // eslint-disable-next-line @next/next/no-img-element -- signed private image
             ? <img src={imageUrl} alt="" loading="lazy" className="size-full object-cover" />

@@ -123,7 +123,7 @@ async function Find({ subject, format, q, meId }: { subject: string; format: str
           })}
         </div>
       )}
-      <section className="flex flex-wrap items-center gap-4 rounded-3xl bg-[#e8efe6] p-5" data-tutor-band>
+      <section className="flex flex-wrap items-center gap-4 rounded-3xl bg-[#e9ead6] p-5" data-tutor-band>
         <Lightbulb className="size-10 shrink-0 text-brand-700" strokeWidth={1.5} aria-hidden="true" />
         <div className="min-w-0 flex-1">{bandText}</div>
         <Link href={bandAction.href} className="btn-primary rounded-full px-6 py-2.5">{bandAction.label} →</Link>
@@ -263,8 +263,8 @@ async function Tutors({ searchParams }: { searchParams: PageProps<"/tutors">["se
   const tabHref = (id: string) => `/tutors${id === "find" ? "" : `?tab=${id}`}`;
   return (
     <div className="space-y-5" data-tutors-page data-wide>
-      <section className="relative isolate overflow-hidden rounded-3xl bg-[#e8efe6] px-5 py-6 lg:px-8 lg:py-8" data-banner>
-        <div className="pointer-events-none absolute -end-10 -top-16 -z-10 size-64 rounded-full bg-[#d7e6d9]" aria-hidden="true" />
+      <section className="relative isolate overflow-hidden rounded-3xl bg-[#e9ead6] px-5 py-6 lg:px-8 lg:py-8" data-banner>
+        <div className="pointer-events-none absolute -end-10 -top-16 -z-10 size-64 rounded-full bg-[#dbe5cc]" aria-hidden="true" />
         <BooksScene className="pointer-events-none absolute end-4 bottom-0 -z-10 hidden h-full w-auto sm:block" />
         <h1 className="font-heading text-[34px] leading-none font-semibold text-brand-900 lg:text-[48px]" data-banner-title>{t("Tutors")}</h1>
         <p className="mt-2 max-w-[28rem] text-[13px] text-ink-2 lg:mt-3 lg:text-base">{t("Get help from experienced tutors in your subjects!")}</p>

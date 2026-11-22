@@ -32,8 +32,8 @@ async function Subject({ params, searchParams }: { params: PageProps<"/academic-
   const covers = await signCovers(supabase, list.map((r) => r.cover_path));
   return (
     <div className="mx-auto max-w-3xl space-y-4">
-      <div className="flex items-center gap-5 rounded-3xl bg-[#e8efe6] p-4 sm:p-5" data-subject-header>
-        <span className="relative flex size-24 shrink-0 items-center justify-center overflow-hidden rounded-3xl bg-gradient-to-br from-sage-soft to-[#d7e6d9] sm:size-32">
+      <div className="flex items-center gap-5 rounded-3xl bg-[#e9ead6] p-4 sm:p-5" data-subject-header>
+        <span className="relative flex size-24 shrink-0 items-center justify-center overflow-hidden rounded-3xl bg-gradient-to-br from-sage-soft to-[#dbe5cc] sm:size-32">
           {banner
             // eslint-disable-next-line @next/next/no-img-element -- short-lived signed URL
             ? <img src={banner} alt="" className="absolute inset-0 size-full object-cover" data-subject-banner />

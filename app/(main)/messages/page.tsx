@@ -8,7 +8,7 @@ import { timeAgo } from "@/lib/time";
 import { getT } from "@/lib/i18n-server";
 import { Avatar } from "@/components/avatar";
 import { Empty } from "@/components/empty";
-import { ImageBanner } from "@/components/ui/image-banner";
+import { PageHeader } from "@/components/page-header";
 import { PageSkeleton } from "@/components/skeleton";
 import { Glyph } from "@/components/glyph";
 
@@ -95,8 +95,7 @@ async function Conversations() {
 export default function MessagesPage() {
   return (
     <>
-      <ImageBanner name="chat" title="Chat" subtitle="Stay in touch." />
-      <div className="flex justify-end"><Link href="/messages/new" className="btn-secondary px-4 py-2">New group</Link></div>
+      <PageHeader title="Chats" back="/clubs" action={<Link href="/messages/new" className="btn-secondary px-3 py-2">New group</Link>} />
       <Suspense fallback={<PageSkeleton />}>
         <Conversations />
       </Suspense>
