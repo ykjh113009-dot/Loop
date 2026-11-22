@@ -7,8 +7,11 @@ import { requireMe } from "@/lib/auth";
 export async function startChat(formData: FormData) {
   await requireMe();
   const supabase = await createClient();
-  const { data, error } = await supabase.rpc("start_direct_conversation", { p_other: String(formData.get("profileId")) });
-  if (error || !data) redirect(`/profile/${formData.get("profileId")}?error=chat`);
+  const other = String(formData.get("profileId"));
+  // Only a real profile id goes into the address we send people to.
+  if (!/^[0-9a-f-]{36}$/i.test(other)) redirect("/messages");
+  const { data, error } = await supabase.rpc("start_direct_conversation", { p_other: other });
+  if (error || !data) redirect(`/profile/${other}?error=chat`);
   redirect(`/messages/${data}`);
 }
 
