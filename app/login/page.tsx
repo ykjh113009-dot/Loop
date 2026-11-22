@@ -37,7 +37,7 @@ export default function LoginPage(props: PageProps<"/login">) {
     <main className="lp">
       <aside className="lp-art" aria-hidden="true">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/brand/loop-icon-512.png" alt="" width={512} height={512} className="lp-logo" />
+        <img src="/brand/loop-panel.png" alt="" width={864} height={864} className="lp-logo" />
       </aside>
 
       <div className="lp-main">
