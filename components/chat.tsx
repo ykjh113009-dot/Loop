@@ -9,7 +9,7 @@ import { ReportButton } from "@/components/report-button";
 import { formatDate, formatTime, localDayKey } from "@/lib/time";
 import type { ChatMessage, ChatPerson, ChatReaction } from "@/lib/chat";
 import { makeT, type Locale } from "@/lib/i18n";
-import { Mic, Paperclip, SmilePlus, Square } from "lucide-react";
+import { CheckCheck, Mic, Paperclip, SmilePlus, Square } from "lucide-react";
 
 const FIELDS = "id, sender_id, body, status, created_at, attachment_path, attachment_kind, attachment_name";
 const EMOJI = ["👍", "❤️", "😂", "😮", "😢", "👏"];
@@ -218,7 +218,12 @@ export function Chat({
   }
 
   return (
-    <div className="flex min-h-[60dvh] flex-col">
+    <div className="relative isolate flex min-h-[60dvh] flex-col overflow-hidden rounded-3xl bg-[#e7eee1] px-3 pt-3 lg:px-6 lg:pt-5" data-chat-panel>
+      <div className="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
+        <span className="absolute -end-16 -top-10 size-72 rounded-[45%] bg-[#d5e2cb]/70" />
+        <span className="absolute -start-20 top-1/3 size-80 rounded-[45%] bg-[#dbe7d2]/70" />
+        <span className="absolute -end-10 bottom-10 size-72 rounded-[45%] bg-[#d3e0c8]/60" />
+      </div>
       <div className="flex-1 space-y-1 pb-4">
         {messages.length === 0 && <p className="py-10 text-center text-sm text-black/45">{t("No messages yet. Say hi! 👋")}</p>}
         {messages.map((m, i) => {
@@ -229,24 +234,28 @@ export function Chat({
           const sameSender = !newDay && prev?.sender_id === m.sender_id;
           return (
             <div key={m.id}>
-              {newDay && <p className="py-3 text-center text-xs font-medium text-black/40">{formatDate(m.created_at)}</p>}
-              <div className={`group flex items-end gap-2 ${mine ? "flex-row-reverse" : ""} ${sameSender ? "" : "pt-2"}`}>
+              {newDay && <p className="py-3 text-center"><span className="inline-block rounded-full bg-black/[0.06] px-4 py-1 text-sm font-medium text-black/60">{formatDate(m.created_at)}</span></p>}
+              <div className={`group flex items-start gap-2 ${mine ? "flex-row-reverse" : ""} ${sameSender ? "" : "pt-2"}`}>
                 {!mine && (
                   <Link href={`/profile/${m.sender_id}`} className={sameSender ? "invisible" : ""}>
-                    <Avatar avatar={person?.avatar ?? "a01"} size="sm" />
+                    <Avatar avatar={person?.avatar ?? "a01"} className="size-11" />
                   </Link>
                 )}
                 <div className={`max-w-[78%] ${mine ? "items-end" : "items-start"} flex flex-col`}>
                   {showNames && !mine && !sameSender && (
-                    <span className="mb-0.5 px-1 text-xs font-medium text-black/50">{person?.full_name ?? "…"}</span>
+                    <span className="mb-0.5 px-1 text-sm font-semibold text-brand-800">{person?.full_name ?? "…"}</span>
                   )}
                   <div
-                    className={`rounded-2xl px-3 py-2 break-words whitespace-pre-wrap ${
-                      mine ? "rounded-ee-md bg-brand-700 text-white" : "rounded-es-md bg-white shadow-sm"
+                    className={`rounded-2xl px-4 py-2.5 text-[17px] break-words whitespace-pre-wrap ${
+                      mine ? "rounded-ee-md bg-[#d9e8cf] text-brand-900" : "rounded-es-md bg-white shadow-sm"
                     } ${m.status === "held" ? "opacity-60" : ""}`}
                   >
                     {m.attachment_path && <Attachment message={m} label={t("Attachment")} />}
                     {m.body}
+                    <span className="ms-3 inline-flex translate-y-0.5 items-center gap-1 align-bottom text-[11px] text-black/45">
+                      {formatTime(m.created_at)}
+                      {mine && <CheckCheck className="size-3.5 text-brand-700" aria-hidden="true" />}
+                    </span>
                   </div>
                   {(() => {
                     const mineR = reactions.filter((r) => r.message_id === m.id);
@@ -272,8 +281,7 @@ export function Chat({
                     );
                   })()}
                   <span className="mt-0.5 flex items-center gap-1 px-1 text-[11px] text-black/40">
-                    {formatTime(m.created_at)}
-                    {m.status === "held" && ` · ${t("Waiting for a moderator. Only you can see this.")}`}
+                    {m.status === "held" && t("Waiting for a moderator. Only you can see this.")}
                     {!mine && (
                       <span className="opacity-60 group-hover:opacity-100">
                         <ReportButton targetType="message" targetId={m.id} compact />
@@ -288,24 +296,24 @@ export function Chat({
         <div ref={bottom} />
       </div>
 
-      <div className="sticky bottom-[calc(4rem+env(safe-area-inset-bottom))] -mx-4 border-t border-black/5 bg-[#f5f6f4] px-4 py-2">
+      <div className="sticky bottom-[calc(4rem+env(safe-area-inset-bottom))] -mx-3 bg-transparent px-3 py-2 lg:bottom-3 lg:mx-0 lg:px-0">
         {locked ? (
           <p className="py-2 text-center text-sm text-black/50">{t("Your message request was sent. You can write again once it is accepted.")}</p>
         ) : canSend ? (
-          <form onSubmit={send} className="flex gap-2">
+          <form onSubmit={send} className="flex items-center gap-2 rounded-full border border-brand-700/10 bg-white py-1.5 ps-3 pe-1.5 shadow-sm">
             <input ref={fileInput} type="file" hidden accept="image/*,video/mp4,video/webm,audio/*,application/pdf,.docx,.pptx,.xlsx,.txt"
               onChange={(e) => { const f = e.target.files?.[0]; if (f) sendFile(f, f.name); e.target.value = ""; }} />
-            <button type="button" onClick={() => fileInput.current?.click()} disabled={sending} className="btn-secondary px-3" aria-label={t("Send a photo or file")}><Paperclip className="size-5" aria-hidden="true" /></button>
-            <button type="button" onClick={toggleRecording} disabled={sending} className={`px-3 ${recording ? "btn-danger" : "btn-secondary"}`} aria-label={recording ? t("Stop and send the voice message") : t("Record a voice message")}>{recording ? <Square className="size-5" aria-hidden="true" /> : <Mic className="size-5" aria-hidden="true" />}</button>
+            <button type="button" onClick={() => fileInput.current?.click()} disabled={sending} className="rounded-full p-2 text-black/55 hover:bg-black/5" aria-label={t("Send a photo or file")}><Paperclip className="size-5" aria-hidden="true" /></button>
+            <button type="button" onClick={toggleRecording} disabled={sending} className={`rounded-full p-2 ${recording ? "btn-danger" : "text-black/55 hover:bg-black/5"}`} aria-label={recording ? t("Stop and send the voice message") : t("Record a voice message")}>{recording ? <Square className="size-5" aria-hidden="true" /> : <Mic className="size-5" aria-hidden="true" />}</button>
             <input
               value={text}
               onChange={(e) => setText(e.target.value)}
               maxLength={2000}
               placeholder={t("Write a message…")}
-              className="input"
+              className="min-w-0 flex-1 bg-transparent py-2 text-base outline-none"
               aria-label={t("Message")}
             />
-            <button className="btn-primary px-3" disabled={sending || !text.trim()} aria-label={t("Send")}>
+            <button className="btn-primary size-11 shrink-0 !rounded-full !p-0" disabled={sending || !text.trim()} aria-label={t("Send")}>
               <Icon name="send" />
             </button>
           </form>

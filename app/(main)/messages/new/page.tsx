@@ -20,7 +20,7 @@ async function NewGroup() {
   ]);
   const friends = new Set([...(a ?? []).map((x) => x.b_id), ...(b ?? []).map((x) => x.a_id)]);
   const people = (students ?? []).map((s) => ({ ...s, friend: friends.has(s.id) })).sort((x, y) => Number(y.friend) - Number(x.friend));
-  return <GroupForm people={people} locale={locale} />;
+  return <GroupForm people={people} locale={locale} schoolId={me.school_id} />;
 }
 
 export default function NewGroupPage() {

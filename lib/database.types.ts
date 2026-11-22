@@ -853,14 +853,14 @@ isOneToOne: false
                   ]
                 },"conversations": {
                   Row: {
-                    "club_id": string | null,"created_at": string,"created_by": string | null,"event_id": string | null,"group_id": string | null,"id": string,"kind": string,"last_message_at": string | null,"school_id": string,"title": string | null
+                    "club_id": string | null,"created_at": string,"created_by": string | null,"event_id": string | null,"group_id": string | null,"id": string,"image_path": string | null,"kind": string,"last_message_at": string | null,"school_id": string,"title": string | null
                   }
                   ComputedFields: never
                   Insert: {
-                    "club_id"?: string | null,"created_at"?: string,"created_by"?: string | null,"event_id"?: string | null,"group_id"?: string | null,"id"?: string,"kind": string,"last_message_at"?: string | null,"school_id": string,"title"?: string | null
+                    "club_id"?: string | null,"created_at"?: string,"created_by"?: string | null,"event_id"?: string | null,"group_id"?: string | null,"id"?: string,"image_path"?: string | null,"kind": string,"last_message_at"?: string | null,"school_id": string,"title"?: string | null
                   }
                   Update: {
-                    "club_id"?: string | null,"created_at"?: string,"created_by"?: string | null,"event_id"?: string | null,"group_id"?: string | null,"id"?: string,"kind"?: string,"last_message_at"?: string | null,"school_id"?: string,"title"?: string | null
+                    "club_id"?: string | null,"created_at"?: string,"created_by"?: string | null,"event_id"?: string | null,"group_id"?: string | null,"id"?: string,"image_path"?: string | null,"kind"?: string,"last_message_at"?: string | null,"school_id"?: string,"title"?: string | null
                   }
                   Relationships: [
                     {
@@ -3851,6 +3851,12 @@ isOneToOne: false
 "grant_leadership":
 { Args: { "p_club": string,"p_kind": string,"p_profile": string,"p_scope": string }; Returns: undefined
                            },
+"group_image_manager":
+{ Args: { "p_name": string }; Returns: boolean
+                           },
+"group_image_reader":
+{ Args: { "p_name": string }; Returns: boolean
+                           },
 "group_is_public":
 { Args: { "p_group": string }; Returns: boolean
                            },
@@ -4271,6 +4277,9 @@ isOneToOne: false
                            },
 "set_event_organizers":
 { Args: { "p_event": string,"p_ids": (string)[] }; Returns: undefined
+                           },
+"set_group_image":
+{ Args: { "p_conversation": string,"p_path": string }; Returns: undefined
                            },
 "set_group_role":
 { Args: { "p_group": string,"p_profile": string,"p_role": string }; Returns: undefined

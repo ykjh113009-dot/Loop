@@ -1,6 +1,9 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { Camera } from "lucide-react";
+import { saveGroupPhoto } from "@/lib/group-photo";
 import { createGroup } from "@/app/actions/messages";
 import { Avatar } from "@/components/avatar";
 import { SubmitButton } from "@/components/submit-button";
@@ -8,13 +11,47 @@ import { makeT, type Locale } from "@/lib/i18n";
 
 type Person = { id: string; full_name: string; avatar: string; grade: number | null; friend: boolean };
 
-export function GroupForm({ people, locale }: { people: Person[]; locale: Locale }) {
+export function GroupForm({ people, locale, schoolId }: { people: Person[]; locale: Locale; schoolId: string }) {
   const t = makeT(locale);
   const [state, action] = useActionState(createGroup, null);
   const [query, setQuery] = useState("");
+  const router = useRouter();
+  const input = useRef<HTMLInputElement>(null);
+  const [photo, setPhoto] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
+  const [photoError, setPhotoError] = useState(false);
+  useEffect(() => {
+    if (!state?.id) return;
+    const id = state.id;
+    (async () => {
+      if (photo) await saveGroupPhoto(schoolId, id, photo);
+      router.push(`/messages/${id}`);
+    })();
+  }, [state, photo, schoolId, router]);
+  function choose(file: File | undefined) {
+    setPhotoError(false);
+    if (!file) return;
+    if (!/^image\/(jpeg|png|webp)$/.test(file.type)) return setPhotoError(true);
+    setPhoto(file);
+    setPreview((old) => { if (old) URL.revokeObjectURL(old); return URL.createObjectURL(file); });
+  }
   const shown = people.filter((p) => p.full_name.toLowerCase().includes(query.toLowerCase()));
   return (
     <form action={action} className="card space-y-4 p-4">
+      <div className="flex items-center gap-4" data-group-photo-field>
+        <button type="button" onClick={() => input.current?.click()} className="relative flex size-20 shrink-0 items-center justify-center overflow-hidden rounded-full bg-sage-soft text-brand-800 hover:bg-sage-soft/70" aria-label={t("Add a group photo")}>
+          {preview
+            // eslint-disable-next-line @next/next/no-img-element -- local preview
+            ? <img src={preview} alt="" className="size-full object-cover" />
+            : <Camera className="size-8" aria-hidden="true" />}
+        </button>
+        <div className="space-y-1">
+          <p className="label !mb-0">{t("Group photo")} <span className="font-normal text-black/45">({t("optional")})</span></p>
+          <input ref={input} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={(e) => { choose(e.target.files?.[0]); e.target.value = ""; }} data-group-photo-input />
+          <button type="button" onClick={() => input.current?.click()} className="btn-secondary px-3 py-1.5 text-sm">{photo ? t("Change photo") : t("Add a group photo")}</button>
+          {photoError && <p role="alert" className="text-xs text-red-700">{t("Choose a JPG, PNG or WebP picture.")}</p>}
+        </div>
+      </div>
       <label className="block">
         <span className="label">{t("Group name")}</span>
         <input name="title" required minLength={2} maxLength={60} className="input" placeholder={t("e.g. Physics study group")} />

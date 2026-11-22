@@ -21,7 +21,7 @@ export async function respondMessageRequest(formData: FormData) {
   redirect(accept ? `/messages/${id}` : "/messages");
 }
 
-export async function createGroup(_: { error?: string } | null, formData: FormData): Promise<{ error?: string } | null> {
+export async function createGroup(_: { error?: string; id?: string } | null, formData: FormData): Promise<{ error?: string; id?: string } | null> {
   await requireMe();
   const supabase = await createClient();
   const { data, error } = await supabase.rpc("create_group_conversation", {
@@ -29,7 +29,7 @@ export async function createGroup(_: { error?: string } | null, formData: FormDa
     p_members: formData.getAll("member").map(String).slice(0, 30),
   });
   if (error) return { error: error.code === "P0001" ? error.message.replace(/^[A-Z_]+: /, "") : "The group could not be created. Please try again." };
-  redirect(`/messages/${data}`);
+  return { id: String(data) };
 }
 
 export async function leaveGroup(formData: FormData) {

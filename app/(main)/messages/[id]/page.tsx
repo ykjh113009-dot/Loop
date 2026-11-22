@@ -11,13 +11,15 @@ import { Chat } from "@/components/chat";
 import { Icon } from "@/components/icons";
 import { PageSkeleton } from "@/components/skeleton";
 import { Glyph } from "@/components/glyph";
+import { GroupPhotoButton } from "@/components/group-photo-button";
+import { signGroupImages } from "@/lib/images";
 
 async function DirectChat({ params }: { params: PageProps<"/messages/[id]">["params"] }) {
   const { id } = await params;
   const me = await requireMe();
   const supabase = await createClient();
   const { t, locale } = await getT();
-  const { data: conversation } = await supabase.from("conversations").select("id, kind, club_id, title").eq("id", id).maybeSingle();
+  const { data: conversation } = await supabase.from("conversations").select("id, kind, club_id, title, image_path, created_by").eq("id", id).maybeSingle();
   if (!conversation) notFound();
   if (conversation.kind === "club") redirect(`/clubs/${conversation.club_id}/chat`);
 
@@ -26,6 +28,8 @@ async function DirectChat({ params }: { params: PageProps<"/messages/[id]">["par
     supabase.from("blocks").select("blocked_id").eq("blocker_id", me.id),
     supabase.from("conversation_members").select("profile_id, accepted_at").eq("conversation_id", conversation.id),
   ]);
+  const groupImage = conversation.image_path ? (await signGroupImages(supabase, [conversation.image_path])).get(conversation.image_path) ?? null : null;
+  const canEditPhoto = conversation.kind === "group" && (conversation.created_by === me.id || me.isAdmin);
   const group = conversation.kind === "group" || conversation.kind === "groupchat" || conversation.kind === "eventchat";
   const other = group ? undefined : Object.values(people).find((p) => p.id !== me.id);
   const iBlocked = !!other && (blocks ?? []).some((b) => b.blocked_id === other.id);
@@ -35,16 +39,22 @@ async function DirectChat({ params }: { params: PageProps<"/messages/[id]">["par
 
   return (
     <>
-      <div className="sticky top-12 z-10 -mx-4 -mt-4 mb-2 flex items-center gap-2 border-b border-black/5 bg-[#f5f6f4]/95 px-4 py-2 backdrop-blur">
-        <Link href="/messages" className="-ms-2 rounded-full p-2 text-black/60 hover:bg-black/5 rtl:-scale-x-100" aria-label={t("Back")}>
+      <div className="mb-3 flex items-center gap-3 rounded-3xl border border-brand-700/10 bg-white/70 px-4 py-3" data-chat-header>
+        <Link href="/messages" className="-ms-2 rounded-full p-2 text-black/60 hover:bg-black/5 lg:hidden rtl:-scale-x-100" aria-label={t("Back")}>
           <Icon name="back" />
         </Link>
         {group ? (
           <>
-            <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-brand-50"><Glyph e="👥" /></span>
+            <span className="flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-full bg-brand-700 text-white" data-group-photo>
+              {groupImage
+                // eslint-disable-next-line @next/next/no-img-element -- signed private image
+                ? <img src={groupImage} alt="" className="size-full object-cover" />
+                : <Glyph e="👥" />}
+            </span>
             <span className="min-w-0 flex-1">
-              <span className="block truncate font-semibold">{conversation.title}</span>
-              <span className="block truncate text-xs text-black/45">{Object.values(people).map((p) => p.full_name.split(" ")[0]).join(", ")}</span>
+              <span className="block truncate font-heading text-xl font-semibold text-brand-900">{conversation.title}</span>
+              <span className="block truncate text-sm text-black/50">{t("{n} members", { n: Object.keys(people).length })}</span>
+              {canEditPhoto && <GroupPhotoButton conversationId={conversation.id} schoolId={me.school_id} hasPhoto={!!groupImage} locale={locale} />}
             </span>
             {conversation.kind === "group" && (
               <form action={leaveGroup}>
@@ -54,10 +64,12 @@ async function DirectChat({ params }: { params: PageProps<"/messages/[id]">["par
             )}
           </>
         ) : other && (
-          <Link href={`/profile/${other.id}`} className="flex min-w-0 items-center gap-2">
-            <Avatar avatar={other.avatar} size="sm" />
-            <span className="truncate font-semibold">{other.full_name}</span>
-            {other.grade && <span className="text-xs text-black/45">{t("Grade {n}", { n: other.grade })}</span>}
+          <Link href={`/profile/${other.id}`} className="flex min-w-0 items-center gap-3">
+            <Avatar avatar={other.avatar} className="size-14" />
+            <span className="min-w-0">
+              <span className="block truncate font-heading text-xl font-semibold text-brand-900">{other.full_name}</span>
+              {other.grade && <span className="block text-sm text-black/50">{t("Grade {n}", { n: other.grade })}</span>}
+            </span>
           </Link>
         )}
       </div>
