@@ -34,14 +34,14 @@
     radial-gradient(60% 46% at 18% 12%, rgb(253 250 239 / 0.95), rgb(253 250 239 / 0) 70%),
     linear-gradient(158deg, var(--c-sage-soft) 0%, #e4ece3 46%, var(--c-sky) 100%);
 }
-.lp-ribbon {
+.lp-logo {
   position: absolute;
   top: 58%;
   left: 50%;
-  width: min(66%, 380px);
-  overflow: visible;
+  width: min(44%, 300px);
+  height: auto;
   transform: translate(-50%, -50%);
-  filter: drop-shadow(0 16px 24px rgb(70 98 55 / 0.2));
+  filter: drop-shadow(0 18px 28px rgb(31 61 43 / 0.28));
 }
 
 .lp-brand {
@@ -273,9 +273,9 @@
     min-height: calc(100dvh - 36px);
     border-radius: 34px;
   }
-  .lp-ribbon {
+  .lp-logo {
     top: 50%;
-    width: 74%;
+    width: min(36%, 340px);
   }
   .lp-brand {
     position: static;

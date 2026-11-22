@@ -4,7 +4,6 @@ import { GoogleButton } from "./google-button";
 import { demoSignIn } from "@/app/actions/auth";
 import { DEMO_ACCOUNTS, isDemoMode } from "@/lib/demo";
 import { Avatar } from "@/components/avatar";
-import { LoopRibbon } from "@/components/loop-ribbon";
 
 export const metadata = { title: "Sign in" };
 
@@ -37,7 +36,8 @@ export default function LoginPage(props: PageProps<"/login">) {
   return (
     <main className="lp">
       <aside className="lp-art" aria-hidden="true">
-        <LoopRibbon />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/brand/loop-icon-512.png" alt="" width={512} height={512} className="lp-logo" />
       </aside>
 
       <div className="lp-main">
