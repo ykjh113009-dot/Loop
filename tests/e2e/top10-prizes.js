@@ -14,6 +14,7 @@ const login = async (b, email, vp = { width: 1280, height: 900 }, mobile = false
 };
 const text = (p) => p.innerText('body');
 
+const go = (p, u) => p.goto(BASE + u, { waitUntil: 'networkidle' });
 (async () => {
   const b = await chromium.launch();
   const maya = await login(b, 'demo.maya@pioneers.edu.ps');
@@ -21,6 +22,11 @@ const text = (p) => p.innerText('body');
   await p.goto(BASE + '/shop', { waitUntil: 'networkidle' });
   check('The Reward Shop page shows Coming soon for redeeming', (await p.locator('[data-coming-soon]').count()) === 1 && /Coming soon/.test(await text(p)) && (await p.locator('[data-reward]').count()) === 0);
   check('The Top 10 banner shows the competition, title and trophy text', (await p.locator('[data-top10-banner]').count()) === 1 && /Monthly competition/.test(await p.locator('[data-top10-banner]').innerText()) && /Reach the top 10 and win exclusive rewards/.test(await text(p)));
+  check('The ten prizes show as cards on the Reward Shop page', (await p.locator('[data-prize-card]:visible').count()) === 10 && /MacBook Air/.test(await p.locator('[data-prize-card="1"]').innerText()) && (await p.locator('[data-prize-card="1"][data-special]').count()) === 0);
+  await go(p, '/shop?cat=technology');
+  const tech = (await p.locator('[data-prize-card]:visible').allInnerTexts()).join('|');
+  check('The category chips filter the prize cards', /MacBook Air/.test(tech) && /iPad/.test(tech) && !/Gift Card/.test(tech) && (await p.locator('[data-shop-categories] a[aria-current=page]').innerText()) === 'Technology', tech.slice(0, 80));
+  await go(p, '/shop?view=top10');
   check('The countdown is shown for the monthly competition', (await p.locator('[data-countdown]').count()) === 1 && /Ends in/.test(await p.locator('[data-countdown]').innerText()));
   const slots = await p.locator('[data-prize-slot]').evaluateAll((els) => els.map((e) => e.querySelector('p span')?.textContent));
   check('The ten starting prizes are in place', slots[0] === 'MacBook Air' && slots[1] === 'AirPods Pro' && slots[2] === '$100 Gift Card' && slots[3] === 'iPad' && slots[8] === 'SAT Refund' && slots[9] === 'Four Cinema Tickets' && slots.length === 10, slots.join(' / '));

@@ -64,6 +64,16 @@ export function prizeIconFor(title: string, category?: string): LucideIcon {
   return category ? CATEGORY_ICON[category] ?? Gift : Gift;
 }
 
+// Which shelf a Top 10 prize belongs on, worked out from its name (prizes have no category of their own).
+export function prizeCategory(title: string): (typeof CATEGORIES)[number] | "other" {
+  const t = title.toLowerCase();
+  if (/macbook|laptop|ipad|tablet|airpods|headphone|earbud|phone|watch|console/.test(t)) return "technology";
+  if (/cinema|movie|ticket|trip|experience|concert/.test(t)) return "experiences";
+  if (/sat|exam|refund|tuition|course|book|stationery|study|subscription|premium/.test(t)) return "study";
+  if (/gift card|voucher|spotify|playstation|gaming|cash/.test(t)) return "gift_cards";
+  return "other";
+}
+
 export function PrizeIcon({ title, category, className = "size-6", strokeWidth = 1.5 }: { title: string; category?: string; className?: string; strokeWidth?: number }) {
   return createElement(prizeIconFor(title, category), { className, strokeWidth, "aria-hidden": true });
 }

@@ -1,11 +1,14 @@
 import { Suspense } from "react";
-import { GraduationCap, Sparkles } from "lucide-react";
+import Link from "next/link";
+import { Sparkles } from "lucide-react";
 import { requireMe } from "@/lib/auth";
+import { createClient } from "@/lib/supabase/server";
+import { signImages } from "@/lib/images";
 import { getT } from "@/lib/i18n-server";
 import { GiftScene } from "@/components/art/scenes";
 import { PageSkeleton } from "@/components/skeleton";
 import { Top10Panel } from "@/components/shop/top10-panel";
-import { Waves } from "@/components/shop/art";
+import { CATEGORIES, CATEGORY_LABEL, PrizeIcon, Waves, prizeCategory } from "@/components/shop/art";
 
 export const metadata = { title: "Reward Shop" };
 
@@ -17,6 +20,12 @@ async function Shop({ searchParams }: { searchParams: PageProps<"/shop">["search
   const { t } = await getT();
   const sp = await searchParams;
   const topFirst = sp.view === "top10";
+  const cat = typeof sp.cat === "string" && ([...CATEGORIES] as string[]).includes(sp.cat) ? sp.cat : "";
+  const supabase = await createClient();
+  const { data: prizes } = await supabase.from("top10_prizes").select("place, title, description, value, image_path, special").order("place");
+  const images = await signImages(supabase, (prizes ?? []).map((x) => x.image_path));
+  const shown = (prizes ?? []).filter((p) => !cat || prizeCategory(p.title) === cat);
+  const chips: [string, string][] = [["", "All"], ...CATEGORIES.map((c) => [c, CATEGORY_LABEL[c]] as [string, string])];
   return (
     <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_390px]" data-shop-page data-wide>
       <div className={`min-w-0 space-y-5 ${topFirst ? "order-2 xl:order-none" : ""}`} data-section="reward-shop">
@@ -32,27 +41,45 @@ async function Shop({ searchParams }: { searchParams: PageProps<"/shop">["search
           <p className="text-sm text-ink-2">{t("The Top 10 Prizes are already live. Earn points to climb the leaderboard and win one.")}</p>
         </section>
 
-        {/* A preview of what is coming: nothing here can be used yet. */}
-        <div className="pointer-events-none select-none space-y-4 opacity-80" aria-hidden="true" data-shop-preview>
-          <div className="flex gap-2 overflow-x-auto">
-            {["All", "Gift Cards", "Technology", "Study", "Experiences"].map((c, i) => (
-              <span key={c} className={`opt shrink-0 px-5 py-2 ${i === 0 ? "opt-on" : ""}`}>{t(c)}</span>
-            ))}
-          </div>
-          <ul className="grid grid-cols-2 gap-3 lg:grid-cols-3">
-            {Array.from({ length: 6 }, (_, i) => (
-              <li key={i} className="space-y-2 rounded-2xl border border-black/5 bg-white/60 p-2.5">
-                <div className="aspect-[4/3] rounded-xl bg-sand/70" />
-                <div className="h-3 w-2/5 rounded-full bg-black/[0.06]" />
-                <div className="h-8 rounded-full bg-black/[0.06]" />
-              </li>
+        {/* The ten prizes, one card each: the student in that place on the leaderboard wins it. */}
+        <nav aria-label={t("Prize categories")} className="-mx-1 overflow-x-auto px-1 [scrollbar-width:none]" data-shop-categories>
+          <ul className="flex min-w-max gap-2 py-1">
+            {chips.map(([id, label]) => (
+              <li key={id || "all"}><Link href={id ? `/shop?cat=${id}` : "/shop"} aria-current={cat === id ? "page" : undefined} className="opt px-5 py-2">{t(label)}</Link></li>
             ))}
           </ul>
-          <div className="flex items-center gap-4 rounded-2xl bg-sage-soft/50 p-4">
-            <GraduationCap className="size-10 shrink-0 text-brand-800/60" strokeWidth={1.3} />
-            <div className="min-w-0 flex-1 space-y-2"><div className="h-3 w-3/4 rounded-full bg-black/10" /><div className="h-3 w-1/2 rounded-full bg-black/10" /></div>
-          </div>
-        </div>
+        </nav>
+        {shown.length === 0 ? (
+          <p className="card px-6 py-8 text-center text-sm text-ink-2">{t("No prizes in this group.")}</p>
+        ) : (
+          <ul className="grid grid-cols-2 gap-3 lg:grid-cols-3" data-prize-cards>
+            {shown.map((p) => {
+              const img = p.image_path ? images.get(p.image_path) ?? null : null;
+              return (
+                <li key={p.place} className="card flex flex-col overflow-hidden" data-prize-card={p.place}>
+                  <div className="relative flex aspect-[4/3] items-center justify-center bg-gradient-to-br from-sand to-sage-soft/60 text-brand-800">
+                    {img
+                      // eslint-disable-next-line @next/next/no-img-element -- private signed link
+                      ? <img src={img} alt="" loading="lazy" className="size-full object-cover" />
+                      : <PrizeIcon title={p.title} className="size-14" strokeWidth={1.2} />}
+                    <span className="absolute start-3 top-3 rounded-full border border-gold/40 bg-white/90 px-2.5 py-1 text-[11px] font-semibold shadow-sm">{t("Place {n}", { n: p.place })}</span>
+                  </div>
+                  <div className="flex flex-1 flex-col gap-1.5 p-3.5">
+                    <h2 className="flex flex-wrap items-center gap-x-2 text-[15px] leading-tight font-semibold">
+                      <span>{p.title}</span>
+                      {p.special && <span className="rounded-full border border-brand-700/20 bg-white/80 px-2 py-0.5 text-[10px] font-medium text-brand-800">{t("Education reward")}</span>}
+                    </h2>
+                    {p.description && <p className="line-clamp-2 text-sm text-ink-2">{p.description}</p>}
+                    <p className="mt-auto flex items-center justify-between gap-2 pt-1 text-xs text-ink-2">
+                      <span>{p.place === 1 ? t("Top of the leaderboard") : t("Rank {n} on the leaderboard", { n: p.place })}</span>
+                      {p.value && <span className="font-semibold tabular-nums text-gold">{p.value}</span>}
+                    </p>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        )}
       </div>
       <aside className={`min-w-0 ${topFirst ? "order-1 xl:order-none" : ""}`}>
         <Top10Panel meId={me.id} />
