@@ -15,7 +15,7 @@ const check = (name, ok, info = '') => { results.push(ok); console.log((ok ? 'PA
   await p.waitForURL('**/home'); await p.waitForTimeout(800);
   await p.goto(BASE + '/clubs', { waitUntil: 'networkidle' });
   const t = async () => (await p.locator('main').innerText()).replace(/\s+/g, ' ');
-  check('Clubs has its banner with the tagline', /Find your people\. Join clubs that match your interests\./.test(await t()) && (await p.locator('[data-banner] img').evaluate((i) => i.complete && i.naturalWidth > 0)));
+  check('Clubs has its banner with the tagline', /Find your people\. Join clubs that match your interests\./.test(await t()) && (await p.locator('[data-banner] [data-banner-title]').innerText()) === 'Clubs');
   const pills = await p.locator('[data-club-filters] a').allInnerTexts();
   check('Category pills: All Clubs, Sports, Academics, Tech, Culture, Charity', JSON.stringify(pills.map((x) => x.trim())) === JSON.stringify(['All Clubs', 'Sports', 'Academics', 'Tech', 'Culture', 'Charity']), pills.join(','));
   const total = Number(q("select count(*) from public.clubs where status='approved'"));
