@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { formatDateTime } from "@/lib/time";
 import { deletePoll } from "@/app/actions/polls";
 import { VoteForm } from "@/components/vote-form";
-import { Glyph } from "@/components/glyph";
+import { PollResults } from "@/components/poll-results";
 
 type Poll = {
   id: string;
@@ -32,23 +32,7 @@ export async function PollCard({ poll, canVote, canDelete }: { poll: Poll; canVo
       </div>
       {open && canVote && r.mine === null && <VoteForm pollId={poll.id} options={poll.options} />}
       {r.show && r.counts ? (
-        <ul className="space-y-2">
-          {poll.options.map((option, i) => {
-            const n = r.counts![i] ?? 0;
-            const pct = r.total ? Math.round((n / r.total) * 100) : 0;
-            return (
-              <li key={i} className="text-sm">
-                <div className="flex justify-between">
-                  <span className={r.mine === i ? "font-semibold" : ""}>{option}{r.mine === i && <Glyph e="✓" className="ms-1" />}</span>
-                  <span className="tabular-nums text-black/60">{pct}% ({n})</span>
-                </div>
-                <div className="mt-1 h-2.5 rounded-full bg-black/[0.06]">
-                  <div className={`h-2.5 rounded-full ${r.mine === i ? "bg-brand-700" : "bg-brand-500/60"}`} style={{ width: `${Math.max(1, pct)}%` }} />
-                </div>
-              </li>
-            );
-          })}
-        </ul>
+        <PollResults pollId={poll.id} options={poll.options} counts={r.counts} total={r.total} mine={r.mine} canChange={open && canVote && r.mine !== null} />
       ) : !(open && canVote) ? (
         <p className="text-sm text-black/50">Results appear when the poll closes.</p>
       ) : null}

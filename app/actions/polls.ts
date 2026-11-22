@@ -24,6 +24,15 @@ export async function vote(_: ActionResult, formData: FormData): Promise<ActionR
   return { ok: true };
 }
 
+export async function changeVote(pollId: string, option: number): Promise<ActionResult> {
+  await requireMe();
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("change_poll_vote", { p_poll: pollId, p_option: option });
+  if (error) return { error: error.code === "P0001" ? error.message.replace(/^[A-Z_]+: /, "") : friendlyError(error) };
+  refresh();
+  return { ok: true };
+}
+
 export async function createPoll(_: ActionResult, formData: FormData): Promise<ActionResult> {
   const me = await requireMe();
   const question = String(formData.get("question") ?? "").trim();

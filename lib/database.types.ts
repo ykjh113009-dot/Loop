@@ -3727,6 +3727,9 @@ isOneToOne: false
 "challenge_stats":
 { Args: { "p_challenge": string }; Returns: Json
                            },
+"change_poll_vote":
+{ Args: { "p_option": number,"p_poll": string }; Returns: undefined
+                           },
 "check_rate":
 { Args: { "p_action": string,"p_max": number,"p_seconds": number }; Returns: undefined
                            },
