@@ -89,6 +89,32 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"admin_hidden": {
+                  Row: {
+                    "hidden_at": string,"hidden_by": string | null,"id": string,"kind": string,"prev_status": string | null,"reason": string,"school_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "hidden_at"?: string,"hidden_by"?: string | null,"id": string,"kind": string,"prev_status"?: string | null,"reason": string,"school_id": string
+                  }
+                  Update: {
+                    "hidden_at"?: string,"hidden_by"?: string | null,"id"?: string,"kind"?: string,"prev_status"?: string | null,"reason"?: string,"school_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "admin_hidden_hidden_by_fkey"
+      columns: ["hidden_by"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "admin_hidden_school_id_fkey"
+      columns: ["school_id"]
+isOneToOne: false
+      referencedRelation: "schools"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"announcements": {
                   Row: {
                     "author_id": string | null,"body": string,"created_at": string,"id": string,"school_id": string,"title": string
@@ -3597,16 +3623,36 @@ isOneToOne: false
 "admin_adjust_points":
 { Args: { "p_points": number,"p_profile": string,"p_reason": string }; Returns: undefined
                            },
-"admin_content_feed":
-{ Args: { "p_kind"?: string,"p_limit"?: number }; Returns: {
-              "author": string,"author_id": string,"created_at": string,"detail": string,"id": string,"kind": string,"status": string,"title": string
+"admin_close_poll":
+{ Args: { "p_id": string }; Returns: undefined
+                           },
+"admin_content_list":
+{ Args: { "p_kind"?: string,"p_limit"?: number,"p_view"?: string }; Returns: {
+              "author": string,"author_id": string,"can_edit": boolean,"can_hide": boolean,"can_purge": boolean,"created_at": string,"detail": string,"hidden_at": string,"hidden_by": string,"hidden_reason": string,"id": string,"kind": string,"status": string,"title": string
             }[]
+                           },
+"admin_edit_content":
+{ Args: { "p_detail": string,"p_id": string,"p_kind": string,"p_title": string }; Returns: undefined
+                           },
+"admin_hide_content":
+{ Args: { "p_id": string,"p_kind": string,"p_reason": string }; Returns: undefined
+                           },
+"admin_purge_content":
+{ Args: { "p_id": string,"p_kind": string,"p_reason": string }; Returns: undefined
                            },
 "admin_remove_content":
 { Args: { "p_id": string,"p_kind": string,"p_reason": string }; Returns: undefined
                            },
+"admin_restore_content":
+{ Args: { "p_id": string,"p_kind": string }; Returns: undefined
+                           },
 "admin_reverse_entry":
 { Args: { "p_entry": number,"p_reason": string }; Returns: undefined
+                           },
+"admin_review_reported_conversation":
+{ Args: { "p_reason": string,"p_report": string }; Returns: {
+              "body": string,"created_at": string,"id": string,"reported": boolean,"sender": string
+            }[]
                            },
 "admin_set_achievement":
 { Args: { "p_active": boolean,"p_code": string,"p_points": number }; Returns: undefined
@@ -3775,6 +3821,9 @@ isOneToOne: false
                            },
 "contains_blocked_word":
 { Args: { "p_school": string,"p_text": string }; Returns: boolean
+                           },
+"content_can_hide":
+{ Args: { "p_kind": string }; Returns: boolean
                            },
 "create_default_houses":
 { Args: { "p_count": number }; Returns: number

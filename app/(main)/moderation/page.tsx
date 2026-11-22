@@ -11,6 +11,7 @@ import { PageHeader } from "@/components/page-header";
 import { SubmitButton } from "@/components/submit-button";
 import { PageSkeleton } from "@/components/skeleton";
 import { Glyph } from "@/components/glyph";
+import { ReviewConversation } from "@/components/review-conversation";
 
 export const metadata = { title: "Moderation" };
 
@@ -101,6 +102,7 @@ async function Reports() {
             )}
             <blockquote className="rounded-xl bg-black/[0.04] px-3 py-2 text-sm whitespace-pre-wrap">{first.snapshot || "(empty)"}</blockquote>
 
+            {first.target_type === "message" && me.isSuperAdmin && <ReviewConversation reportId={first.id} />}
             <ul className="space-y-1 text-xs text-black/60">
               {group.map((r) => (
                 <li key={r.id}>
@@ -349,6 +351,7 @@ export default function ModerationPage(props: PageProps<"/moderation">) {
   return (
     <>
       <PageHeader title="Moderation" />
+      <p className="mb-3 text-sm"><Link href="/admin/content" className="font-medium text-brand-700 underline">Manage everything people posted</Link> <span className="text-black/50">(hide, restore, edit)</span></p>
       <Suspense fallback={<PageSkeleton />}>
         <Moderation searchParams={props.searchParams} />
       </Suspense>
