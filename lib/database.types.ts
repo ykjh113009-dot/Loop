@@ -3597,6 +3597,14 @@ isOneToOne: false
 "admin_adjust_points":
 { Args: { "p_points": number,"p_profile": string,"p_reason": string }; Returns: undefined
                            },
+"admin_content_feed":
+{ Args: { "p_kind"?: string,"p_limit"?: number }; Returns: {
+              "author": string,"author_id": string,"created_at": string,"detail": string,"id": string,"kind": string,"status": string,"title": string
+            }[]
+                           },
+"admin_remove_content":
+{ Args: { "p_id": string,"p_kind": string,"p_reason": string }; Returns: undefined
+                           },
 "admin_reverse_entry":
 { Args: { "p_entry": number,"p_reason": string }; Returns: undefined
                            },
