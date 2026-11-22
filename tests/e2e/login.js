@@ -144,11 +144,16 @@ const text = async (p) => (await p.locator('body').innerText()).replace(/\s+/g, 
     const anon = createClient(SB, KEY, { auth: { persistSession: false } });
     const g = await anon.auth.signInWithOtp({ email: 'someone.random@gmail.com', options: { shouldCreateUser: true } });
     check('Unsupported account (Gmail) is refused', !!g.error, g.error?.message?.slice(0, 80));
+    // The real school is Google-only; the local demo data is not (demo accounts sign in with a password), so switch it on for this check.
+    const { execSync: sh } = require('child_process');
+    const DB = 'postgresql://postgres:postgres@127.0.0.1:54322/postgres';
+    sh(`psql ${DB} -qtAc "delete from auth.users where email = 'fake.student@pioneers.edu.ps'; update public.schools set google_only = true"`);
     const s = await anon.auth.signUp({ email: 'fake.student@pioneers.edu.ps', password: 'Test-pass-12345' });
     check('School-looking email cannot create a password account', !!s.error, s.error?.message?.slice(0, 80));
     const { execSync } = require('child_process');
     const n = execSync(`psql postgresql://postgres:postgres@127.0.0.1:54322/postgres -qtAc "select count(*) from auth.users where email in ('someone.random@gmail.com','fake.student@pioneers.edu.ps')"`).toString().trim();
     check('Refused accounts were not created in the database', n === '0', 'rows: ' + n);
+    sh(`psql ${DB} -qtAc "update public.schools set google_only = false"`);
     const l = await anon.auth.signInWithPassword({ email: 'demo.layla@pioneers.edu.ps', password: 'wrong-password' });
     check('Wrong password on a demo account is refused', !!l.error, l.error?.message);
   }
