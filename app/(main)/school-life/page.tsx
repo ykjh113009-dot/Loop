@@ -48,8 +48,8 @@ async function SchoolLife({ month }: { month?: string }) {
 
   return (
     <div className="space-y-5" data-category-page="school-life" data-wide>
-      <section className="relative isolate overflow-hidden rounded-3xl bg-[#e9ead6] px-5 py-6 lg:px-8 lg:py-8" data-banner>
-        <div className="pointer-events-none absolute -end-16 -top-24 -z-10 size-72 rounded-full bg-[#dbe5cc]" aria-hidden="true" />
+      <section className="relative isolate overflow-hidden rounded-3xl bg-[#e8efe6] px-5 py-6 lg:px-8 lg:py-8" data-banner>
+        <div className="pointer-events-none absolute -end-16 -top-24 -z-10 size-72 rounded-full bg-[#d7e6d9]" aria-hidden="true" />
         <div className="pointer-events-none absolute -bottom-32 end-28 -z-10 h-56 w-[28rem] rounded-[50%] bg-[#d3dfc3]/80" aria-hidden="true" />
         <h1 className="font-heading text-[34px] leading-none font-semibold text-brand-900 lg:text-[50px]" data-banner-title>{t("School Life")}</h1>
         <p className="mt-2 max-w-xl text-[13px] text-ink-2 lg:mt-3 lg:text-lg">{t("Get involved. Make an impact. Be part of your school.")}</p>

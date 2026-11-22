@@ -17,7 +17,7 @@ const titles = async (p) => (await p.locator('[data-listing]:visible p.line-clam
   const { p } = await login(b, 'demo.maya@pioneers.edu.ps');
   await go(p, '/marketplace');
   check('The Marketplace is the student market', (await p.locator('[data-market-banner]').count()) === 1 && /Buy, Sell, and Swap with ease/.test(await p.innerText('body')) && /Discover great deals/.test(await p.innerText('body')));
-  check('Buy, Sell and Swap tabs, with Buy selected in green', (await p.locator('[data-market-controls] [role=tab]').allInnerTexts()).join('|') === 'Buy|Sell|Swap' && (await p.locator('[role=tab][aria-selected=true]').evaluate((e) => getComputedStyle(e).backgroundColor)) === 'rgb(70, 98, 55)');
+  check('Buy, Sell and Swap tabs, with Buy selected in green', (await p.locator('[data-market-controls] [role=tab]').allInnerTexts()).join('|') === 'Buy|Sell|Swap' && (await p.locator('[role=tab][aria-selected=true]').evaluate((e) => getComputedStyle(e).backgroundColor)) === 'rgb(77, 114, 91)');
   check('The market page has no reward shop or Top 10 content', !/Top 10|Reward|Your Points/.test(await p.locator('[data-market-page]').innerText()));
   const buy = await titles(p);
   check('Buy lists items for sale and free items', buy.length >= 3 && buy.some((x) => /Football boots/.test(x)) && !buy.some((x) => /^Swap:/.test(x)), buy.join(' | '));

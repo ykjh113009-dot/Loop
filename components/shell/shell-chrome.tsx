@@ -24,7 +24,7 @@ function Wordmark({ className }: { className: string }) {
   return (
     <Link href="/home" aria-label="Loop home" className="inline-flex">
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/brand/loop-wordmark.png" alt="Loop" width={574} height={240} className={className} />
+      <img src="/brand/loop-wordmark.png" alt="Loop" width={1148} height={520} className={className} />
     </Link>
   );
 }
@@ -107,7 +107,7 @@ export function ShellChrome({ user, badges, pathname, locale = "en", search = ""
         <Link
           href="#composer"
           aria-label={t("New post")}
-          className="fixed end-4 bottom-[calc(4.75rem+env(safe-area-inset-bottom))] z-30 flex size-14 items-center justify-center rounded-full bg-brand-700 text-white shadow-[0_10px_24px_-8px_rgba(58,82,48,0.8)] active:scale-95 print:hidden lg:hidden"
+          className="fixed end-4 bottom-[calc(4.75rem+env(safe-area-inset-bottom))] z-30 flex size-14 items-center justify-center rounded-full bg-brand-700 text-white shadow-[0_10px_24px_-8px_rgba(62,93,74,0.8)] active:scale-95 print:hidden lg:hidden"
         >
           <Pencil className="size-6" strokeWidth={1.9} aria-hidden="true" />
         </Link>

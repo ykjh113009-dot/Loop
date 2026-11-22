@@ -1,6 +1,6 @@
 // Small vector scenes for page banners and empty states. Soft sage, cream and forest green, like the rest of Loop.
-const FOREST = "#466237";
-const SAGE = "#99ab78";
+const FOREST = "#4d725b";
+const SAGE = "#a7c4aa";
 const SOFT = "#dde6cc";
 const SKY = "#cfe2ea";
 const CREAM = "#fdfaef";
