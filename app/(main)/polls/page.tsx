@@ -36,7 +36,7 @@ async function Polls({ searchParams }: { searchParams: PageProps<"/polls">["sear
 
   return (
     <div className="space-y-5" data-polls-page data-wide>
-      <ImageBanner name="community" title="Community" subtitle="Connect. Share. Belong." />
+      <ImageBanner name="community" title="Polls" subtitle="See your polls and vote in ongoing ones!" />
       <SectionTabs label="Polls" current={href(tab)} items={TABS.map(([k, label]) => ({ href: href(k), label }))} />
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1fr)_300px]">
         <section className="min-w-0 space-y-3">

@@ -24,7 +24,7 @@ async function Saved({ searchParams }: { searchParams: PageProps<"/saved">["sear
   const href = (k: string) => `/saved${k ? `?tab=${k}` : ""}`;
   const header = (
     <>
-      <ImageBanner name="community" title="Community" subtitle="Connect. Share. Belong." />
+      <ImageBanner name="community" title="Saved" subtitle="Your saved posts, polls and resources" />
       <SectionTabs label={t("Saved")} current={href(tab)} items={TABS.map(([k, label]) => ({ href: href(k), label: t(label) }))} />
     </>
   );

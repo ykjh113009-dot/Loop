@@ -39,7 +39,7 @@ async function Groups({ searchParams }: { searchParams: PageProps<"/groups">["se
 
   return (
     <div className="space-y-5" data-groups-page data-wide>
-      <ImageBanner name="community" title="Community" subtitle="Connect. Share. Belong." />
+      <ImageBanner name="community" title="Groups" subtitle="Find and join groups that match your interests!" />
       <div className="flex flex-wrap items-center gap-3">
         <SectionTabs label={t("Groups")} current={href(tab)} items={TABS.map(([k, label]) => ({ href: href(k), label: t(label) }))} />
         <form role="search" className="relative ms-auto min-w-[200px] flex-1 sm:max-w-xs">
