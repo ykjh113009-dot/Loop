@@ -15,8 +15,8 @@ export function LogHoursForm({ today }: { today: string }) {
   return (
     <form ref={form} action={action} className="card space-y-3 p-4">
       <h2 className="font-semibold">Log volunteering hours</h2>
-      <input name="organization" required minLength={2} maxLength={100} placeholder="Where? e.g. Red Crescent, public library" className="input" />
-      <textarea name="description" rows={2} maxLength={500} placeholder="What did you do?" className="input resize-none" />
+      <input name="organization" required minLength={2} maxLength={100} placeholder="Where? e.g. Red Crescent, public library" className="input" aria-label="Where? e.g. Red Crescent, public library" />
+      <textarea name="description" rows={2} maxLength={500} placeholder="What did you do?" className="input resize-none" aria-label="What did you do?" />
       <div className="grid grid-cols-2 gap-2">
         <label className="text-sm">
           <span className="label">Date</span>
@@ -27,7 +27,7 @@ export function LogHoursForm({ today }: { today: string }) {
           <input type="number" name="hours" required min={0.5} max={12} step={0.5} defaultValue={2} className="input" />
         </label>
       </div>
-      <input name="supervisor_name" maxLength={80} placeholder="Supervisor's name (who can confirm it)" className="input" />
+      <input name="supervisor_name" maxLength={80} placeholder="Supervisor's name (who can confirm it)" className="input" aria-label="Supervisor's name (who can confirm it)" />
       <p className="text-xs text-black/50">Don&apos;t write phone numbers. A moderator checks your hours before they count.</p>
       <FormMessage state={state} />
       <SubmitButton className="btn-primary w-full">Save hours</SubmitButton>

@@ -72,7 +72,7 @@ async function Election({ params }: { params: PageProps<"/council/elections/[id]
               {c.profile.id === me.id && state !== "closed" && (
                 <ActionForm action={updateStatement} className="space-y-1">
                   <input type="hidden" name="id" value={c.id} />
-                  <textarea name="statement" rows={2} maxLength={500} defaultValue={c.statement} placeholder="Your message to voters" className="input resize-none text-sm" />
+                  <textarea name="statement" rows={2} maxLength={500} defaultValue={c.statement} placeholder="Your message to voters" className="input resize-none text-sm" aria-label="Your message to voters" />
                   <SubmitButton className="btn-secondary px-3 py-1.5 text-xs">Save my statement</SubmitButton>
                 </ActionForm>
               )}
@@ -102,7 +102,7 @@ async function Election({ params }: { params: PageProps<"/council/elections/[id]
               <ActionForm action={addCandidate} className="mt-3 space-y-2">
                 <input type="hidden" name="electionId" value={e.id} />
                 <StudentPicker />
-                <textarea name="statement" rows={2} maxLength={500} placeholder="Their statement (they can edit it later)" className="input resize-none" />
+                <textarea name="statement" rows={2} maxLength={500} placeholder="Their statement (they can edit it later)" className="input resize-none" aria-label="Their statement (they can edit it later)" />
                 <SubmitButton className="btn-primary w-full">Add candidate</SubmitButton>
               </ActionForm>
             </details>

@@ -19,8 +19,8 @@ export function SuggestionForm() {
       <select name="category" className="input" aria-label="Category" defaultValue="activities">
         {Object.entries(SUGGESTION_CATEGORIES).map(([id, label]) => <option key={id} value={id}>{label}</option>)}
       </select>
-      <input name="title" required minLength={3} maxLength={100} placeholder="Your idea in a few words" className="input" />
-      <textarea name="body" rows={3} maxLength={1500} placeholder="Explain it (optional)" className="input resize-none" />
+      <input name="title" required minLength={3} maxLength={100} placeholder="Your idea in a few words" className="input" aria-label="Your idea in a few words" />
+      <textarea name="body" rows={3} maxLength={1500} placeholder="Explain it (optional)" className="input resize-none" aria-label="Explain it (optional)" />
       <p className="text-xs text-black/50">Only you, the student council and school admins can see your suggestion.</p>
       <FormMessage state={state} />
       <SubmitButton className="btn-primary w-full" pendingText="Sending…">Send</SubmitButton>
@@ -42,7 +42,7 @@ export function RespondForm({ id, status, response }: { id: string; status: stri
         </select>
         <SubmitButton className="btn-primary shrink-0 px-3" pendingText="…">Update</SubmitButton>
       </div>
-      <textarea name="response" rows={2} maxLength={1000} defaultValue={response ?? ""} placeholder="Reply to the student (optional)" className="input resize-none text-sm" />
+      <textarea name="response" rows={2} maxLength={1000} defaultValue={response ?? ""} placeholder="Reply to the student (optional)" className="input resize-none text-sm" aria-label="Reply to the student (optional)" />
       <FormMessage state={state} />
     </form>
   );

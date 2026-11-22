@@ -49,8 +49,7 @@ export function PostComposer({ clubId, schoolId, userId }: { clubId: string; sch
         maxLength={2000}
         rows={2}
         placeholder="Share something with the club…"
-        className="input resize-none"
-      />
+        className="input resize-none" aria-label="Share something with the club…" />
       {preview && (
         <div className="relative">
           {/* eslint-disable-next-line @next/next/no-img-element */}

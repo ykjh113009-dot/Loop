@@ -10,8 +10,8 @@ export function PostUpdateForm({ eventId, locale }: { eventId: string; locale: L
   return (
     <form action={action} className="space-y-2">
       <input type="hidden" name="id" value={eventId} />
-      <input name="title" required maxLength={100} className="input" placeholder={t("Title, e.g. Bring a jacket")} />
-      <textarea name="body" rows={2} maxLength={1000} className="input resize-none" placeholder={t("Details (optional)")} />
+      <input name="title" required maxLength={100} className="input" placeholder={t("Title, e.g. Bring a jacket")} aria-label={t("Title, e.g. Bring a jacket")} />
+      <textarea name="body" rows={2} maxLength={1000} className="input resize-none" placeholder={t("Details (optional)")} aria-label={t("Details (optional)")} />
       {state?.error && <p role="alert" className="text-sm text-red-700">{state.error}</p>}
       {state?.message && <p className="text-sm text-brand-800">{state.message}</p>}
       <button disabled={pending} className="btn-secondary w-full">{pending ? "…" : t("Tell everyone involved")}</button>
@@ -43,7 +43,7 @@ export function ProposalDecision({ eventId, locale }: { eventId: string; locale:
   return (
     <form action={action} className="space-y-2">
       <input type="hidden" name="id" value={eventId} />
-      <input name="note" maxLength={300} className="input text-sm" placeholder={t("Feedback for the student (needed to reject)")} />
+      <input name="note" maxLength={300} className="input text-sm" placeholder={t("Feedback for the student (needed to reject)")} aria-label={t("Feedback for the student (needed to reject)")} />
       <div className="flex gap-2">
         <button name="decision" value="reject" disabled={pending} className="btn-danger flex-1">{t("Reject")}</button>
         <button name="decision" value="approve" disabled={pending} className="btn-primary flex-1">{t("Approve and publish")}</button>

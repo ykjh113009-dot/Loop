@@ -109,7 +109,7 @@ async function Student({ params }: { params: PageProps<"/admin/students/[id]">["
           </p>
           <ActionForm action={setAlumni} className="flex gap-2">
             <input type="hidden" name="profileId" value={s.id} />
-            <input name="alumni_year" type="number" min={1990} max={2100} defaultValue={s.alumni_year ?? ""} placeholder="Graduation year, empty = current student" className="input" />
+            <input name="alumni_year" type="number" min={1990} max={2100} defaultValue={s.alumni_year ?? ""} placeholder="Graduation year, empty = current student" className="input" aria-label="Graduation year, empty = current student" />
             <SubmitButton className="btn-secondary shrink-0">Save</SubmitButton>
           </ActionForm>
         </section>
@@ -139,7 +139,7 @@ async function Student({ params }: { params: PageProps<"/admin/students/[id]">["
                 <option value="custom">Custom…</option>
               </select>
               <input name="customDays" type="number" min={1} max={365} placeholder="Days (custom)" aria-label="Custom number of days" className="input w-32" />
-              <input name="reason" required maxLength={200} placeholder="Reason (the student sees this)" className="input min-w-40 flex-1" />
+              <input name="reason" required maxLength={200} placeholder="Reason (the student sees this)" className="input min-w-40 flex-1" aria-label="Reason (the student sees this)" />
               <SubmitButton className="btn-danger" pendingText="…">Suspend</SubmitButton>
             </ActionForm>
           )}
@@ -179,7 +179,7 @@ async function Student({ params }: { params: PageProps<"/admin/students/[id]">["
               {Object.entries(RESTRICTIONS).map(([kind, label]) => <option key={kind} value={kind}>{label}</option>)}
             </select>
             <input name="days" type="number" min={1} max={365} defaultValue={7} aria-label="Days" className="input w-24" />
-            <input name="reason" required maxLength={200} placeholder="Reason (the student sees this)" className="input min-w-40 flex-1" />
+            <input name="reason" required maxLength={200} placeholder="Reason (the student sees this)" className="input min-w-40 flex-1" aria-label="Reason (the student sees this)" />
             <SubmitButton className="btn-danger" pendingText="…">Pause</SubmitButton>
           </ActionForm>
         </section>

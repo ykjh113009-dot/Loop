@@ -25,7 +25,7 @@ export function ManageEvent({ eventId, startsAt, endsAt, minStart }: { eventId: 
       <form action={cancel} className="mt-6 space-y-3 border-t border-black/5 pt-4">
         <input type="hidden" name="eventId" value={eventId} />
         <p className="text-sm font-medium">Cancel the event</p>
-        <input name="reason" maxLength={300} className="input" placeholder="Why? (shown to everyone going)" />
+        <input name="reason" maxLength={300} className="input" placeholder="Why? (shown to everyone going)" aria-label="Why? (shown to everyone going)" />
         <FormMessage state={cancelState} />
         <SubmitButton className="btn-danger w-full" pendingText="Cancelling…">Cancel event</SubmitButton>
       </form>

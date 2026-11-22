@@ -29,7 +29,7 @@ function TeamPicker({ people, initial, t }: { people: Person[]; initial: string[
           <button key={p.id} type="button" onClick={() => setIds(ids.filter((x) => x !== p.id))} className="chip bg-brand-50 text-brand-900">{p.name} <Glyph e="✕" /></button>
         ))}
       </div>
-      {ids.length < 8 && <input value={q} onChange={(e) => setQ(e.target.value)} className="input" placeholder={t("Type a name to add someone")} />}
+      {ids.length < 8 && <input value={q} onChange={(e) => setQ(e.target.value)} className="input" placeholder={t("Type a name to add someone")} aria-label={t("Type a name to add someone")} />}
       {matches.length > 0 && (
         <ul className="card divide-y divide-black/5 text-sm">
           {matches.map((p) => (

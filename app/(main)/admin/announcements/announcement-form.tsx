@@ -14,8 +14,8 @@ export function AnnouncementForm() {
   }, null);
   return (
     <form ref={form} action={action} className="card space-y-3 p-4">
-      <input name="title" required maxLength={120} placeholder="Title" className="input font-semibold" />
-      <textarea name="body" required maxLength={3000} rows={4} placeholder="Message to every student" className="input resize-none" />
+      <input name="title" required maxLength={120} placeholder="Title" className="input font-semibold" aria-label="Title" />
+      <textarea name="body" required maxLength={3000} rows={4} placeholder="Message to every student" className="input resize-none" aria-label="Message to every student" />
       <FormMessage state={state} />
       <SubmitButton className="btn-primary w-full" pendingText="Posting…">Post to everyone</SubmitButton>
     </form>

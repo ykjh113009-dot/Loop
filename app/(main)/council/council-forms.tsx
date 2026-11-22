@@ -22,8 +22,8 @@ export function PostForm({ locale }: { locale: Locale }) {
         <option value="initiative">{t("Initiative")}</option>
         <option value="activity">{t("Activity")}</option>
       </select>
-      <input name="title" required minLength={3} maxLength={100} className="input" placeholder={t("Title")} />
-      <textarea name="body" rows={3} maxLength={2000} className="input resize-none" placeholder={t("Details")} />
+      <input name="title" required minLength={3} maxLength={100} className="input" placeholder={t("Title")} aria-label={t("Title")} />
+      <textarea name="body" rows={3} maxLength={2000} className="input resize-none" placeholder={t("Details")} aria-label={t("Details")} />
       <select name="status" defaultValue="planned" className="input" aria-label={t("Initiative status")}>
         <option value="planned">{t("Initiative: planned")}</option>
         <option value="in_progress">{t("Initiative: in progress")}</option>
@@ -49,10 +49,10 @@ export function InfoForm({ locale, info }: { locale: Locale; info: { about: stri
   const [state, action, pending] = useActionState(setCouncilInfo, null);
   return (
     <form action={action} className="space-y-2">
-      <textarea name="about" rows={2} maxLength={1000} defaultValue={info.about} className="input resize-none" placeholder={t("About the council")} />
-      <input name="contact_email" type="email" maxLength={120} defaultValue={info.contact_email} className="input" placeholder={t("Contact email")} />
-      <input name="office" maxLength={120} defaultValue={info.office} className="input" placeholder={t("Where to find us, e.g. Room 3")} />
-      <input name="meeting_info" maxLength={300} defaultValue={info.meeting_info} className="input" placeholder={t("When we meet, e.g. Thursdays at lunch")} />
+      <textarea name="about" rows={2} maxLength={1000} defaultValue={info.about} className="input resize-none" placeholder={t("About the council")} aria-label={t("About the council")} />
+      <input name="contact_email" type="email" maxLength={120} defaultValue={info.contact_email} className="input" placeholder={t("Contact email")} aria-label={t("Contact email")} />
+      <input name="office" maxLength={120} defaultValue={info.office} className="input" placeholder={t("Where to find us, e.g. Room 3")} aria-label={t("Where to find us, e.g. Room 3")} />
+      <input name="meeting_info" maxLength={300} defaultValue={info.meeting_info} className="input" placeholder={t("When we meet, e.g. Thursdays at lunch")} aria-label={t("When we meet, e.g. Thursdays at lunch")} />
       <Msg state={state} />
       <button disabled={pending} className="btn-secondary w-full">{pending ? "…" : t("Save")}</button>
     </form>
@@ -64,8 +64,8 @@ export function ContactForm({ locale }: { locale: Locale }) {
   const [state, action, pending] = useActionState(contactCouncil, null);
   return (
     <form action={action} key={state?.message ? "done" : "form"} className="space-y-2">
-      <input name="subject" required minLength={3} maxLength={100} className="input" placeholder={t("Subject")} />
-      <textarea name="body" required minLength={3} maxLength={1500} rows={3} className="input resize-none" placeholder={t("What would you like to tell or ask the council?")} />
+      <input name="subject" required minLength={3} maxLength={100} className="input" placeholder={t("Subject")} aria-label={t("Subject")} />
+      <textarea name="body" required minLength={3} maxLength={1500} rows={3} className="input resize-none" placeholder={t("What would you like to tell or ask the council?")} aria-label={t("What would you like to tell or ask the council?")} />
       <Msg state={state} />
       <button disabled={pending} className="btn-primary w-full">{pending ? "…" : t("Send to the council")}</button>
       <p className="text-xs text-black/50">{t("Only the council and admins can read this. You will get the answer here and as a notification.")}</p>
@@ -79,7 +79,7 @@ export function ReplyForm({ id, locale }: { id: string; locale: Locale }) {
   return (
     <form action={action} className="space-y-2">
       <input type="hidden" name="id" value={id} />
-      <textarea name="reply" rows={2} maxLength={1500} className="input resize-none text-sm" placeholder={t("Your reply")} />
+      <textarea name="reply" rows={2} maxLength={1500} className="input resize-none text-sm" placeholder={t("Your reply")} aria-label={t("Your reply")} />
       <Msg state={state} />
       <div className="flex gap-2">
         <button name="close" value="1" disabled={pending} className="btn-ghost flex-1">{t("Close without reply")}</button>

@@ -49,7 +49,7 @@ export function EntryDecision({ id, locale, changing = false }: { id: string; lo
   return (
     <form action={action} className="space-y-2">
       <input type="hidden" name="id" value={id} />
-      <input name="note" maxLength={300} required={changing} placeholder={changing ? t("Why are you changing the decision?") : t("Feedback for the student (needed to reject)")} className="input text-sm" />
+      <input name="note" maxLength={300} required={changing} placeholder={changing ? t("Why are you changing the decision?") : t("Feedback for the student (needed to reject)")} className="input text-sm" aria-label={changing ? t("Why are you changing the decision?") : t("Feedback for the student (needed to reject)")} />
       <div className="flex gap-2">
         <button name="decision" value="reject" disabled={pending} className="btn-danger flex-1">{t("Reject")}</button>
         <button name="decision" value="approve" disabled={pending} className="btn-primary flex-1">{t("Approve")}</button>
@@ -67,7 +67,7 @@ export function IdeaDecision({ id, locale }: { id: string; locale: Locale }) {
     <form action={action} className="space-y-2">
       <input type="hidden" name="id" value={id} />
       <label className="flex items-start gap-2 text-sm"><input type="checkbox" name="safe" className="mt-0.5 size-5 shrink-0 accent-brand-700" /><span>{t("I checked it is safe, private and inside school rules.")}</span></label>
-      <input name="note" maxLength={300} placeholder={t("Feedback for the creator (needed to reject)")} className="input text-sm" />
+      <input name="note" maxLength={300} placeholder={t("Feedback for the creator (needed to reject)")} className="input text-sm" aria-label={t("Feedback for the creator (needed to reject)")} />
       <div className="flex gap-2">
         <button name="decision" value="reject" disabled={pending} className="btn-danger flex-1">{t("Send back")}</button>
         <button name="decision" value="approve" disabled={pending} className="btn-primary flex-1">{t("Approve")}</button>
@@ -85,7 +85,7 @@ export function CancelForm({ id, locale }: { id: string; locale: Locale }) {
       <summary className="cursor-pointer text-sm font-semibold text-red-700">{t("Cancel this challenge")}</summary>
       <form action={action} className="mt-3 space-y-2">
         <input type="hidden" name="id" value={id} />
-        <input name="note" required maxLength={300} placeholder={t("Why are you cancelling it?")} className="input text-sm" />
+        <input name="note" required maxLength={300} placeholder={t("Why are you cancelling it?")} className="input text-sm" aria-label={t("Why are you cancelling it?")} />
         <button disabled={pending} className="btn-danger w-full">{pending ? "…" : t("Cancel challenge")}</button>
         <Msg state={state} />
       </form>

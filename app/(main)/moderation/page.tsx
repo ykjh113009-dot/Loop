@@ -145,7 +145,7 @@ async function Reports() {
                     <option value="custom">Custom…</option>
                   </select>
                   <input name="customDays" type="number" min={1} max={365} placeholder="Days (custom)" aria-label="Custom number of days" className="input w-32" />
-                  <input name="reason" required maxLength={200} placeholder="Reason (the student sees this)" className="input min-w-40 flex-1" />
+                  <input name="reason" required maxLength={200} placeholder="Reason (the student sees this)" className="input min-w-40 flex-1" aria-label="Reason (the student sees this)" />
                   <SubmitButton className="btn-danger" pendingText="…">Suspend</SubmitButton>
                 </ActionForm>
               </details>
@@ -161,7 +161,7 @@ function ReviewButtons({ action, idName, id }: { action: typeof reviewClub; idNa
   return (
     <ActionForm action={action} className="flex flex-wrap gap-2 border-t border-black/5 pt-3">
       <input type="hidden" name={idName} value={id} />
-      <input name="note" maxLength={300} placeholder="Note (optional, sent if you say no)" className="input min-w-40 flex-1 text-sm" />
+      <input name="note" maxLength={300} placeholder="Note (optional, sent if you say no)" className="input min-w-40 flex-1 text-sm" aria-label="Note (optional, sent if you say no)" />
       <SubmitButton name="decision" value="approve" className="btn-primary px-3 py-2" pendingText="…">Approve</SubmitButton>
       <SubmitButton name="decision" value="reject" className="btn-secondary px-3 py-2" pendingText="…">Say no</SubmitButton>
     </ActionForm>

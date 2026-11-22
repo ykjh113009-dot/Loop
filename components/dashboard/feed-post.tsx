@@ -46,7 +46,7 @@ export function FeedPostCard({ post, meId, locale = "en", full = false, wide = f
     return (
       <article className={bare ? `min-w-0 py-4 ${isPoll ? "rounded-2xl bg-sage-soft/50 px-4" : ""}` : `min-w-0 rounded-3xl border border-brand-700/10 p-4 shadow-[0_1px_2px_rgba(40,60,40,0.04)] sm:p-5 ${isPoll ? "bg-sage-soft/50" : "bg-white/85"}`} data-post={post.id}>
         <div className="flex gap-3.5 sm:gap-4">
-          <Link href={`/profile/${post.author_id}`} className="shrink-0">
+          <Link href={`/profile/${post.author_id}`} className="shrink-0" aria-label={post.author?.full_name ?? undefined}>
             <Avatar avatar={post.author?.avatar ?? "a01"} size="md" className="!size-12 sm:!size-14" />
           </Link>
           <div className="min-w-0 flex-1">
@@ -99,7 +99,7 @@ export function FeedPostCard({ post, meId, locale = "en", full = false, wide = f
   return (
     <article className={`flex min-w-0 flex-col rounded-2xl border border-brand-700/10 bg-white shadow-[0_1px_2px_rgba(40,60,40,0.04)] ${wide ? "p-5" : "p-3.5"}`} data-post={post.id}>
       <header className="flex items-start gap-2.5">
-        <Link href={`/profile/${post.author_id}`} className="shrink-0">
+        <Link href={`/profile/${post.author_id}`} className="shrink-0" aria-label={post.author?.full_name ?? undefined}>
           <Avatar avatar={post.author?.avatar ?? "a01"} size="md" />
         </Link>
         <div className="min-w-0 flex-1 leading-tight">

@@ -24,8 +24,8 @@ export function ListingForm({ schoolId, userId, initialKind = "sell" }: { school
           ))}
         </div>
       </fieldset>
-      <input name="title" required minLength={3} maxLength={80} placeholder="What is it? e.g. Grade 11 math book" className="input" />
-      <textarea name="description" rows={3} maxLength={800} placeholder={kind === "swap" ? "What would you like in exchange?" : "Describe it: size, edition, anything missing…"} className="input resize-none" />
+      <input name="title" required minLength={3} maxLength={80} placeholder="What is it? e.g. Grade 11 math book" className="input" aria-label="What is it? e.g. Grade 11 math book" />
+      <textarea name="description" rows={3} maxLength={800} placeholder={kind === "swap" ? "What would you like in exchange?" : "Describe it: size, edition, anything missing…"} className="input resize-none" aria-label={kind === "swap" ? "What would you like in exchange?" : "Describe it: size, edition, anything missing…"} />
       <div className="grid grid-cols-2 gap-2">
         <select name="category" className="input" aria-label="Category" defaultValue="books">
           {Object.entries(CATEGORIES).map(([id, label]) => <option key={id} value={id}>{label}</option>)}

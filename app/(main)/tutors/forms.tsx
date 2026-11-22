@@ -25,7 +25,7 @@ export function ReviewForm({ requestId }: { requestId: string }) {
           </button>
         ))}
       </div>
-      <textarea name="comment" rows={2} maxLength={500} placeholder="Say a few words about the session (optional)" className="input resize-none" />
+      <textarea name="comment" rows={2} maxLength={500} placeholder="Say a few words about the session (optional)" className="input resize-none" aria-label="Say a few words about the session (optional)" />
       <FormMessage state={state} />
       <SubmitButton className="btn-primary rounded-full px-5 py-2 text-sm" pendingText="Sending…">Send review</SubmitButton>
     </form>
@@ -43,7 +43,7 @@ export function AskTutorForm({ tutorId, subjects }: { tutorId: string; subjects:
         <select name="subject" className="input" aria-label="Subject">
           {subjects.map((s) => <option key={s}>{s}</option>)}
         </select>
-        <textarea name="message" rows={2} maxLength={500} placeholder="What do you need help with?" className="input resize-none" />
+        <textarea name="message" rows={2} maxLength={500} placeholder="What do you need help with?" className="input resize-none" aria-label="What do you need help with?" />
         <FormMessage state={state} />
         <SubmitButton className="btn-primary w-full" pendingText="Sending…">Send request</SubmitButton>
       </form>
@@ -60,7 +60,7 @@ export function StudyBuddyForm() {
         <option value="" disabled>Subject…</option>
         {SUBJECTS.map((s) => <option key={s}>{s}</option>)}
       </select>
-      <textarea name="note" required minLength={3} maxLength={300} rows={2} placeholder="e.g. Solving past math exams on Tuesdays after school" className="input resize-none" />
+      <textarea name="note" required minLength={3} maxLength={300} rows={2} placeholder="e.g. Solving past math exams on Tuesdays after school" className="input resize-none" aria-label="e.g. Solving past math exams on Tuesdays after school" />
       <FormMessage state={state} />
       <SubmitButton className="btn-primary w-full" pendingText="Posting…">Post</SubmitButton>
     </form>

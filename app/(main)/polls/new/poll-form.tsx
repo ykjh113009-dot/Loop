@@ -29,7 +29,7 @@ export function PollForm({ clubs, allowSchoolWide, minClose, defaultClose }: {
       <fieldset className="space-y-2">
         <legend className="label">Answers</legend>
         {Array.from({ length: count }, (_, i) => (
-          <input key={i} name="option" required={i < 2} maxLength={80} placeholder={`Answer ${i + 1}`} className="input" />
+          <input key={i} name="option" required={i < 2} maxLength={80} placeholder={`Answer ${i + 1}`} aria-label={`Answer ${i + 1}`} className="input" />
         ))}
         {count < 6 && (
           <button type="button" onClick={() => setCount((c) => c + 1)} className="btn-ghost px-2 text-sm">+ Add answer</button>

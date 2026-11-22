@@ -59,7 +59,7 @@ async function Applications() {
               <option value="admin">Give: Admin</option>
               {me.isOwner && <option value="super_admin">Give: Super Admin</option>}
             </select>
-            <input name="note" maxLength={500} placeholder="Message to the applicant (required if you reject)" className="input min-w-40 flex-1" />
+            <input name="note" maxLength={500} placeholder="Message to the applicant (required if you reject)" className="input min-w-40 flex-1" aria-label="Message to the applicant (required if you reject)" />
             <SubmitButton name="decision" value="approve" className="btn-primary" pendingText="…">Approve</SubmitButton>
             <SubmitButton name="decision" value="reject" className="btn-danger" pendingText="…">Reject</SubmitButton>
           </ActionForm>

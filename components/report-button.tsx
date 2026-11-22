@@ -83,7 +83,7 @@ export function ReportButton({
                   </label>
                 ))}
               </div>
-              <textarea name="details" rows={2} maxLength={1000} placeholder="Anything else we should know? (optional)" className="input resize-none text-sm" />
+              <textarea name="details" rows={2} maxLength={1000} placeholder="Anything else we should know? (optional)" className="input resize-none text-sm" aria-label="Anything else we should know? (optional)" />
               {result?.error && <p className="text-sm text-red-700">{result.error}</p>}
               <div className="flex gap-2">
                 <button type="button" className="btn-secondary flex-1" onClick={() => dialog.current?.close()}>

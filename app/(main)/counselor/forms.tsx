@@ -16,7 +16,7 @@ export function CounselorRequestForm() {
           {Object.entries(TOPICS).map(([id, label]) => <option key={id} value={id}>{label}</option>)}
         </select>
       </label>
-      <textarea name="message" required rows={4} maxLength={2000} placeholder="Write as much or as little as you like. You can also just ask for a time to talk." className="input resize-none" />
+      <textarea name="message" required rows={4} maxLength={2000} placeholder="Write as much or as little as you like. You can also just ask for a time to talk." className="input resize-none" aria-label="Write as much or as little as you like. You can also just ask for a time to talk." />
       <label className="flex items-start gap-3 text-sm">
         <input type="checkbox" name="urgent" className="mt-0.5 size-5 accent-red-600" />
         <span>It&apos;s urgent — I need to talk today</span>
@@ -37,7 +37,7 @@ export function ReplyForm({ requestId }: { requestId: string }) {
   return (
     <form ref={form} action={action} className="space-y-2">
       <input type="hidden" name="requestId" value={requestId} />
-      <textarea name="body" required rows={3} maxLength={2000} placeholder="Write a message…" className="input resize-none" />
+      <textarea name="body" required rows={3} maxLength={2000} placeholder="Write a message…" className="input resize-none" aria-label="Write a message…" />
       <FormMessage state={state} />
       <SubmitButton className="btn-primary w-full" pendingText="Sending…">Send</SubmitButton>
     </form>

@@ -67,7 +67,7 @@ async function Settings() {
             </select>
           </div>
           <div className="flex gap-2">
-            <input name="alumni_year" type="number" min={1990} max={2100} placeholder="Graduation year (alumni only)" className="input" />
+            <input name="alumni_year" type="number" min={1990} max={2100} placeholder="Graduation year (alumni only)" className="input" aria-label="Graduation year (alumni only)" />
             <SubmitButton className="btn-primary shrink-0">Add</SubmitButton>
           </div>
         </ActionForm>
@@ -96,7 +96,7 @@ async function Settings() {
           Arabic vowel marks and stretched letters (&quot;heyyyy&quot;). {shared.length} words are built in.
         </p>
         <ActionForm action={addBlockedWord} className="mt-3 flex gap-2">
-          <input name="word" required minLength={2} maxLength={60} placeholder="Add a word or phrase" className="input" />
+          <input name="word" required minLength={2} maxLength={60} placeholder="Add a word or phrase" className="input" aria-label="Add a word or phrase" />
           <SubmitButton className="btn-primary shrink-0">Add</SubmitButton>
         </ActionForm>
         {ours.length > 0 && (

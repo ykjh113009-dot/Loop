@@ -42,7 +42,7 @@ async function Post({ params }: { params: PageProps<"/post/[id]">["params"] }) {
 
   const one = (c: Comment, reply: boolean) => (
     <div key={c.id} className={`flex gap-2.5 ${reply ? "ms-10" : ""}`} data-comment={c.id}>
-      <Link href={`/profile/${c.author_id}`} className="shrink-0"><Avatar avatar={c.author?.avatar ?? "a01"} size="sm" /></Link>
+      <Link href={`/profile/${c.author_id}`} className="shrink-0" aria-label={c.author?.full_name ?? undefined}><Avatar avatar={c.author?.avatar ?? "a01"} size="sm" /></Link>
       <div className="min-w-0 flex-1">
         <div className="rounded-2xl bg-brand-50/70 px-3 py-2">
           <Link href={`/profile/${c.author_id}`} className="text-sm font-semibold hover:underline">{c.author?.full_name}</Link>

@@ -10,7 +10,7 @@ export function DecisionForm({ id, locale }: { id: string; locale: Locale }) {
   return (
     <form action={action} className="space-y-2">
       <input type="hidden" name="id" value={id} />
-      <textarea name="note" rows={2} maxLength={500} className="input resize-none text-sm" placeholder={t("Feedback for the student (needed to reject)")} />
+      <textarea name="note" rows={2} maxLength={500} className="input resize-none text-sm" placeholder={t("Feedback for the student (needed to reject)")} aria-label={t("Feedback for the student (needed to reject)")} />
       <div className="flex gap-2">
         <button name="decision" value="reject" disabled={pending} className="btn-danger flex-1">{t("Reject")}</button>
         <button name="decision" value="approve" disabled={pending} className="btn-primary flex-1">{t("Approve")}</button>

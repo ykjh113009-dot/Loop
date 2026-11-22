@@ -50,7 +50,7 @@ async function Leadership() {
             ) : (
               <ActionForm action={reviewLeadershipRequest} className="flex flex-wrap gap-2 border-t border-black/5 pt-3">
                 <input type="hidden" name="requestId" value={r.id} />
-                <input name="note" maxLength={500} placeholder="Message to the student (required if you reject)" className="input min-w-40 flex-1" />
+                <input name="note" maxLength={500} placeholder="Message to the student (required if you reject)" className="input min-w-40 flex-1" aria-label="Message to the student (required if you reject)" />
                 <SubmitButton name="decision" value="approve" className="btn-primary" pendingText="…">Approve</SubmitButton>
                 <SubmitButton name="decision" value="reject" className="btn-danger" pendingText="…">Reject</SubmitButton>
               </ActionForm>

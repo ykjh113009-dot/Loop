@@ -18,7 +18,7 @@ export function ApplyForm({ id, locale }: { id: string; locale: Locale }) {
   return (
     <form action={action} className="space-y-2">
       <input type="hidden" name="id" value={id} />
-      <input name="message" maxLength={300} className="input text-sm" placeholder={t("Why would you like to help? (optional)")} />
+      <input name="message" maxLength={300} className="input text-sm" placeholder={t("Why would you like to help? (optional)")} aria-label={t("Why would you like to help? (optional)")} />
       <button disabled={pending} className="btn-primary w-full">{pending ? "…" : t("Apply to volunteer")}</button>
       <Msg state={state} />
     </form>
@@ -44,8 +44,8 @@ export function ReviewApplication({ id, locale, current }: { id: string; locale:
   return (
     <form action={action} className="space-y-2">
       <input type="hidden" name="id" value={id} />
-      <input name="responsibility" maxLength={200} defaultValue={current} className="input text-sm" placeholder={t("Their role, e.g. Hand out water")} />
-      <input name="note" maxLength={300} className="input text-sm" placeholder={t("A note for the student (needed to decline)")} />
+      <input name="responsibility" maxLength={200} defaultValue={current} className="input text-sm" placeholder={t("Their role, e.g. Hand out water")} aria-label={t("Their role, e.g. Hand out water")} />
+      <input name="note" maxLength={300} className="input text-sm" placeholder={t("A note for the student (needed to decline)")} aria-label={t("A note for the student (needed to decline)")} />
       <div className="flex gap-2">
         <button name="decision" value="decline" disabled={pending} className="btn-ghost flex-1 text-red-700">{t("Decline")}</button>
         <button name="decision" value="accept" disabled={pending} className="btn-primary flex-1">{t("Accept")}</button>

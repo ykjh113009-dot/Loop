@@ -77,7 +77,7 @@ export function PostActions({
           {mine ? <span className="text-base leading-none">{REACTIONS[mine]}</span> : <LineIcon name="heart" className={icon} />}
           <span className="tabular-nums" data-testid="reaction-count">{count}</span>
         </button>
-        <button type="button" onClick={() => setPicker((p) => !p)} aria-label={t("Choose a reaction")} aria-expanded={picker} className="rounded-full px-1.5 py-1 text-xs hover:bg-brand-50">
+        <button type="button" onClick={() => setPicker((p) => !p)} aria-label={t("Choose a reaction")} aria-expanded={picker} className="rounded-full px-2.5 py-2 text-xs hover:bg-brand-50">
           ＋
         </button>
         <Link href={`/post/${postId}`} aria-label={t("Comments")} className={`flex items-center gap-1.5 ${btn}`}>
@@ -89,7 +89,7 @@ export function PostActions({
             {t("Share")}
           </button>
         )}
-        <button type="button" onClick={save} aria-pressed={isSaved} aria-label={isSaved ? t("Remove from saved") : t("Save")} className={`ms-auto rounded-full p-1.5 hover:bg-brand-50 ${isSaved ? "text-brand-700" : ""}`}>
+        <button type="button" onClick={save} aria-pressed={isSaved} aria-label={isSaved ? t("Remove from saved") : t("Save")} className={`ms-auto rounded-full p-2.5 hover:bg-brand-50 ${isSaved ? "text-brand-700" : ""}`}>
           <LineIcon name="bookmark" className="size-[18px]" strokeWidth={isSaved ? 2.6 : 1.7} />
         </button>
       </div>

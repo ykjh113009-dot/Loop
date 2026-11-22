@@ -29,7 +29,7 @@ export function ChatList({ items, locale }: { items: ChatItem[]; locale: Locale 
   return (
     <aside className={`${onList ? "" : "hidden lg:flex"} min-h-0 flex-col rounded-3xl border border-brand-700/10 bg-white/70 p-4 lg:flex lg:max-h-[calc(100dvh-120px)]`} data-chat-list>
       <div className="mb-3 flex items-center justify-between">
-        <h1 className="font-heading text-[28px] font-semibold text-brand-900" data-banner-title>{t("Chats")}</h1>
+        {onList ? <h1 className="font-heading text-[28px] font-semibold text-brand-900" data-banner-title>{t("Chats")}</h1> : <p className="font-heading text-[28px] font-semibold text-brand-900">{t("Chats")}</p>}
         <Link href="/messages/new" className="rounded-xl p-2 text-brand-800 hover:bg-brand-50" aria-label={t("New group")} title={t("New group")}><SquarePen className="size-6" aria-hidden="true" /></Link>
       </div>
       <label className="relative mb-3 block">

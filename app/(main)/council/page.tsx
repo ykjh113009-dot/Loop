@@ -69,7 +69,7 @@ async function Council() {
           <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
             {(members ?? []).map((m) => m.profile && (
               <li key={m.profile.id} className="card flex flex-col items-center gap-1 p-4 text-center" data-council-member={m.profile.id}>
-                <Link href={`/profile/${m.profile.id}`} className="rounded-full"><Avatar avatar={m.profile.avatar} size="xl" /></Link>
+                <Link href={`/profile/${m.profile.id}`} className="rounded-full" aria-label={m.profile.full_name}><Avatar avatar={m.profile.avatar} size="xl" /></Link>
                 <p className="mt-1 text-[15px] font-semibold">{m.profile.full_name}</p>
                 <p className="text-sm text-ink-2">{m.position}</p>
                 {m.profile.id !== me.id && (
@@ -205,7 +205,7 @@ async function Council() {
             <ActionForm action={addCouncilMember} className="mt-3 space-y-2">
               <StudentPicker />
               <div className="flex gap-2">
-                <input name="position" required maxLength={60} placeholder="Position, e.g. Treasurer" className="input" />
+                <input name="position" required maxLength={60} placeholder="Position, e.g. Treasurer" className="input" aria-label="Position, e.g. Treasurer" />
                 <input name="sort" type="number" min={0} max={99} placeholder="Order" className="input w-24" aria-label="Order" />
               </div>
               <SubmitButton className="btn-primary w-full">Add</SubmitButton>
@@ -214,8 +214,8 @@ async function Council() {
           <details className="card p-4">
             <summary className="cursor-pointer font-semibold">Create an election</summary>
             <ActionForm action={createElection} className="mt-3 space-y-3">
-              <input name="title" required minLength={3} maxLength={100} placeholder="e.g. Grade 11 representative" className="input" />
-              <textarea name="description" rows={2} maxLength={1000} placeholder="What is this role?" className="input resize-none" />
+              <input name="title" required minLength={3} maxLength={100} placeholder="e.g. Grade 11 representative" className="input" aria-label="e.g. Grade 11 representative" />
+              <textarea name="description" rows={2} maxLength={1000} placeholder="What is this role?" className="input resize-none" aria-label="What is this role?" />
               <div className="grid grid-cols-2 gap-2">
                 <label className="text-sm"><span className="label">Voting opens</span>
                   <input name="opens_at" type="datetime-local" required defaultValue={toLocalInput(tomorrow)} className="input" />
