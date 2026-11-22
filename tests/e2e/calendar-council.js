@@ -19,7 +19,7 @@ const go = (p, u) => p.goto(BASE + u, { waitUntil: 'networkidle' });
   const b = await chromium.launch();
   const { p } = await login(b, 'demo.maya@pioneers.edu.ps');
   await go(p, '/events');
-  check('The calendar page has its banner and a wide layout', (await p.locator('[data-events-banner]').count()) === 1 && /One Loop/.test(await p.locator('[data-events-banner]').innerText()) && (await p.locator('[data-events-page]').evaluate((e) => e.getBoundingClientRect().width)) > 700);
+  check('The calendar page has its banner and a wide layout', (await p.locator('[data-image-banner]:visible').count()) === 1 && /Be part of more|Never miss a thing/.test(await p.locator('[data-image-banner]:visible').innerText()) && (await p.locator('[data-events-page]').evaluate((e) => e.getBoundingClientRect().width)) > 700);
   check('The month grid shows the month, today in green and dots on event days', (await p.locator('[data-month-calendar]').count()) === 1 && (await p.locator('[data-month-calendar] a[href^="#day-"]').count()) >= 3);
   check('Upcoming events are rows with date, time, place and club', (await p.locator('[data-event-row]').count()) >= 3 && /\d{2}:\d{2}/.test(await p.locator('[data-event-row]').first().innerText()));
   const row = p.locator('[data-event-row]', { hasText: 'Friendly Match vs Al-Nahda' });

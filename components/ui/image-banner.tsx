@@ -1,40 +1,47 @@
 import { Suspense } from "react";
+import { BookOpen, CalendarDays, Gift, Home, Megaphone, MessageCircle, ShoppingCart, Ticket, Trophy, User, Users } from "lucide-react";
 import { getT } from "@/lib/i18n-server";
 
-// The illustrated page banners (public/banners). The words are part of the picture, so they stay English there;
-// the same words are also in the page for screen readers, and Arabic readers get a plain banner in their own language.
-const SIZE: Record<string, [number, number]> = {
-  dashboard: [1123, 277], clubs: [1123, 279], calendar: [1123, 241], "learning-hub": [1122, 247], profile: [1123, 202], announcements: [1123, 207],
-  community: [1125, 279], market: [1125, 283], leaderboards: [1123, 238], events: [1125, 249], chat: [1123, 205], rewards: [1125, 207],
+// The page banners: a sharp icon tile, title and subtitle on soft green, like the Academic Library banner.
+const ICONS = {
+  dashboard: Home, community: Users, clubs: Users, market: ShoppingCart, calendar: CalendarDays, events: Ticket,
+  leaderboards: Trophy, "learning-hub": BookOpen, chat: MessageCircle, announcements: Megaphone, rewards: Gift, profile: User,
 };
-export type BannerName = keyof typeof SIZE;
+export type BannerName = keyof typeof ICONS;
 
-async function Banner({ name, title, subtitle, className = "" }: { name: BannerName; title: string; subtitle: string; className?: string }) {
-  const { t, locale } = await getT();
-  if (locale === "ar") {
-    return (
-      <section className={`rounded-3xl border border-brand-700/10 bg-gradient-to-r from-sage-soft/80 via-brand-100/70 to-brand-50 px-6 py-7 ${className}`} data-banner data-image-banner>
-        <h1 className="font-heading text-3xl font-semibold text-brand-900" data-banner-title>{t(title)}</h1>
-        <p className="mt-1 text-ink-2">{t(subtitle)}</p>
-      </section>
-    );
-  }
-  const [w, h] = SIZE[name];
+// Soft leaf-green shapes on the right, so the banner has the same calm look as the Academic Library one. No animals.
+export function BannerArt({ name }: { name: BannerName }) {
   return (
-    <section className={className} data-banner data-image-banner={name}>
-      <h1 className="sr-only" data-banner-title>{title}</h1>
-      <p className="sr-only">{subtitle}</p>
-      {/* eslint-disable-next-line @next/next/no-img-element -- a fixed, local illustration */}
-      <img src={`/banners/${name}.webp`} alt="" width={w} height={h} className="block h-auto w-full select-none" draggable={false} />
+    <div className="pointer-events-none absolute inset-y-0 end-0 -z-10 hidden w-[42%] sm:block" aria-hidden="true" data-banner-art={name}>
+      <span className="absolute -end-10 -top-16 size-64 rounded-full bg-[#d3dfc3]/70" />
+      <span className="absolute end-24 -bottom-24 size-56 rounded-full bg-[#dbe7d2]/80" />
+      <span className="absolute end-10 bottom-6 size-24 rounded-full bg-[#c7d8b8]/60" />
+    </div>
+  );
+}
+
+async function Banner({ name, title, subtitle, className = "", children }: { name: BannerName; title: string; subtitle: string; className?: string; children?: React.ReactNode }) {
+  const { t } = await getT();
+  const Icon = ICONS[name];
+  return (
+    <section className={`relative isolate overflow-hidden rounded-3xl bg-[#e8efe6] px-5 py-6 lg:px-8 lg:py-8 ${className}`} data-banner data-image-banner={name}>
+      <BannerArt name={name} />
+      <div className="flex items-center gap-4 lg:gap-6">
+        <span className="hidden size-20 shrink-0 items-center justify-center rounded-3xl bg-[#d3dfc3] text-brand-800 sm:flex lg:size-24" aria-hidden="true"><Icon className="size-10 lg:size-12" strokeWidth={1.5} /></span>
+        <div>
+          <h1 className="font-heading text-[34px] leading-none font-semibold text-brand-900 lg:text-[48px]" data-banner-title>{t(title)}</h1>
+          <p className="mt-2 max-w-md text-[13px] text-ink-2 lg:mt-3 lg:text-base">{t(subtitle)}</p>
+          {children}
+        </div>
+      </div>
     </section>
   );
 }
 
-// Reading the language needs the request, so it streams in behind a banner-shaped placeholder.
-export function ImageBanner(props: { name: BannerName; title: string; subtitle: string; className?: string }) {
-  const [w, h] = SIZE[props.name];
+// Reading the language needs the request, so the words stream in behind a banner-shaped placeholder.
+export function ImageBanner(props: { name: BannerName; title: string; subtitle: string; className?: string; children?: React.ReactNode }) {
   return (
-    <Suspense fallback={<div className={`w-full rounded-3xl bg-sage-soft/40 ${props.className ?? ""}`} style={{ aspectRatio: `${w} / ${h}` }} />}>
+    <Suspense fallback={<div className={`h-[116px] rounded-3xl bg-[#e8efe6] lg:h-[152px] ${props.className ?? ""}`} />}>
       <Banner {...props} />
     </Suspense>
   );
