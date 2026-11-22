@@ -33,7 +33,7 @@ const text = async (p) => (await p.locator('body').innerText()).replace(/\s+/g, 
   for (const [name, w, h] of [['desktop', 1440, 900], ['laptop', 1280, 770], ['tablet', 768, 1024], ['phone', 390, 844], ['small-phone', 360, 640]]) {
     const ctx = await browser.newContext({ viewport: { width: w, height: h } }); const p = await ctx.newPage();
     await p.goto(BASE + '/login', { waitUntil: 'networkidle' });
-    const m = await p.evaluate(() => ({ sideScroll: document.documentElement.scrollWidth > innerWidth, h1: document.querySelector('h1')?.innerText.replace(/\n/g, ' '), btn: document.querySelector('.lp-gbtn')?.getBoundingClientRect().bottom <= innerHeight, ribbon: !!document.querySelector('.lp-logo'), logo: !!document.querySelector('img[alt="Loop"]') }));
+    const m = await p.evaluate(() => ({ sideScroll: document.documentElement.scrollWidth > innerWidth, h1: document.querySelector('h1')?.innerText.replace(/\n/g, ' '), btn: document.querySelector('.lp-gbtn')?.getBoundingClientRect().bottom <= innerHeight, ribbon: !!document.querySelector('.lp-ribbon'), logo: !!document.querySelector('img[alt="Loop"]') }));
     check(`Login page ${name} (${w}x${h}): fits, headline, logo, ribbon, button on screen`, !m.sideScroll && m.h1 === 'Your school. Your community.' && m.ribbon && m.logo && m.btn, JSON.stringify(m));
     await ctx.close();
   }

@@ -30,15 +30,18 @@
   min-height: 210px;
   overflow: hidden;
   border-radius: 0 0 44px 44px;
-  background: #1b452d;
+  background:
+    radial-gradient(60% 46% at 18% 12%, rgb(253 250 239 / 0.95), rgb(253 250 239 / 0) 70%),
+    linear-gradient(158deg, var(--c-sage-soft) 0%, #e4ece3 46%, var(--c-sky) 100%);
 }
-.lp-logo {
+.lp-ribbon {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: min(100%, calc(100dvh - 36px));
-  object-fit: contain;
+  top: 58%;
+  left: 50%;
+  width: min(66%, 380px);
+  overflow: visible;
+  transform: translate(-50%, -50%);
+  filter: drop-shadow(0 16px 24px rgb(70 98 55 / 0.2));
 }
 
 .lp-brand {
@@ -49,7 +52,6 @@
 }
 .lp-wordmark {
   display: block;
-  filter: brightness(0) invert(1);
   width: auto;
   height: 38px;
 }
@@ -271,12 +273,15 @@
     min-height: calc(100dvh - 36px);
     border-radius: 34px;
   }
+  .lp-ribbon {
+    top: 50%;
+    width: 74%;
+  }
   .lp-brand {
     position: static;
   }
   .lp-wordmark {
     height: 48px;
-    filter: none;
   }
   .lp-main {
     order: 1;
