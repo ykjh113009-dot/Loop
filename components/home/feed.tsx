@@ -7,6 +7,7 @@ import { loadFeed } from "@/lib/feed";
 import { getT } from "@/lib/i18n-server";
 import { timeAgo } from "@/lib/time";
 import { Empty } from "@/components/empty";
+import { contentPowers } from "@/lib/content-powers";
 import { FeedPostCard } from "@/components/dashboard/feed-post";
 import { HomeComposer } from "@/components/dashboard/home-composer";
 
@@ -47,7 +48,7 @@ export async function HomeFeed({ show }: { show?: string }) {
         {all.length === 0 ? (
           <div className="py-4"><Empty emoji="✏️" title={t("No posts yet")}>{t("Be the first to share something with your school.")}</Empty></div>
         ) : (
-          all.map((p) => <FeedPostCard key={p.id} post={p} meId={me.id} locale={locale} wide bare />)
+          all.map((p) => <FeedPostCard key={p.id} post={p} meId={me.id} locale={locale} wide bare staff={me.isStaff ? contentPowers(me, "post") : undefined} />)
         )}
       </div>
       {all.length >= shown && shown < 100 && (

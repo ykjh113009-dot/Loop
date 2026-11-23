@@ -1,6 +1,7 @@
 "use server";
 
 import { refresh } from "next/cache";
+import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { requireMe } from "@/lib/auth";
 import { friendlyError, type ActionResult } from "@/lib/errors";
@@ -10,11 +11,15 @@ import { friendlyError, type ActionResult } from "@/lib/errors";
 const fail = (error: { message?: string; code?: string }): ActionResult => ({ error: error.code === "P0001" ? (error.message ?? "") : friendlyError(error) });
 const kind = (fd: FormData) => String(fd.get("kind") ?? "");
 const id = (fd: FormData) => String(fd.get("id") ?? "");
+// Where to go once the item is gone (inline controls on its own page). Only addresses inside Loop are accepted.
+const after = (fd: FormData) => { const n = String(fd.get("next") ?? ""); return n.startsWith("/") && !n.startsWith("//") ? n : null; };
 
 export async function hideContent(_: ActionResult, fd: FormData): Promise<ActionResult> {
   await requireMe("staff");
   const { error } = await (await createClient()).rpc("admin_hide_content", { p_kind: kind(fd), p_id: id(fd), p_reason: String(fd.get("reason") ?? "") });
   if (error) return fail(error);
+  const to = after(fd);
+  if (to) redirect(to);
   refresh();
   return { ok: true, message: "Hidden. You can restore it from Recently removed." };
 }
@@ -48,6 +53,8 @@ export async function purgeContent(_: ActionResult, fd: FormData): Promise<Actio
   if (String(fd.get("confirm") ?? "").trim() !== "DELETE") return { error: "Type DELETE to confirm." };
   const { error } = await (await createClient()).rpc("admin_purge_content", { p_kind: kind(fd), p_id: id(fd), p_reason: String(fd.get("reason") ?? "") });
   if (error) return fail(error);
+  const to = after(fd);
+  if (to) redirect(to);
   refresh();
   return { ok: true, message: "Deleted for good." };
 }

@@ -4,6 +4,7 @@ import { InterestIcon } from "@/components/interest-icon";
 import { Suspense } from "react";
 import { toggleFollow, sendFriendRequest, unfriend, cancelFriendRequest, respondFriendRequest } from "@/app/actions/social";
 import { ActionForm } from "@/components/action-form";
+import { contentPowers } from "@/lib/content-powers";
 import { FeedPostCard } from "@/components/dashboard/feed-post";
 import { ACCENTS } from "@/lib/accent";
 import { loadFeed } from "@/lib/feed";
@@ -299,7 +300,7 @@ async function Profile({ params, searchParams }: { params: PageProps<"/profile/[
           <p className="text-sm text-ink-2">{t("No posts yet.")}</p>
         ) : (
           <div className="mx-auto max-w-3xl space-y-4">
-            {posts.map((p) => <FeedPostCard key={p.id} post={p} meId={me.id} locale={locale} wide />)}
+            {posts.map((p) => <FeedPostCard key={p.id} post={p} meId={me.id} locale={locale} wide staff={me.isStaff ? contentPowers(me, "post") : undefined} />)}
           </div>
         )}
       </section>

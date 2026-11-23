@@ -7,6 +7,7 @@ import { BarChart3 } from "lucide-react";
 import { ImageBanner } from "@/components/ui/image-banner";
 import { SectionTabs } from "@/components/ui/section-tabs";
 import { PollCard } from "@/components/poll-card";
+import { contentPowers } from "@/lib/content-powers";
 import { PageSkeleton } from "@/components/skeleton";
 
 export const metadata = { title: "Polls" };
@@ -41,7 +42,7 @@ async function Polls({ searchParams }: { searchParams: PageProps<"/polls">["sear
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1fr)_300px]">
         <section className="min-w-0 space-y-3">
           {shown.length === 0 ? <Empty emoji="📊" title={empty}>Polls from clubs and your school show up here. You can also add a poll to a post in the feed.</Empty> : shown.map((p) => (
-            <PollCard key={p.id} poll={p} canVote={canVote && p.closes_at > now} canDelete={me.isStaff || p.created_by === me.id} />
+            <PollCard key={p.id} poll={p} canVote={canVote && p.closes_at > now} canDelete={me.isStaff || p.created_by === me.id} staff={me.isStaff ? contentPowers(me, "poll") : undefined} />
           ))}
         </section>
         <aside className="h-fit space-y-3 rounded-3xl border border-brand-700/10 bg-white/85 p-5 text-center" aria-label="Create a poll">

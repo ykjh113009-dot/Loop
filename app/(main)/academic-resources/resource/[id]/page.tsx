@@ -1,4 +1,6 @@
 import { TypeIcon } from "@/components/library/type-icon";
+import { AdminControls } from "@/components/admin-controls";
+import { contentPowers } from "@/lib/content-powers";
 import { Suspense } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -96,6 +98,7 @@ async function Resource({ params }: { params: PageProps<"/academic-resources/res
       {r.description && <p className="whitespace-pre-wrap text-sm leading-relaxed text-black/75">{r.description}</p>}
 
       <div className="flex flex-wrap items-start gap-2">
+        {me.isAdmin && <AdminControls kind="resource" id={r.id} {...contentPowers(me, "resource")} next="/academic-resources" />}
         {r.file_name && isPdfOrImage && <Link href={`/academic-resources/resource/${r.id}/read`} className="btn-primary" data-read><Glyph e="📖" /> {t("Read in Loop")}</Link>}
         {r.file_name && r.downloadable && <a href={`/api/library/${r.id}/file?kind=download`} className="btn-secondary" data-download><Glyph e="⬇" /> {t("Download")}</a>}
         {r.link_url && <a href={r.link_url} target="_blank" rel="noopener noreferrer nofollow" className="btn-primary" data-open-link><Glyph e="↗" /> {t("Open Resource")}</a>}

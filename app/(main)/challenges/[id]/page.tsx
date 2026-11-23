@@ -1,4 +1,6 @@
 import { Suspense } from "react";
+import { AdminControls } from "@/components/admin-controls";
+import { contentPowers } from "@/lib/content-powers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireMe } from "@/lib/auth";
@@ -60,7 +62,10 @@ async function Challenge({ params }: { params: PageProps<"/challenges/[id]">["pa
           <div className="flex items-start gap-3">
             <span className="text-3xl"><Glyph e={c.emoji} /></span>
             <div className="min-w-0 flex-1">
-              <h2 className="text-xl font-bold">{c.title}</h2>
+              <div className="flex items-start justify-between gap-3">
+                <h2 className="text-xl font-bold">{c.title}</h2>
+                {me.isStaff && <AdminControls kind="challenge" id={c.id} title={c.title} detail={c.description} {...contentPowers(me, "challenge")} next="/challenges" compact />}
+              </div>
               <p className="text-xs text-black/50"><Glyph e={cat.emoji} /> {t(cat.label)} · {t(kindOf(c.kind).label)} · {t("by {name}", { name: c.creator?.full_name ?? t("a former student") })}</p>
             </div>
             <span className={`chip shrink-0 ${PHASE[phase].cls}`}>{t(PHASE[phase].label)}</span>

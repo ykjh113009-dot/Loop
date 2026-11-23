@@ -14,8 +14,10 @@ export type Me = Profile & {
   /** Admin or Super Admin. */
   isAdmin: boolean;
   isSuperAdmin: boolean;
-  /** The platform owner: the only one who appoints Super Admins. */
+  /** The school Owner or a platform owner: the only ones who appoint Super Admins. */
   isOwner: boolean;
+  /** A platform owner (signs in from a listed Google address, above every school role). */
+  isPlatformOwner: boolean;
   /** An Admin who has not passed the second sign-in step in this session yet. */
   needsMfa: boolean;
   isCounselor: boolean;
@@ -50,6 +52,8 @@ export const getMe = cache(async (): Promise<Me | null> => {
   // checks the same thing, so this only decides what the pages show.
   const needsMfa = adminRole && !isSuspended && profile.school.admin_mfa_required && data.claims.aal !== "aal2";
   const isAdmin = adminRole && !isSuspended && !needsMfa;
+  // Only a Super Admin can be a platform owner, so only they pay for the extra check. The database decides for real.
+  const isPlatformOwner = isAdmin && profile.role === "super_admin" ? (await supabase.rpc("is_platform_owner")).data === true : false;
   return {
     ...profile,
     school: profile.school,
@@ -58,7 +62,8 @@ export const getMe = cache(async (): Promise<Me | null> => {
     isStaff: isAdmin || (!isSuspended && profile.role === "moderator"),
     isAdmin,
     isSuperAdmin: isAdmin && profile.role === "super_admin",
-    isOwner: isAdmin && profile.role === "super_admin" && profile.is_owner,
+    isOwner: (isAdmin && profile.role === "super_admin" && profile.is_owner) || isPlatformOwner,
+    isPlatformOwner,
     needsMfa,
     isCounselor: !isSuspended && profile.role === "counselor",
     isAlumni: profile.alumni_year !== null,

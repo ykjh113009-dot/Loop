@@ -6,6 +6,7 @@ import { getT } from "@/lib/i18n-server";
 import { RESOURCE_COLUMNS, signCovers, type LibraryResource } from "@/lib/library";
 import { Empty } from "@/components/empty";
 import { PageSkeleton } from "@/components/skeleton";
+import { contentPowers } from "@/lib/content-powers";
 import { FeedPostCard } from "@/components/dashboard/feed-post";
 import { ResourceCard } from "@/components/library/resource-card";
 import { ImageBanner } from "@/components/ui/image-banner";
@@ -56,7 +57,7 @@ async function Saved({ searchParams }: { searchParams: PageProps<"/saved">["sear
       {posts.length === 0 ? (
         <Empty emoji="🔖" title={t(tab === "polls" ? "No saved polls yet" : "Nothing saved yet")}>{t("Tap the bookmark on a post to keep it here. Only you can see this list.")}</Empty>
       ) : (
-        <div className="mx-auto max-w-3xl space-y-4">{posts.map((p) => <FeedPostCard key={p.id} post={p} meId={me.id} locale={locale} wide />)}</div>
+        <div className="mx-auto max-w-3xl space-y-4">{posts.map((p) => <FeedPostCard key={p.id} post={p} meId={me.id} locale={locale} wide staff={me.isStaff ? contentPowers(me, "post") : undefined} />)}</div>
       )}
     </div>
   );

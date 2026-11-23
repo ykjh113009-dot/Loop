@@ -1,4 +1,6 @@
 import { Suspense } from "react";
+import { AdminControls } from "@/components/admin-controls";
+import { contentPowers } from "@/lib/content-powers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { requireMe } from "@/lib/auth";
@@ -117,7 +119,10 @@ async function Hub({ searchParams }: { searchParams: PageProps<"/volunteering">[
           const app = (mine ?? []).find((a) => a.opportunity_id === o.id && a.status !== "withdrawn");
           return (
             <article key={o.id} className="card space-y-2 p-4 text-sm">
-              <h2 className="font-bold">{o.title}</h2>
+              <div className="flex items-start justify-between gap-3">
+                <h2 className="font-bold">{o.title}</h2>
+                {me.isStaff && <AdminControls kind="volunteering" id={o.id} title={o.title} detail={o.description} {...contentPowers(me, "volunteering")} next="/volunteering" compact />}
+              </div>
               <p className="text-xs text-black/50">
                 {o.event ? <Link href={`/events/${o.event.id}`} className="text-brand-700 underline"><Glyph e="📅" /> {o.event.title}</Link> : <><Glyph e="💚" /> {t("School volunteering")}</>}
                 {o.starts_at && ` · ${formatDateTime(o.starts_at)}`}{o.location && ` · ${o.location}`}{o.spots && ` · ${t("{n} spots", { n: o.spots })}`}

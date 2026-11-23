@@ -13,6 +13,8 @@ import { PageHeader } from "@/components/page-header";
 import { ReportButton } from "@/components/report-button";
 import { SubmitButton } from "@/components/submit-button";
 import { PageSkeleton } from "@/components/skeleton";
+import { contentPowers } from "@/lib/content-powers";
+import { AdminControls } from "@/components/admin-controls";
 import { FeedPostCard } from "@/components/dashboard/feed-post";
 import { RichText } from "@/components/feed/rich-text";
 
@@ -51,6 +53,7 @@ async function Post({ params }: { params: PageProps<"/post/[id]">["params"] }) {
         </div>
         <div className="mt-0.5 flex items-center gap-3 ps-3 text-[11px] text-ink-2">
           <span>{timeAgo(c.created_at)}</span>
+          {me.isStaff && <AdminControls kind="comment" id={c.id} detail={c.body} {...contentPowers(me, "comment")} next={`/post/${id}`} compact />}
           {c.author_id === me.id ? (
             <form action={deleteComment}>
               <input type="hidden" name="commentId" value={c.id} />
@@ -78,7 +81,7 @@ async function Post({ params }: { params: PageProps<"/post/[id]">["params"] }) {
   return (
     <div className="mx-auto max-w-2xl space-y-4">
       <PageHeader title={t("Post")} back="/home" />
-      <FeedPostCard post={post} meId={me.id} locale={locale} full />
+      <FeedPostCard post={post} meId={me.id} locale={locale} full staff={me.isStaff ? contentPowers(me, "post") : undefined} />
       <section className="card space-y-3 p-4">
         <h2 className="font-semibold">{t("Comments")} <span className="font-normal text-ink-2">({post.comment_count})</span></h2>
         {canWrite && (

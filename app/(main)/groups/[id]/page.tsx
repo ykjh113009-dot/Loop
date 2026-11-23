@@ -8,6 +8,8 @@ import { getT } from "@/lib/i18n-server";
 import { archiveGroup, joinGroup, leaveGroup, removeGroupMember, respondGroupRequest, setGroupRole, updateGroup } from "@/app/actions/community";
 import { ActionForm } from "@/components/action-form";
 import { Avatar } from "@/components/avatar";
+import { contentPowers } from "@/lib/content-powers";
+import { AdminControls } from "@/components/admin-controls";
 import { FeedPostCard } from "@/components/dashboard/feed-post";
 import { Empty } from "@/components/empty";
 import { PageHeader } from "@/components/page-header";
@@ -68,6 +70,7 @@ async function Group({ params, searchParams }: { params: PageProps<"/groups/[id]
             </p>
           </div>
           {!member && <ReportButton targetType="group" targetId={g.id} compact />}
+          {me.isStaff && <AdminControls kind="group" id={g.id} title={g.name} detail={g.description} {...contentPowers(me, "group")} next="/groups" compact />}
         </div>
         {g.description && <p className="mt-3 text-sm whitespace-pre-wrap text-black/75">{g.description}</p>}
         <div className="mt-3 flex flex-wrap gap-2">
@@ -95,7 +98,7 @@ async function Group({ params, searchParams }: { params: PageProps<"/groups/[id]
           <>
             {member && !me.isSuspended && <SpaceComposer type="group" spaceId={g.id} canAnnounce={!!manage} locale={locale} />}
             {posts.length === 0 ? <Empty emoji="💬" title={t("No posts yet")}>{t("Start the first discussion.")}</Empty> : (
-              <div className="grid grid-cols-1 gap-3">{posts.map((p) => <FeedPostCard key={p.id} post={p} meId={me.id} locale={locale} />)}</div>
+              <div className="grid grid-cols-1 gap-3">{posts.map((p) => <FeedPostCard key={p.id} post={p} meId={me.id} locale={locale} staff={me.isStaff ? contentPowers(me, "post") : undefined} />)}</div>
             )}
           </>
         )

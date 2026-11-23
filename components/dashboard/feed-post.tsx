@@ -6,6 +6,7 @@ import { ReportButton } from "@/components/report-button";
 import { PollBox } from "@/components/feed/poll-box";
 import { PostActions } from "@/components/feed/post-actions";
 import { RichText } from "@/components/feed/rich-text";
+import { AdminControls } from "@/components/admin-controls";
 import { timeAgo } from "@/lib/time";
 import { makeT, type Locale } from "@/lib/i18n";
 import type { FeedItem } from "@/lib/feed";
@@ -16,8 +17,12 @@ const KIND_BADGE: Record<string, { label: string; className: string }> = {
   poll: { label: "Poll", className: "bg-brand-100 text-brand-900" },
 };
 
-function PostMenu({ post, mine, t }: { post: FeedItem; mine: boolean; t: (s: string) => string }) {
+type Staff = { canHide: boolean; canEdit: boolean; canDelete: boolean };
+
+function PostMenu({ post, mine, t, staff }: { post: FeedItem; mine: boolean; t: (s: string) => string; staff?: Staff }) {
   return (
+    <>
+    {staff && <AdminControls kind="post" id={post.id} detail={post.body} {...staff} next="/community" compact />}
     <details className="relative">
       <summary aria-label={t("Post options")} className="flex cursor-pointer list-none rounded-full p-1.5 text-ink-2 hover:bg-brand-50 [&::-webkit-details-marker]:hidden">
         <LineIcon name="dots" className="size-5" strokeWidth={2.6} />
@@ -33,11 +38,12 @@ function PostMenu({ post, mine, t }: { post: FeedItem; mine: boolean; t: (s: str
         )}
       </div>
     </details>
+    </>
   );
 }
 
 // One post: who, what, photo or poll, and the reaction row.
-export function FeedPostCard({ post, meId, locale = "en", full = false, wide = false, bare = false }: { post: FeedItem; meId: string; locale?: Locale; full?: boolean; wide?: boolean; bare?: boolean }) {
+export function FeedPostCard({ post, meId, locale = "en", full = false, wide = false, bare = false, staff }: { post: FeedItem; meId: string; locale?: Locale; full?: boolean; wide?: boolean; bare?: boolean; staff?: Staff }) {
   const t = makeT(locale);
   const mine = post.author_id === meId;
   const badge = KIND_BADGE[post.kind];
@@ -59,7 +65,7 @@ export function FeedPostCard({ post, meId, locale = "en", full = false, wide = f
                 {post.club && <span className="text-ink-2"> · <Link href={`/clubs/${post.club.id}`} className="hover:underline">{post.club.name}</Link></span>}
               </p>
               {badge && <span className={`chip shrink-0 ${badge.className}`}>{t(badge.label)}</span>}
-              <PostMenu post={post} mine={mine} t={t} />
+              <PostMenu post={post} mine={mine} t={t} staff={staff} />
             </header>
             {post.status === "held" && (
               <p className="mt-2.5 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800">{t("Only you can see this. It's waiting for a moderator to check it.")}</p>
@@ -113,6 +119,7 @@ export function FeedPostCard({ post, meId, locale = "en", full = false, wide = f
           </p>
         </div>
         {badge && <span className={`chip shrink-0 ${badge.className}`}>{t(badge.label)}</span>}
+        {staff && <AdminControls kind="post" id={post.id} detail={post.body} {...staff} next="/home" compact />}
         <details className="relative">
           <summary aria-label={t("Post options")} className="flex cursor-pointer list-none rounded-full p-1.5 text-ink-2 hover:bg-brand-50 [&::-webkit-details-marker]:hidden">
             <LineIcon name="dots" className="size-5" strokeWidth={2.6} />

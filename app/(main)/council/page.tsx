@@ -1,4 +1,6 @@
 import { Suspense } from "react";
+import { AdminControls } from "@/components/admin-controls";
+import { contentPowers } from "@/lib/content-powers";
 import Link from "next/link";
 import { requireMe } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
@@ -106,6 +108,7 @@ async function Council() {
                 {p.body && <p className="line-clamp-3 whitespace-pre-wrap text-ink-2">{p.body}</p>}
                 <p className="flex items-center gap-2 text-xs text-black/45">{formatDate(p.created_at)} · {p.author?.full_name} · {timeAgo(p.created_at)}
                   {canPost && <span className="ms-auto"><DeletePost id={p.id} locale={locale} /></span>}</p>
+                {me.isStaff && <div><AdminControls kind="council" id={p.id} title={p.title} detail={p.body} {...contentPowers(me, "council")} next="/council" compact /></div>}
               </div>
             </article>
           ))}

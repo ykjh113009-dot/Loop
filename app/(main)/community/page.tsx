@@ -8,6 +8,7 @@ import { getT } from "@/lib/i18n-server";
 import { Empty } from "@/components/empty";
 import { PageHeader } from "@/components/page-header";
 import { PageSkeleton } from "@/components/skeleton";
+import { contentPowers } from "@/lib/content-powers";
 import { FeedPostCard } from "@/components/dashboard/feed-post";
 
 export const metadata = { title: "Community" };
@@ -32,7 +33,7 @@ async function Tagged({ searchParams }: { searchParams: PageProps<"/community">[
       {all.length === 0 ? (
         <Empty emoji="✏️" title={t("No posts yet")}>{t("Be the first to share something with your school.")}</Empty>
       ) : (
-        <div className="space-y-4">{all.map((p) => <FeedPostCard key={p.id} post={p} meId={me.id} locale={locale} wide />)}</div>
+        <div className="space-y-4">{all.map((p) => <FeedPostCard key={p.id} post={p} meId={me.id} locale={locale} wide staff={me.isStaff ? contentPowers(me, "post") : undefined} />)}</div>
       )}
       {all.length >= shown && shown < 200 && (
         <div className="text-center">

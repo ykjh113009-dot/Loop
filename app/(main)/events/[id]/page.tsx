@@ -1,4 +1,6 @@
 import { ClubMark } from "@/components/club-mark";
+import { AdminControls } from "@/components/admin-controls";
+import { contentPowers } from "@/lib/content-powers";
 import { Suspense } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -70,7 +72,7 @@ async function EventDetails({ params }: { params: PageProps<"/events/[id]">["par
 
   return (
     <div className="mx-auto max-w-2xl space-y-4">
-      <PageHeader title={event.title} back="/events" action={<ReportButton targetType="event" targetId={event.id} compact />} />
+      <PageHeader title={event.title} back="/events" action={<span className="flex items-center gap-2"><ReportButton targetType="event" targetId={event.id} compact />{me.isStaff && <AdminControls kind="event" id={event.id} title={event.title} detail={event.description} {...contentPowers(me, "event")} next="/events" compact />}</span>} />
 
       {event.status === "cancelled" && (
         <p className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-800"><strong>{t("Cancelled.")}</strong> {event.cancel_reason}</p>

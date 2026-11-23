@@ -3972,6 +3972,9 @@ isOneToOne: false
 "is_owner":
 { Args: Record<PropertyKey, never>; Returns: boolean
                            },
+"is_platform_owner":
+{ Args: Record<PropertyKey, never>; Returns: boolean
+                           },
 "is_reader":
 { Args: Record<PropertyKey, never>; Returns: boolean
                            },

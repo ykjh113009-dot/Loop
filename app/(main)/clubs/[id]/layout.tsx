@@ -1,4 +1,6 @@
 import { Suspense } from "react";
+import { AdminControls } from "@/components/admin-controls";
+import { contentPowers } from "@/lib/content-powers";
 import Link from "next/link";
 import { getClub } from "@/lib/clubs";
 import { joinClub, leaveClub } from "@/app/actions/clubs";
@@ -45,6 +47,7 @@ async function ClubHeader({ params }: { params: LayoutProps<"/clubs/[id]">["para
             </p>
           </div>
           <ReportButton targetType="club" targetId={club.id} compact />
+          {me.isStaff && <AdminControls kind="club" id={club.id} title={club.name} detail={club.description} {...contentPowers(me, "club")} next="/clubs" compact />}
         </div>
         <p className="mt-3 text-sm whitespace-pre-wrap text-black/75">{club.description}</p>
         {(leaderRows ?? []).length > 0 && (

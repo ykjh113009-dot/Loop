@@ -8,6 +8,7 @@ import { respondOffer, setListingSaved, withdrawOffer, makeOffer } from "@/app/a
 import { startChat } from "@/app/actions/messages";
 import { Avatar } from "@/components/avatar";
 import { ReportButton } from "@/components/report-button";
+import { AdminControls } from "@/components/admin-controls";
 import { Gallery } from "@/components/market/gallery";
 import { makeT, type Locale } from "@/lib/i18n";
 import type { ListingDetails } from "@/lib/market-details";
@@ -159,7 +160,7 @@ export function ListingDetailsView({ d, locale, onChanged, onBack }: { d: Listin
               <p className="rounded-2xl bg-black/[0.04] p-3 text-sm text-ink-2">{t("This item is no longer available.")}</p>
             ) : null}
             {error && <p role="alert" className="text-sm text-red-700">{t(error)}</p>}
-            <div><ReportButton targetType="listing" targetId={d.id} label={t("Report Listing")} /></div>
+            <div className="flex flex-wrap items-center gap-3"><ReportButton targetType="listing" targetId={d.id} label={t("Report Listing")} />{d.staff && <AdminControls kind="listing" id={d.id} title={d.title} detail={d.description} {...d.staff} next="/market" />}</div>
           </div>
         )}
       </div>

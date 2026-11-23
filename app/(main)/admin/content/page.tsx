@@ -24,14 +24,20 @@ const KINDS = [
   { id: "event", label: "Events" },
   { id: "poll", label: "Polls" },
   { id: "resource", label: "Library" },
+  { id: "challenge", label: "Challenges" },
+  { id: "volunteering", label: "Volunteering" },
+  { id: "announcement", label: "Announcements" },
+  { id: "council", label: "Council" },
 ] as const;
-const LABEL: Record<string, string> = { post: "Post", comment: "Comment", message: "Group chat message", club: "Club", group: "Group", listing: "Marketplace", event: "Event", poll: "Poll", resource: "Library" };
+const LABEL: Record<string, string> = { post: "Post", comment: "Comment", message: "Group chat message", club: "Club", group: "Group", listing: "Marketplace", event: "Event", poll: "Poll", resource: "Library", challenge: "Challenge", volunteering: "Volunteering", announcement: "Announcement", council: "Council post" };
 const OPEN: Record<string, (id: string) => string> = {
   post: (id) => `/post/${id}`, club: (id) => `/clubs/${id}`, group: (id) => `/groups/${id}`, listing: (id) => `/market/${id}`,
-  event: (id) => `/events/${id}`, resource: (id) => `/academic-resources/resource/${id}`,
+  event: (id) => `/events/${id}`, resource: (id) => `/academic-resources/resource/${id}`, challenge: (id) => `/challenges/${id}`,
 };
 // What each kind's "title" field means when editing (posts and comments have only text).
-const TITLE_LABEL: Record<string, string> = { listing: "Title", group: "Name", club: "Name", event: "Title", poll: "Question" };
+const TITLE_LABEL: Record<string, string> = { listing: "Title", group: "Name", club: "Name", event: "Title", poll: "Question", challenge: "Title", volunteering: "Title", announcement: "Title", council: "Title" };
+// Kinds that are not hidden: shown with Delete for good directly (Super Admin).
+const NO_HIDE = new Set(["poll", "announcement", "council"]);
 const NO_STATUS_CHIP = new Set(["visible", "approved", "active", "open"]);
 
 const linkTo = (kind: string, view: string) => {
@@ -109,7 +115,7 @@ async function Feed({ searchParams }: { searchParams: PageProps<"/admin/content"
                 <SubmitButton className="btn-secondary px-3.5 py-1.5 text-sm" pendingText="Closing…">Close poll</SubmitButton>
               </ActionForm>
             )}
-            {view === "active" && r.can_hide && r.kind !== "poll" && (
+            {view === "active" && r.can_hide && !NO_HIDE.has(r.kind) && (
               <details className="w-full sm:w-auto">
                 <summary className="inline-flex cursor-pointer list-none rounded-full border border-red-200 px-3.5 py-1.5 text-sm font-medium text-red-700 hover:bg-red-50 [&::-webkit-details-marker]:hidden">Hide…</summary>
                 <ActionForm action={hideContent} className="mt-2 flex flex-col gap-2 sm:flex-row">
@@ -127,7 +133,7 @@ async function Feed({ searchParams }: { searchParams: PageProps<"/admin/content"
                 <SubmitButton className="btn-primary px-3.5 py-1.5 text-sm" pendingText="Restoring…">Restore</SubmitButton>
               </ActionForm>
             )}
-            {((view === "removed" && r.can_purge) || (view === "active" && r.kind === "poll" && r.can_purge)) && (
+            {((view === "removed" && r.can_purge) || (view === "active" && NO_HIDE.has(r.kind) && r.can_purge)) && (
               <details className="w-full sm:w-auto">
                 <summary className="inline-flex cursor-pointer list-none rounded-full border border-red-300 px-3.5 py-1.5 text-sm font-medium text-red-800 hover:bg-red-50 [&::-webkit-details-marker]:hidden">Delete for good…</summary>
                 <ActionForm action={purgeContent} className="mt-2 flex flex-col gap-2 sm:min-w-[28rem]">

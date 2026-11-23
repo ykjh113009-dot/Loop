@@ -4,6 +4,7 @@ import { formatDateTime } from "@/lib/time";
 import { deletePoll } from "@/app/actions/polls";
 import { VoteForm } from "@/components/vote-form";
 import { PollResults } from "@/components/poll-results";
+import { AdminControls } from "@/components/admin-controls";
 
 type Poll = {
   id: string;
@@ -16,7 +17,7 @@ type Poll = {
 
 type Results = { show: boolean; total: number; mine: number | null; counts?: number[] };
 
-export async function PollCard({ poll, canVote, canDelete }: { poll: Poll; canVote: boolean; canDelete: boolean }) {
+export async function PollCard({ poll, canVote, canDelete, staff }: { poll: Poll; canVote: boolean; canDelete: boolean; staff?: { canHide: boolean; canEdit: boolean; canDelete: boolean } }) {
   const supabase = await createClient();
   const { data } = await supabase.rpc("poll_results", { p_poll: poll.id });
   const r = (data as Results | null) ?? { show: false, total: 0, mine: null };
@@ -28,7 +29,10 @@ export async function PollCard({ poll, canVote, canDelete }: { poll: Poll; canVo
         <p className="text-xs text-black/45">
           {poll.club ? <><ClubMark club={poll.club} /> {poll.club.name}</> : "Whole school"} · {open ? `closes ${formatDateTime(poll.closes_at)}` : "closed"}
         </p>
-        <h2 className="text-[17px] font-semibold">{poll.question}</h2>
+        <div className="flex items-start justify-between gap-3">
+          <h2 className="text-[17px] font-semibold">{poll.question}</h2>
+          {staff && <AdminControls kind="poll" id={poll.id} title={poll.question} {...staff} closable={open} next="/polls" compact />}
+        </div>
       </div>
       {open && canVote && r.mine === null && <VoteForm pollId={poll.id} options={poll.options} />}
       {r.show && r.counts ? (

@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { signImages } from "@/lib/images";
 import { CATEGORIES, CONDITIONS, priceLabel } from "@/lib/market";
 import { timeAgo } from "@/lib/time";
+import type { Me } from "@/lib/auth";
 
 export type ListingDetails = {
   id: string;
@@ -25,10 +26,12 @@ export type ListingDetails = {
   canOffer: boolean;
   myOffer: { id: string; amount: number; message: string } | null;
   offers: { id: string; name: string; avatar: string; grade: number | null; amount: number; message: string; posted: string }[];
+  /** Staff buttons (hide, edit, delete); only set for staff. The database checks every action again. */
+  staff: { canHide: boolean; canEdit: boolean; canDelete: boolean } | null;
 };
 
 // Everything the item-details view needs. The database decides what the signed-in student may see (listing, pictures, offers).
-export async function loadListingDetails(id: string, me: { id: string; isStudent: boolean; isSuspended: boolean }): Promise<ListingDetails | null> {
+export async function loadListingDetails(id: string, me: { id: string; isStudent: boolean; isSuspended: boolean } & Partial<Pick<Me, "isStaff" | "isAdmin" | "isPlatformOwner">>): Promise<ListingDetails | null> {
   if (!/^[0-9a-f-]{36}$/.test(id)) return null;
   const supabase = await createClient();
   const { data: l } = await supabase.from("listings").select("*, seller:profiles!listings_seller_id_fkey(id, full_name, avatar, grade)").eq("id", id).maybeSingle();
@@ -53,6 +56,7 @@ export async function loadListingDetails(id: string, me: { id: string; isStudent
     mine, saved: !!saved, canAct,
     canOffer: canAct && !mine && l.kind === "sell" && l.price !== null && l.status === "active",
     myOffer: myOffer ? { id: myOffer.id, amount: Number(myOffer.amount), message: myOffer.message } : null,
+    staff: me.isStaff ? { canHide: true, canEdit: !!me.isAdmin, canDelete: !!me.isPlatformOwner } : null,
     offers: (offers ?? []).map((o) => {
       const b = o.buyer as unknown as { full_name: string; avatar: string; grade: number | null } | null;
       return { id: o.id, name: b?.full_name ?? "", avatar: b?.avatar ?? "a01", grade: b?.grade ?? null, amount: Number(o.amount), message: o.message, posted: timeAgo(o.created_at) };

@@ -124,4 +124,42 @@ select tests.login(:omar);
 select tests.refused($$select * from public.admin_review_reported_conversation(gen_random_uuid(), 'A serious safety concern was reported')$$, 'Super Admin', 'a moderator cannot open a conversation');
 reset role;
 
+-- School Life kinds: challenges and volunteering hide and restore; announcements and council posts are edited or deleted.
+reset role;
+insert into public.volunteer_opportunities (school_id, title, description, created_by, status)
+  select school_id, 'Beach clean-up', 'Help clean the beach', :layla, 'open' from public.profiles where id = :layla;
+insert into public.council_posts (school_id, title, body, created_by, kind, status)
+  select school_id, 'Bigger lockers', 'Ask for bigger lockers', :layla, 'initiative', 'planned' from public.profiles where id = :layla;
+create temporary table t_sl as select
+  (select id from public.challenges where status = 'approved' order by created_at limit 1) as ch,
+  (select id from public.volunteer_opportunities where title = 'Beach clean-up') as vol,
+  (select id from public.announcements order by created_at limit 1) as ann,
+  (select id from public.council_posts where title = 'Bigger lockers') as cp;
+grant select on t_sl to authenticated;
+select tests.login(:omar);
+select tests.refused($$select public.admin_hide_content('challenge', (select ch from t_sl), 'because')$$, 'permission', 'a moderator cannot hide a challenge');
+reset role;
+select tests.login(:rania);
+select tests.ok((select count(*) from public.admin_content_list('challenge', 'active', 5)) > 0 and (select count(*) from public.admin_content_list('announcement', 'active', 5)) > 0
+  and (select count(*) from public.admin_content_list('volunteering', 'active', 5)) > 0 and (select count(*) from public.admin_content_list('council', 'active', 5)) > 0, 'the new kinds are listed');
+select public.admin_hide_content('challenge', (select ch from t_sl), 'Not suitable');
+select public.admin_hide_content('volunteering', (select vol from t_sl), 'Cancelled by the school');
+reset role;
+select tests.ok((select status from public.challenges where id = (select ch from t_sl)) = 'cancelled', 'a hidden challenge is cancelled, not deleted');
+select tests.ok((select status from public.volunteer_opportunities where id = (select vol from t_sl)) = 'cancelled', 'a hidden volunteering opportunity is cancelled, not deleted');
+select tests.login(:rania);
+select public.admin_restore_content('challenge', (select ch from t_sl));
+select public.admin_restore_content('volunteering', (select vol from t_sl));
+select public.admin_edit_content('announcement', (select ann from t_sl), 'Edited announcement', 'New words');
+select public.admin_edit_content('council', (select cp from t_sl), 'Edited initiative', 'New words');
+select public.admin_edit_content('challenge', (select ch from t_sl), 'Edited challenge', 'New words');
+select public.admin_purge_content('announcement', (select ann from t_sl), 'Out of date');
+select public.admin_purge_content('council', (select cp from t_sl), 'Duplicate idea');
+select tests.refused($$select public.admin_purge_content('challenge', (select ch from t_sl), 'because')$$, 'Hide it first', 'a challenge must be hidden before it is deleted for good');
+reset role;
+select tests.ok((select status from public.challenges where id = (select ch from t_sl)) = 'approved', 'a restored challenge is approved again');
+select tests.ok((select status from public.volunteer_opportunities where id = (select vol from t_sl)) = 'open', 'a restored volunteering opportunity is open again');
+select tests.ok((select title from public.challenges where id = (select ch from t_sl)) = 'Edited challenge', 'the challenge edit was saved');
+select tests.ok(not exists (select 1 from public.announcements where id = (select ann from t_sl)) and not exists (select 1 from public.council_posts where id = (select cp from t_sl)), 'announcements and council posts can be deleted directly by a Super Admin');
+
 rollback;
