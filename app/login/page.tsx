@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { GoogleButton } from "./google-button";
+import { OwnerSignIn } from "./owner-sign-in";
 import { demoSignIn } from "@/app/actions/auth";
 import { DEMO_ACCOUNTS, isDemoMode } from "@/lib/demo";
 import { Avatar } from "@/components/avatar";
@@ -60,6 +61,7 @@ export default function LoginPage(props: PageProps<"/login">) {
               <ErrorMessage searchParams={props.searchParams} />
             </Suspense>
             <GoogleButton />
+            <Suspense fallback={null}><OwnerSignIn /></Suspense>
             <p className="lp-domain">
               Use your <span className="lp-pill">@{SCHOOL_DOMAIN}</span> school account. Personal Gmail and other
               accounts can&apos;t join.
