@@ -33,7 +33,12 @@ const TARGETS: Record<string, string> = {
   listing: "Listing",
   question: "Question",
   answer: "Answer",
+  comment: "Comment",
+  group: "Group",
+  challenge: "Challenge",
 };
+// A report about a kind this page has no label for must never break the page.
+const targetLabel = (t: string) => TARGETS[t] ?? t.charAt(0).toUpperCase() + t.slice(1);
 
 type Report = {
   id: string;
@@ -82,9 +87,9 @@ async function Reports() {
         return (
           <article key={first.id} className={`card space-y-3 p-4 ${urgent ? "border-2 border-red-500" : ""}`}>
             <div className="flex flex-wrap items-center gap-1.5 text-xs">
-              <span className="chip">{TARGETS[first.target_type]}</span>
+              <span className="chip">{targetLabel(first.target_type)}</span>
               {[...new Set(group.map((r) => r.reason))].map((reason) => (
-                <span key={reason} className={`chip ${reason === "self_harm" ? "bg-red-100 text-red-800" : ""}`}>{REASONS[reason]}</span>
+                <span key={reason} className={`chip ${reason === "self_harm" ? "bg-red-100 text-red-800" : ""}`}>{REASONS[reason] ?? reason}</span>
               ))}
               {first.admin_only && <span className="chip bg-purple-50 text-purple-800">Private message · admins only</span>}
               <span className="ms-auto text-black/40">{timeAgo(first.created_at)}</span>
@@ -106,7 +111,7 @@ async function Reports() {
             <ul className="space-y-1 text-xs text-black/60">
               {group.map((r) => (
                 <li key={r.id}>
-                  <strong>{r.reporter?.full_name ?? "Automatic"}</strong>: {REASONS[r.reason]}
+                  <strong>{r.reporter?.full_name ?? "Automatic"}</strong>: {REASONS[r.reason] ?? r.reason}
                   {r.details && ` — “${r.details}”`}
                 </li>
               ))}
@@ -129,7 +134,7 @@ async function Reports() {
                 <input type="hidden" name="reportId" value={first.id} />
                 <input type="hidden" name="action" value="remove" />
                 <SubmitButton className={removable ? "btn-danger px-3 py-2" : "btn-secondary px-3 py-2"} pendingText="…">
-                  {removable ? `Remove ${TARGETS[first.target_type].toLowerCase()}` : "Mark as handled"}
+                  {removable ? `Remove ${targetLabel(first.target_type).toLowerCase()}` : "Mark as handled"}
                 </SubmitButton>
               </ActionForm>
             </div>
