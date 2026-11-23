@@ -32,7 +32,9 @@ export function GoogleButton() {
     return () => window.removeEventListener("pageshow", reset);
   }, []);
 
-  async function signIn() {
+  // `owner` skips the school-account hint so the platform owner can choose a personal Google account (for example Gmail).
+  // The database still refuses every address that is not on the owner list.
+  async function signIn(owner = false) {
     setLoading(true);
     setMessage(null);
     if (await googleIsOff()) {
@@ -41,7 +43,8 @@ export function GoogleButton() {
       return;
     }
     // Remembered for ten minutes so the page after Google knows where to go.
-    document.cookie = `loop_next=${kind === "admin" ? "apply-admin" : ""}; path=/; max-age=${kind === "admin" ? 600 : 0}; samesite=lax`;
+    const wantsAdmin = kind === "admin" && !owner;
+    document.cookie = `loop_next=${wantsAdmin ? "apply-admin" : ""}; path=/; max-age=${wantsAdmin ? 600 : 0}; samesite=lax`;
     const hostedDomain = process.env.NEXT_PUBLIC_GOOGLE_HOSTED_DOMAIN;
     // "hd" only makes Google suggest school accounts. The database is what
     // actually refuses other emails.
@@ -49,7 +52,7 @@ export function GoogleButton() {
       provider: "google",
       options: {
         redirectTo: `${window.location.origin}/auth/callback`,
-        queryParams: { prompt: "select_account", ...(hostedDomain ? { hd: hostedDomain } : {}) },
+        queryParams: { prompt: "select_account", ...(hostedDomain && !owner ? { hd: hostedDomain } : {}) },
       },
     });
     if (error) {
@@ -78,7 +81,7 @@ export function GoogleButton() {
           any admin access.
         </p>
       )}
-      <button type="button" onClick={signIn} disabled={loading} className="lp-gbtn">
+      <button type="button" onClick={() => signIn()} disabled={loading} className="lp-gbtn">
       {loading ? (
         <>
           <span className="lp-spin" aria-hidden="true" />
@@ -97,6 +100,9 @@ export function GoogleButton() {
           Continue with Google
         </>
       )}
+      </button>
+      <button type="button" onClick={() => signIn(true)} disabled={loading} className="lp-owner-link">
+        Platform owner? Use another Google account
       </button>
     </>
   );

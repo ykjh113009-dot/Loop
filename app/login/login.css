@@ -342,3 +342,20 @@
     transition: none;
   }
 }
+
+.lp-owner-link {
+  align-self: flex-start;
+  margin-top: 10px;
+  padding: 6px 0;
+  border: 0;
+  background: none;
+  color: var(--c-muted, #667780);
+  font: inherit;
+  font-size: 13px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.lp-owner-link:hover {
+  color: var(--c-olive);
+}
